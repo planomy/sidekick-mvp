@@ -11,7 +11,8 @@ api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
 if not api_key:
     st.warning("Please enter your OpenAI API key in the sidebar to use the app.")
     st.stop()
-openai.api_key = api_key
+
+client = openai.OpenAI(api_key=api_key)
 
 # ---------- BOOST MESSAGE ----------
 teacher_boosts = [
@@ -54,7 +55,7 @@ if tool == "Lesson Builder":
             lesson_prompt += " Align the plan with the Australian V9 curriculum."
 
         with st.spinner("Planning your lesson..."):
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a practical, creative Australian teacher."},
@@ -77,7 +78,7 @@ if tool == "Feedback Assistant":
         )
 
         with st.spinner("Analysing writing..."):
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a kind, helpful teacher giving writing feedback."},
@@ -100,7 +101,7 @@ if tool == "Email Assistant":
         )
 
         with st.spinner("Writing your email..."):
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an experienced teacher writing professional school emails."},
@@ -108,3 +109,4 @@ if tool == "Email Assistant":
                 ]
             )
             st.markdown(response.choices[0].message.content)
+
