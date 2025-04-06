@@ -116,19 +116,24 @@ if tool == "Unit Planner":
         if response and response.choices:
             import re
             unit_plan_raw = response.choices[0].message.content
-            # Clean formatting (remove **, #, etc.)
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)      # Remove bold
-            unit_plan = re.sub(r"#+\s*", "", unit_plan)                     # Remove headers
-            unit_plan = re.sub(r"\n\s*\n", "\n\n", unit_plan.strip())       # Clean spacing
-
-            # Replace "-" with "•" and indent bullet points under headings
-            cleaned_lines = []
+            
+            # Clean up: remove bold/markdown, collapse extra lines, keep double space after headings
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)       # Remove bold
+            unit_plan = re.sub(r"#+\s*", "", unit_plan)                      # Remove markdown headings
+            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())           # Collapse extra lines
+            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)               # Keep double spacing after colons
+            
+            # Replace all numbered or dashed lines with indented bullet points
+            bullet_lines = []
             for line in unit_plan.splitlines():
-                if line.strip().startswith("-"):
-                    cleaned_lines.append("   • " + line.strip()[1:].strip())  # 3 spaces indent
+                stripped = line.strip()
+                if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Matches "1. ", "2. ", or "- "
+                    bullet_lines.append("    • " + re.sub(r'^(\d+\.\s+|-\s+)', '', stripped))
                 else:
-                    cleaned_lines.append(line)
-            unit_plan = "\n".join(cleaned_lines)
+                    bullet_lines.append(line)
+            
+            unit_plan = "\n".join(bullet_lines)
+
 
 
             # Show on screen
