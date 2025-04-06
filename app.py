@@ -7,7 +7,7 @@ st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
 
 # ---------- API KEY INPUT ----------
 st.sidebar.title("🔐 API Key Setup")
-api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
+api_key = st.secrets["OPENAI_API_KEY"]
 if not api_key:
     st.warning("Please enter your OpenAI API key in the sidebar to use the app.")
     st.stop()
