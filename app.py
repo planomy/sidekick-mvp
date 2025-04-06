@@ -178,8 +178,8 @@ if tool == "Unit Glossary Generator":
         glossary_prompt = (
             f"Create a 3-tier vocabulary glossary for a Year {year} {subject} unit on '{topic}'. "
             "Use this structure:\n\n"
-            "Tier 1 (General): 5 basic words students must know.\n"
-            "Tier 2 (Core): 5 subject-specific words they will encounter in lessons.\n"
+            "Tier 1 (General): 10 basic words students must know.\n"
+            "Tier 2 (Core): 7 subject-specific words they will encounter in lessons.\n"
             "Tier 3 (Stretch): 5 challenge words that extend thinking or link to deeper understanding.\n\n"
             "Use bullet points. Keep each definition under 20 words. Use student-friendly language, especially for primary year levels."
         )
