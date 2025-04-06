@@ -145,16 +145,34 @@ if tool == "Unit Planner":
 
             # Word export
             from docx import Document
+            from docx.shared import Pt
             from io import BytesIO
+            
             doc = Document()
+            
+            # Set default font and spacing
+            style = doc.styles['Normal']
+            font = style.font
+            font.name = 'Calibri'
+            font.size = Pt(11)
+            
+            # Format each line
             for line in unit_plan.split("\n"):
-                doc.add_paragraph(line)
+                paragraph = doc.add_paragraph(line)
+                paragraph.paragraph_format.space_after = Pt(0)
+            
+                # Indent bullets
+                if line.strip().startswith("•"):
+                    paragraph.paragraph_format.left_indent = Pt(18)
+            
             word_buffer = BytesIO()
             doc.save(word_buffer)
             word_buffer.seek(0)
+            
             st.download_button("📝 Download Word", word_buffer,
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
 
             # Create PDF-safe version of the text (replace bullet with hyphen)
             pdf_safe_plan = unit_plan.replace("•", "-")
