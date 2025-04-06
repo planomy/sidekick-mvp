@@ -65,7 +65,57 @@ st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_
 
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
-tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator"])
+tool = st.sidebar.radio("Choose a tool:", ["Unit Planner", "Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator"])
+
+# ---------- TOOL 0: UNIT PLANNER ----------
+if tool == "Unit Planner":
+    st.header("📘 Unit Planner")
+
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    subject = st.text_input("Subject (e.g. HASS, English, Science)")
+    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
+    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
+
+    include_assessment = st.checkbox("Include Assessment Suggestions?")
+    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?")
+    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?")
+    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
+
+    if st.button("Generate Unit Plan"):
+        prompt_parts = [
+            f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
+            f"The unit runs for approximately {weeks} weeks.",
+            "Include the following sections:",
+            "1. A short Unit Overview (what it's about).",
+            "2. 3–5 clear Learning Intentions.",
+            "3. A suggested sequence of subtopics or concepts to explore each week.",
+            "4. A list of lesson types or activity ideas that would suit this unit."
+        ]
+
+        if include_assessment:
+            prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
+
+        if include_hook:
+            prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
+
+        if include_fast_finishers:
+            prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
+
+        if include_cheat_sheet:
+            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 5–7 bullet-point facts a teacher should know to teach this unit.")
+
+        full_prompt = " ".join(prompt_parts)
+
+        with st.spinner("Planning your unit..."):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
+                    {"role": "user", "content": full_prompt}
+                ]
+            )
+            st.markdown(response.choices[0].message.content)
+
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
