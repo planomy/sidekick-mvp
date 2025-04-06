@@ -65,7 +65,7 @@ st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_
 
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
-tool = st.sidebar.radio("Choose a tool:", ["Unit Planner", "Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator"])
+tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # ---------- TOOL 0: UNIT PLANNER ----------
 if tool == "Unit Planner":
