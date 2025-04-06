@@ -151,9 +151,9 @@ if tool == "Unit Planner":
                     pdf.cell(0, 8, txt=wrapped, ln=True)
 
             pdf_buffer = BytesIO()
-            pdf.output(pdf_buffer)
+            pdf_output = pdf.output(dest='S').encode('latin1')
             pdf_buffer.seek(0)
-            st.download_button("📎 Download PDF", data=pdf_buffer, file_name="unit_plan.pdf", mime="application/pdf")
+            st.download_button("📎 Download PDF", data=pdf_output, file_name="unit_plan.pdf", mime="application/pdf")
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
 
