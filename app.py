@@ -117,6 +117,13 @@ if tool == "Unit Planner":
         if response and response.choices:
             unit_plan = response.choices[0].message.content
             st.markdown(unit_plan)
+            import re
+
+# Clean up markdown formatting
+unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan)       # remove bold **
+unit_plan = re.sub(r"#+\s*", "", unit_plan)                  # remove markdown headers like ###
+unit_plan = re.sub(r"\n\s*\n", "\n\n", unit_plan.strip())    # normalise whitespace
+
 import re
 from docx import Document
 from fpdf import FPDF
