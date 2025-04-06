@@ -137,18 +137,18 @@ if tool == "Unit Planner":
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-            # PDF
-           from fpdf import FPDF
-import textwrap
+           # PDF
+            from fpdf import FPDF
+            import textwrap
 
-pdf = FPDF()
-pdf.add_page()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=11)
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_auto_page_break(auto=True, margin=15)
+            pdf.set_font("Arial", size=11)
 
-for line in unit_plan.split("\n"):
-    for wrapped in textwrap.wrap(line, width=90):
-        pdf.cell(0, 8, txt=wrapped, ln=True)
+            for line in unit_plan.split("\n"):
+            for wrapped in textwrap.wrap(line, width=90):
+            pdf.cell(0, 8, txt=wrapped, ln=True)
 
 # Export to byte stream correctly
 pdf_bytes = pdf.output(dest='S').encode('latin1')
