@@ -65,7 +65,7 @@ st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_
 
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
-tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant"])
+tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator"])
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
@@ -165,4 +165,30 @@ if tool == "Email Assistant":
                 ]
             )
             st.markdown(response.choices[0].message.content)
+
+# ---------- TOOL 4: UNIT GLOSSARY GENERATOR ----------
+if tool == "Unit Glossary Generator":
+    st.header("📘 Unit Glossary Generator")
+
+    subject = st.text_input("Subject (e.g. Science, HASS)")
+    topic = st.text_input("Topic or Unit Focus (e.g. Body Systems, Volcanoes)")
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+
+    if st.button("Generate Glossary"):
+        glossary_prompt = (
+            f"Create a 3-tier glossary for a Year {year} {subject} unit on '{topic}'. "
+            f"Include Tier 1 (General), Tier 2 (Core), and Tier 3 (Stretch) vocabulary. "
+            f"Use simple, student-friendly definitions, especially if the year level is in primary school."
+        )
+
+        with st.spinner("Generating vocabulary list..."):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful and experienced curriculum-aligned teacher."},
+                    {"role": "user", "content": glossary_prompt}
+                ]
+            )
+            st.markdown(response.choices[0].message.content)
+
 
