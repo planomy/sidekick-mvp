@@ -138,21 +138,22 @@ if tool == "Unit Planner":
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
            # PDF
-            from fpdf import FPDF
-            import textwrap
+           from fpdf import FPDF
+import textwrap
 
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_auto_page_break(auto=True, margin=15)
-            pdf.set_font("Arial", size=11)
+pdf = FPDF()
+pdf.add_page()
+pdf.set_auto_page_break(auto=True, margin=15)
+pdf.set_font("Arial", size=11)
 
-            for line in unit_plan.split("\n"):
-            for wrapped in textwrap.wrap(line, width=90):
-            pdf.cell(0, 8, txt=wrapped, ln=True)
+for line in unit_plan.split("\n"):
+    for wrapped in textwrap.wrap(line, width=90):
+        pdf.cell(0, 8, txt=wrapped, ln=True)
 
-# Export to byte stream correctly
+# Convert PDF output to byte stream
 pdf_bytes = pdf.output(dest='S').encode('latin1')
 st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
+
 
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
