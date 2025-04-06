@@ -117,7 +117,57 @@ if tool == "Unit Planner":
         if response and response.choices:
             unit_plan = response.choices[0].message.content
             st.markdown(unit_plan)
+import re
+from docx import Document
+from fpdf import FPDF
+from io import BytesIO
+import textwrap
 
+# --- CLEAN MARKDOWN SYNTAX ---
+def strip_markdown(md_text):
+    # Remove markdown formatting
+    text = re.sub(r'#+ ', '', md_text)                     # remove headings
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)           # bold
+    text = re.sub(r'\*(.*?)\*', r'\1', text)               # italics
+    return text
+
+clean_text = strip_markdown(unit_plan)
+
+# --- EXPORT AS MARKDOWN ---
+st.download_button("📋 Copy Markdown", clean_text, file_name="unit_plan.md")
+
+# --- EXPORT AS WORD ---
+doc = Document()
+for line in clean_text.split('\n'):
+    if line.strip().startswith("- "):
+        doc.add_paragraph(line.strip()[2:], style='List Bullet')
+    elif line.strip():
+        doc.add_paragraph(line.strip())
+
+word_buffer = BytesIO()
+doc.save(word_buffer)
+word_buffer.seek(0)
+
+st.download_button("📝 Download Word", word_buffer,
+                   file_name="unit_plan.docx",
+                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+# --- EXPORT AS PDF ---
+pdf = FPDF()
+pdf.add_page()
+pdf.set_auto_page_break(auto=True, margin=15)
+pdf.set_font("Arial", size=11)
+
+for line in clean_text.split("\n"):
+    for wrapped in textwrap.wrap(line, width=90):
+        pdf.cell(0, 8, txt=wrapped, ln=True)
+
+pdf_bytes = pdf.output(dest='S').encode('latin1')
+st.download_button("📎 Download PDF", data=pdf_bytes,
+                   file_name="unit_plan.pdf",
+                   mime="application/pdf")
+
+            
             # --- EXPORT OPTIONS ---
             st.markdown("---")
             st.subheader("📄 Export Options")
