@@ -122,13 +122,13 @@ if tool == "Unit Planner":
             unit_plan = re.sub(r"\n\s*\n", "\n\n", unit_plan.strip())       # Clean spacing
 
             # Replace "-" with "•" and indent bullet points under headings
-cleaned_lines = []
-for line in unit_plan.splitlines():
-    if line.strip().startswith("-"):
-        cleaned_lines.append("   • " + line.strip()[1:].strip())  # 3 spaces indent
-    else:
-        cleaned_lines.append(line)
-unit_plan = "\n".join(cleaned_lines)
+            cleaned_lines = []
+            for line in unit_plan.splitlines():
+                if line.strip().startswith("-"):
+                    cleaned_lines.append("   • " + line.strip()[1:].strip())  # 3 spaces indent
+                else:
+                    cleaned_lines.append(line)
+            unit_plan = "\n".join(cleaned_lines)
 
 
             # Show on screen
