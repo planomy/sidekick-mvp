@@ -71,6 +71,7 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
+    # Inputs
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
     subject = st.text_input("Subject (e.g. HASS, English, Science)")
     topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
@@ -82,6 +83,7 @@ if tool == "Unit Planner":
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
     if st.button("Generate Unit Plan"):
+        # Build the prompt
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
@@ -94,15 +96,12 @@ if tool == "Unit Planner":
 
         if include_assessment:
             prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
-
         if include_hook:
             prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
-
         if include_fast_finishers:
             prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
-
         if include_cheat_sheet:
-            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 8-10 bullet-point facts a teacher should know to teach this unit.")
+            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 5–7 bullet-point facts a teacher should know to teach this unit.")
 
         full_prompt = " ".join(prompt_parts)
 
@@ -114,60 +113,49 @@ if tool == "Unit Planner":
                     {"role": "user", "content": full_prompt}
                 ]
             )
-            st.markdown(response.choices[0].message.content)
 
-import textwrap
-from io import BytesIO
-from docx import Document
-from fpdf import FPDF
-import pyperclip
+        if response and response.choices:
+            unit_plan = response.choices[0].message.content
+            st.markdown(unit_plan)
 
-# Save the response as a variable
-unit_plan = response.choices[0].message.content
+            # --- EXPORT OPTIONS ---
+            st.markdown("---")
+            st.subheader("📄 Export Options")
 
-# Markdown Copy Button
-st.markdown("### 📋 Copy Unit Plan (Markdown)")
-st.code(unit_plan, language='markdown')
+            # Markdown
+            st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
 
-# Word Download
-doc = Document()
-doc.add_heading('Unit Plan', 0)
-for para in unit_plan.split('\n'):
-    doc.add_paragraph(para)
+            # Word
+            from docx import Document
+            from io import BytesIO
+            doc = Document()
+            doc.add_paragraph(unit_plan)
+            word_buffer = BytesIO()
+            doc.save(word_buffer)
+            word_buffer.seek(0)
+            st.download_button("📝 Download Word", word_buffer,
+                               file_name="unit_plan.docx",
+                               mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-word_buffer = BytesIO()
-doc.save(word_buffer)
-word_buffer.seek(0)
+            # PDF
+            from fpdf import FPDF
+            import textwrap
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_auto_page_break(auto=True, margin=15)
+            pdf.set_font("Arial", size=11)
+            for line in unit_plan.split("\n"):
+                for wrapped in textwrap.wrap(line, width=90):
+                    pdf.cell(0, 8, txt=wrapped, ln=True)
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer)
+            pdf_buffer.seek(0)
+            st.download_button("📎 Download PDF", pdf_buffer,
+                               file_name="unit_plan.pdf",
+                               mime="application/pdf")
+        else:
+            st.warning("⚠️ Unit plan generation failed. Please try again.")
 
-st.download_button(
-    label="📝 Download as Word",
-    data=word_buffer,
-    file_name="unit_plan.docx",
-    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-)
-
-# PDF Download
-pdf = FPDF()
-pdf.add_page()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=11)
-
-# Add each line with line wrap
-for line in unit_plan.split('\n'):
-    wrapped_lines = textwrap.wrap(line, 90)
-    for wline in wrapped_lines:
-        pdf.cell(0, 8, wline, ln=True)
-
-pdf_buffer = BytesIO()
-pdf.output(pdf_buffer)
-pdf_buffer.seek(0)
-
-st.download_button(
-    label="📄 Download as PDF",
-    data=pdf_buffer,
-    file_name="unit_plan.pdf",
-    mime="application/pdf"
-)
 
 
 
