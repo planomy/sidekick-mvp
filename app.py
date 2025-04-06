@@ -68,6 +68,7 @@ st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # ---------- TOOL 0: UNIT PLANNER ----------
+# ---------- TOOL 0: UNIT PLANNER ----------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -83,9 +84,9 @@ if tool == "Unit Planner":
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
     if st.button("Generate Unit Plan"):
-        # Build prompt
+        # Prompt build
         prompt_parts = [
-            f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
+            f"Create a unit plan overview for a Year {year} {subject} unit on {topic}.",
             f"The unit runs for approximately {weeks} weeks.",
             "Include the following sections:",
             "1. A short Unit Overview (what it's about).",
@@ -104,6 +105,7 @@ if tool == "Unit Planner":
 
         full_prompt = " ".join(prompt_parts)
 
+        # Generate
         with st.spinner("Planning your unit..."):
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
@@ -114,26 +116,23 @@ if tool == "Unit Planner":
             )
 
         if response and response.choices:
-            import re
-            unit_plan_raw = response.choices[0].message.content
-            # Clean formatting (remove **, #, etc.)
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)      # Remove bold
-            unit_plan = re.sub(r"#+\s*", "", unit_plan)                     # Remove headers
-            unit_plan = re.sub(r"\n\s*\n", "\n\n", unit_plan.strip())       # Clean spacing
+            unit_plan = response.choices[0].message.content
 
-            # Show on screen
-            st.text_area("Generated Unit Plan", unit_plan, height=400)
+            # Display clean version
+            st.subheader("Generated Unit Plan")
+            st.text(unit_plan)
 
-            # --- EXPORT OPTIONS ---
+            # Copy-friendly text box
+            st.text_area("📋 Copy-Friendly Unit Plan", unit_plan, height=400)
+
+            # Export options
             st.markdown("---")
             st.subheader("📄 Export Options")
 
-            # Markdown
-            st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
-
-            # Word export
+            # Word
             from docx import Document
             from io import BytesIO
+
             doc = Document()
             for line in unit_plan.split("\n"):
                 doc.add_paragraph(line)
@@ -144,7 +143,7 @@ if tool == "Unit Planner":
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-            # PDF export
+            # PDF
             from fpdf import FPDF
             import textwrap
 
@@ -152,18 +151,19 @@ if tool == "Unit Planner":
             pdf.add_page()
             pdf.set_auto_page_break(auto=True, margin=15)
             pdf.set_font("Arial", size=11)
+
             for line in unit_plan.split("\n"):
-                for wrapped in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, txt=wrapped, ln=True)
+                wrapped_lines = textwrap.wrap(line, width=90)
+                for wrapped_line in wrapped_lines:
+                    pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
             pdf_bytes = pdf.output(dest='S').encode('latin1')
-            st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
+            st.download_button("📎 Download PDF", data=pdf_bytes,
+                               file_name="unit_plan.pdf",
+                               mime="application/pdf")
+
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
-
-
-
-
 
 
 # ---------- TOOL 1: LESSON BUILDER ----------
