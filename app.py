@@ -116,6 +116,60 @@ if tool == "Unit Planner":
             )
             st.markdown(response.choices[0].message.content)
 
+import textwrap
+from io import BytesIO
+from docx import Document
+from fpdf import FPDF
+import pyperclip
+
+# Save the response as a variable
+unit_plan = response.choices[0].message.content
+
+# Markdown Copy Button
+st.markdown("### 📋 Copy Unit Plan (Markdown)")
+st.code(unit_plan, language='markdown')
+
+# Word Download
+doc = Document()
+doc.add_heading('Unit Plan', 0)
+for para in unit_plan.split('\n'):
+    doc.add_paragraph(para)
+
+word_buffer = BytesIO()
+doc.save(word_buffer)
+word_buffer.seek(0)
+
+st.download_button(
+    label="📝 Download as Word",
+    data=word_buffer,
+    file_name="unit_plan.docx",
+    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
+
+# PDF Download
+pdf = FPDF()
+pdf.add_page()
+pdf.set_auto_page_break(auto=True, margin=15)
+pdf.set_font("Arial", size=11)
+
+# Add each line with line wrap
+for line in unit_plan.split('\n'):
+    wrapped_lines = textwrap.wrap(line, 90)
+    for wline in wrapped_lines:
+        pdf.cell(0, 8, wline, ln=True)
+
+pdf_buffer = BytesIO()
+pdf.output(pdf_buffer)
+pdf_buffer.seek(0)
+
+st.download_button(
+    label="📄 Download as PDF",
+    data=pdf_buffer,
+    file_name="unit_plan.pdf",
+    mime="application/pdf"
+)
+
+
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
