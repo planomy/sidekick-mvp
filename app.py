@@ -83,7 +83,7 @@ if tool == "Unit Planner":
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
     if st.button("Generate Unit Plan"):
-        # Build the prompt
+        # Build prompt
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
@@ -93,7 +93,6 @@ if tool == "Unit Planner":
             "3. A suggested sequence of subtopics or concepts to explore each week.",
             "4. A list of lesson types or activity ideas that would suit this unit."
         ]
-
         if include_assessment:
             prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
         if include_hook:
@@ -101,7 +100,7 @@ if tool == "Unit Planner":
         if include_fast_finishers:
             prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
         if include_cheat_sheet:
-            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 5–7 bullet-point facts a teacher should know to teach this unit.")
 
         full_prompt = " ".join(prompt_parts)
 
@@ -115,78 +114,29 @@ if tool == "Unit Planner":
             )
 
         if response and response.choices:
-            unit_plan = response.choices[0].message.content
-            st.markdown(unit_plan)
             import re
+            unit_plan_raw = response.choices[0].message.content
+            # Clean formatting (remove **, #, etc.)
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)      # Remove bold
+            unit_plan = re.sub(r"#+\s*", "", unit_plan)                     # Remove headers
+            unit_plan = re.sub(r"\n\s*\n", "\n\n", unit_plan.strip())       # Clean spacing
 
-# Clean up markdown formatting
-unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan)       # remove bold **
-unit_plan = re.sub(r"#+\s*", "", unit_plan)                  # remove markdown headers like ###
-unit_plan = re.sub(r"\n\s*\n", "\n\n", unit_plan.strip())    # normalise whitespace
+            # Show on screen
+            st.text_area("Generated Unit Plan", unit_plan, height=400)
 
-import re
-from docx import Document
-from fpdf import FPDF
-from io import BytesIO
-import textwrap
-
-# --- CLEAN MARKDOWN SYNTAX ---
-def strip_markdown(md_text):
-    # Remove markdown formatting
-    text = re.sub(r'#+ ', '', md_text)                     # remove headings
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)           # bold
-    text = re.sub(r'\*(.*?)\*', r'\1', text)               # italics
-    return text
-
-clean_text = strip_markdown(unit_plan)
-
-# --- EXPORT AS MARKDOWN ---
-st.download_button("📋 Copy Markdown", clean_text, file_name="unit_plan.md")
-
-# --- EXPORT AS WORD ---
-doc = Document()
-for line in clean_text.split('\n'):
-    if line.strip().startswith("- "):
-        doc.add_paragraph(line.strip()[2:], style='List Bullet')
-    elif line.strip():
-        doc.add_paragraph(line.strip())
-
-word_buffer = BytesIO()
-doc.save(word_buffer)
-word_buffer.seek(0)
-
-st.download_button("📝 Download Word", word_buffer,
-                   file_name="unit_plan.docx",
-                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-# --- EXPORT AS PDF ---
-pdf = FPDF()
-pdf.add_page()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=11)
-
-for line in clean_text.split("\n"):
-    for wrapped in textwrap.wrap(line, width=90):
-        pdf.cell(0, 8, txt=wrapped, ln=True)
-
-pdf_bytes = pdf.output(dest='S').encode('latin1')
-st.download_button("📎 Download PDF", data=pdf_bytes,
-                   file_name="unit_plan.pdf",
-                   mime="application/pdf")
-
-            
             # --- EXPORT OPTIONS ---
             st.markdown("---")
             st.subheader("📄 Export Options")
 
-            # Markdown download
+            # Markdown
             st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
 
-            # Word download
+            # Word export
             from docx import Document
             from io import BytesIO
             doc = Document()
-            doc.add_paragraph(unit_plan)
+            for line in unit_plan.split("\n"):
+                doc.add_paragraph(line)
             word_buffer = BytesIO()
             doc.save(word_buffer)
             word_buffer.seek(0)
@@ -194,7 +144,7 @@ st.download_button("📎 Download PDF", data=pdf_bytes,
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-            # PDF download
+            # PDF export
             from fpdf import FPDF
             import textwrap
 
@@ -202,17 +152,15 @@ st.download_button("📎 Download PDF", data=pdf_bytes,
             pdf.add_page()
             pdf.set_auto_page_break(auto=True, margin=15)
             pdf.set_font("Arial", size=11)
-
             for line in unit_plan.split("\n"):
                 for wrapped in textwrap.wrap(line, width=90):
                     pdf.cell(0, 8, txt=wrapped, ln=True)
 
-            pdf_buffer = BytesIO()
-            pdf_output = pdf.output(dest='S').encode('latin1')
-            pdf_buffer.seek(0)
-            st.download_button("📎 Download PDF", data=pdf_output, file_name="unit_plan.pdf", mime="application/pdf")
+            pdf_bytes = pdf.output(dest='S').encode('latin1')
+            st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
+
 
 
 
