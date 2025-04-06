@@ -68,6 +68,7 @@ st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # ---------- TOOL 0: UNIT PLANNER ----------
+# ---------- TOOL 0: UNIT PLANNER ----------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -116,95 +117,81 @@ if tool == "Unit Planner":
         if response and response.choices:
             import re
             unit_plan_raw = response.choices[0].message.content
-            
-            # Clean up: remove bold/markdown, collapse extra lines, keep double space after headings
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)       # Remove bold
-            unit_plan = re.sub(r"#+\s*", "", unit_plan)                      # Remove markdown headings
-            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())           # Collapse extra lines
-            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)               # Keep double spacing after colons
-            
-            # Replace all numbered or dashed lines with indented bullet points
+
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
+            unit_plan = re.sub(r"#+\s*", "", unit_plan)
+            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())
+            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)
+
             bullet_lines = []
             for line in unit_plan.splitlines():
                 stripped = line.strip()
-                if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Matches "1. ", "2. ", or "- "
+                if re.match(r'^(\d+\.\s+|-\s+)', stripped):
                     bullet_lines.append("    • " + re.sub(r'^(\d+\.\s+|-\s+)', '', stripped))
                 else:
                     bullet_lines.append(line)
-            
+
             unit_plan = "\n".join(bullet_lines)
+            st.session_state["unit_plan"] = unit_plan
 
+    # --- EXPORT + DISPLAY ---
+    if "unit_plan" in st.session_state:
+        export_text = st.session_state["unit_plan"]
 
+        st.text_area("Generated Unit Plan", export_text, height=400)
 
-            # Show on screen
-            st.text_area("Generated Unit Plan", unit_plan, height=400)
+        st.markdown("---")
+        st.subheader("📄 Export Options")
 
-            # --- EXPORT OPTIONS ---
-            st.markdown("---")
-            st.subheader("📄 Export Options")
+        # WORD EXPORT
+        from docx import Document
+        from docx.shared import Pt
+        from io import BytesIO
 
-            # Word export
-            from docx import Document
-            from docx.shared import Pt
-            from io import BytesIO
-            
-            doc = Document()
-            
-            # Set base style
-            style = doc.styles['Normal']
-            font = style.font
-            font.name = 'Calibri'
-            font.size = Pt(11)
-            
-            for line in unit_plan.split("\n"):
-                stripped = line.strip()
-            
-                # Bullet line (starts with • but is not a heading)
-                if stripped.startswith("•") and not stripped.endswith(":"):
-                    p = doc.add_paragraph(stripped)
-                    p.paragraph_format.left_indent = Pt(18)
-                    p.paragraph_format.space_after = Pt(0)
-            
-                # Heading (ends with a colon)
-                elif stripped.endswith(":"):
-                    p = doc.add_paragraph(stripped)
-                    p.paragraph_format.space_after = Pt(8)
-            
-                # Regular text
-                elif stripped:
-                    p = doc.add_paragraph(stripped)
-                    p.paragraph_format.space_after = Pt(0)
-            
-            word_buffer = BytesIO()
-            doc.save(word_buffer)
-            word_buffer.seek(0)
-            
-            st.download_button("📝 Download Word", word_buffer,
-                               file_name="unit_plan.docx",
-                               mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        doc = Document()
+        style = doc.styles['Normal']
+        font = style.font
+        font.name = 'Calibri'
+        font.size = Pt(11)
 
+        for line in export_text.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("•") and not stripped.endswith(":"):
+                p = doc.add_paragraph(stripped)
+                p.paragraph_format.left_indent = Pt(18)
+                p.paragraph_format.space_after = Pt(0)
+            elif stripped.endswith(":"):
+                p = doc.add_paragraph(stripped)
+                p.paragraph_format.space_after = Pt(8)
+            elif stripped:
+                p = doc.add_paragraph(stripped)
+                p.paragraph_format.space_after = Pt(0)
 
+        word_buffer = BytesIO()
+        doc.save(word_buffer)
+        word_buffer.seek(0)
 
-            # Create PDF-safe version of the text (replace bullet with hyphen)
-            pdf_safe_plan = unit_plan.replace("•", "-")
-            
-            from fpdf import FPDF
-            import textwrap
-            
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_auto_page_break(auto=True, margin=15)
-            pdf.set_font("Arial", size=11)
-            
-            for line in pdf_safe_plan.split("\n"):
-                for wrapped in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, txt=wrapped, ln=True)
-            
-            pdf_bytes = pdf.output(dest='S').encode('latin1')
-            st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-        else:
-            st.warning("⚠️ Unit plan generation failed. Please try again.")
+        # PDF EXPORT
+        from fpdf import FPDF
+        import textwrap
+
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Arial", size=11)
+
+        pdf_text = export_text.replace("•", "-")
+
+        for line in pdf_text.split("\n"):
+            for wrapped in textwrap.wrap(line, width=90):
+                pdf.cell(0, 8, txt=wrapped, ln=True)
+
+        pdf_bytes = pdf.output(dest='S').encode('latin1')
+        st.download_button("📌 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
 
 
 
