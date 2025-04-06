@@ -37,6 +37,20 @@ funny_boosts = [
     "They think you're powered by knowledge. It’s actually snacks and spite. 🍫😈"
 ]
 
+sarcastic_boosts = [
+    "Ah yes, because *that* worksheet will definitely solve all behaviour problems. 📄✨",
+    "Nothing says ‘I’m valued’ like being handed a new policy at 8:59am. 🕘💼",
+    "Sure, I’ll just invent an extra hour in the day. No worries. 🕐✨",
+    "Of course I’ll differentiate this lesson... for 28 students... during lunch. 🍽🤡",
+    "Great idea—let’s fix student motivation with another meeting. 🧠🎯",
+    "Marking on a Friday night? Living the dream. 🍷📚",
+    "The photocopier jammed again? Wow, how refreshing. 🖨🔥",
+    "Yes, little Timmy, I do this job just for the fame and fortune. 💰😎",
+    "Don't worry, I’ll just read your mind next time instead of asking for your name. 🧠🔮",
+    "Another email. I was worried my inbox was getting too manageable. 📥📥📥",
+    "Let me drop everything to print that thing you forgot. That's what I'm here for. 🏃‍♂️🖨",
+    "Oh good, another last-minute ‘urgent’ change. Love those. 🧨"
+]
 
 teacher_facts = [
     "The average teacher makes over 1,500 educational decisions per day. 🤯",
@@ -47,7 +61,7 @@ teacher_facts = [
 ]
 
 st.title("📚 Planomy – Teacher Super Aid")
-st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts))
+st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_boosts))
 
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
