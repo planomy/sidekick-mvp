@@ -70,28 +70,55 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
+
     year = st.selectbox("Year Level", ["7", "8", "9", "10", "11", "12"])
     subject = st.text_input("Subject (e.g. English, Science)")
     topic = st.text_input("Lesson Topic or Focus")
+
+    duration = st.slider("Lesson Duration (minutes)", 30, 120, 70, step=5)
+    sequence = st.selectbox("How many lessons do you want?", ["1 (Single Lesson)", "2", "3", "4", "5 (Full Week)"])
+
+    goal_focus = st.selectbox("Learning Goal Focus", ["Skills-Based", "Knowledge-Based", "Critical Thinking", "Creative Thinking"])
     include_curriculum = st.checkbox("Include V9 curriculum reference")
+    device_use = st.selectbox("Device Use", ["Laptops", "iPads", "Both", "No Devices"])
+    grouping = st.selectbox("Grouping Preference", ["Individual", "Pairs", "Small Groups", "Whole Class"])
+    differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
+    lesson_style = st.selectbox("Lesson Style", ["Hands-On", "Discussion-Based", "Quiet/Reflective", "Creative"])
+    assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
 
     if st.button("Generate Lesson Plan"):
-        lesson_prompt = (
-            f"Create a 70-minute Year {year} {subject} lesson on '{topic}'. "
-            f"Structure it with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket."
-        )
-        if include_curriculum:
-            lesson_prompt += " Align the plan with the Australian V9 curriculum."
+        lesson_count = sequence.split()[0]
 
-        with st.spinner("Planning your lesson..."):
+        prompt_parts = [
+            f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
+            f"Start the lesson with a clear Learning Goal aligned to a {goal_focus.lower()} outcome.",
+            f"Structure each lesson with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket.",
+            f"The lesson should use {device_use.lower()}.",
+            f"Students should work in {grouping.lower()}.",
+            f"Use a {lesson_style.lower()} approach."
+        ]
+
+        if differentiation:
+            prompt_parts.append(f"Include differentiation strategies for: {', '.join(differentiation)}.")
+
+        if assessment != "No Assessment":
+            prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
+
+        if include_curriculum:
+            prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
+
+        full_prompt = " ".join(prompt_parts)
+
+        with st.spinner("Planning your lesson(s)..."):
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a practical, creative Australian teacher."},
-                    {"role": "user", "content": lesson_prompt}
+                    {"role": "user", "content": full_prompt}
                 ]
             )
             st.markdown(response.choices[0].message.content)
+
 
 # ---------- TOOL 2: FEEDBACK ASSISTANT ----------
 if tool == "Feedback Assistant":
