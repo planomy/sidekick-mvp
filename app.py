@@ -68,7 +68,6 @@ st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # ---------- TOOL 0: UNIT PLANNER ----------
-# ---------- TOOL 0: UNIT PLANNER ----------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -116,6 +115,7 @@ if tool == "Unit Planner":
 
         if response and response.choices:
             import re
+
             unit_plan_raw = response.choices[0].message.content
 
             unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
@@ -129,71 +129,77 @@ if tool == "Unit Planner":
                 if re.match(r'^(\d+\.\s+|-\s+)', stripped):
                     bullet_lines.append("    • " + re.sub(r'^(\d+\.\s+|-\s+)', '', stripped))
                 else:
-                    bullet_lines.append(line)
+                    bullet_lines.append(stripped)
 
-            unit_plan = "\n".join(bullet_lines)
-            st.session_state["unit_plan"] = unit_plan
+            cleaned_plan = "\n".join(bullet_lines)
+            st.session_state["unit_plan"] = cleaned_plan
 
-    # --- EXPORT + DISPLAY ---
-    if "unit_plan" in st.session_state:
-        export_text = st.session_state["unit_plan"]
+            st.text_area("Generated Unit Plan", cleaned_plan, height=400)
 
-        st.text_area("Generated Unit Plan", export_text, height=400)
+            st.markdown("---")
+            st.subheader("📄 Export Options")
 
-        st.markdown("---")
-        st.subheader("📄 Export Options")
+            if "unit_plan" in st.session_state:
+                export_text = st.session_state["unit_plan"]
 
-        # WORD EXPORT
-        from docx import Document
-        from docx.shared import Pt
-        from io import BytesIO
+                from docx import Document
+                from docx.shared import Pt
+                from io import BytesIO
 
-        doc = Document()
-        style = doc.styles['Normal']
-        font = style.font
-        font.name = 'Calibri'
-        font.size = Pt(11)
+                doc = Document()
+                style = doc.styles['Normal']
+                font = style.font
+                font.name = 'Calibri'
+                font.size = Pt(11)
 
-        for line in export_text.split("\n"):
-            stripped = line.strip()
-            if stripped.startswith("•") and not stripped.endswith(":"):
-                p = doc.add_paragraph(stripped)
-                p.paragraph_format.left_indent = Pt(18)
-                p.paragraph_format.space_after = Pt(0)
-            elif stripped.endswith(":"):
-                p = doc.add_paragraph(stripped)
-                p.paragraph_format.space_after = Pt(8)
-            elif stripped:
-                p = doc.add_paragraph(stripped)
-                p.paragraph_format.space_after = Pt(0)
+                lines = export_text.split("\n")
+                for i, line in enumerate(lines):
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    if stripped.startswith("•") and not stripped.endswith(":"):
+                        p = doc.add_paragraph(stripped)
+                        p.paragraph_format.left_indent = Pt(18)
+                        p.paragraph_format.space_after = Pt(0)
+                    elif stripped.endswith(":"):
+                        p = doc.add_paragraph(stripped)
+                        p.paragraph_format.space_after = Pt(10)
+                    else:
+                        p = doc.add_paragraph(stripped)
+                        p.paragraph_format.space_after = Pt(0)
 
-        word_buffer = BytesIO()
-        doc.save(word_buffer)
-        word_buffer.seek(0)
+                word_buffer = BytesIO()
+                doc.save(word_buffer)
+                word_buffer.seek(0)
 
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                st.download_button("📝 Download Word", word_buffer,
+                                   file_name="unit_plan.docx",
+                                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-        # PDF EXPORT
-        from fpdf import FPDF
-        import textwrap
+                from fpdf import FPDF
+                import textwrap
 
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=11)
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_auto_page_break(auto=True, margin=15)
+                pdf.set_font("Arial", size=11)
 
-        pdf_text = export_text.replace("•", "-")
+                pdf_text = export_text.replace("•", "-")
 
-        for line in pdf_text.split("\n"):
-            for wrapped in textwrap.wrap(line, width=90):
-                pdf.cell(0, 8, txt=wrapped, ln=True)
+                for line in pdf_text.split("\n"):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    for wrapped in textwrap.wrap(line, width=90):
+                        pdf.cell(0, 8, txt=wrapped, ln=True)
+                    if line.endswith(":"):
+                        pdf.cell(0, 4, txt="", ln=True)
 
-        pdf_bytes = pdf.output(dest='S').encode('latin1')
-        st.download_button("📌 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
+                pdf_bytes = pdf.output(dest='S').encode('latin1')
+                st.download_button("📌 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
 
-
+        else:
+            st.warning("⚠️ Unit plan generation failed. Please try again.")
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
