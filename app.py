@@ -68,7 +68,7 @@ st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # ---------- TOOL 0: UNIT PLANNER ----------
-if tool == "Unit Planner":
+elif tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
     # Inputs
@@ -122,10 +122,10 @@ if tool == "Unit Planner":
             st.markdown("---")
             st.subheader("📄 Export Options")
 
-            # Markdown
+            # Markdown download
             st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
 
-            # Word
+            # Word download
             from docx import Document
             from io import BytesIO
             doc = Document()
@@ -137,7 +137,7 @@ if tool == "Unit Planner":
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-           # PDF
+            # PDF download
             from fpdf import FPDF
             import textwrap
 
@@ -150,13 +150,13 @@ if tool == "Unit Planner":
                 for wrapped in textwrap.wrap(line, width=90):
                     pdf.cell(0, 8, txt=wrapped, ln=True)
 
-# Convert PDF output to byte stream
-pdf_bytes = pdf.output(dest='S').encode('latin1')
-st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
-
-
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer)
+            pdf_buffer.seek(0)
+            st.download_button("📎 Download PDF", data=pdf_buffer, file_name="unit_plan.pdf", mime="application/pdf")
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
+
 
 
 
