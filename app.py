@@ -68,7 +68,7 @@ st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # ---------- TOOL 0: UNIT PLANNER ----------
-elif tool == "Unit Planner":
+if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
     # Inputs
