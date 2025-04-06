@@ -138,7 +138,7 @@ if tool == "Unit Planner":
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
            # PDF
-           from fpdf import FPDF
+            from fpdf import FPDF
             import textwrap
 
             pdf = FPDF()
