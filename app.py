@@ -150,24 +150,30 @@ if tool == "Unit Planner":
             
             doc = Document()
             
-            # Set default font and spacing
+            # Set base style
             style = doc.styles['Normal']
             font = style.font
             font.name = 'Calibri'
             font.size = Pt(11)
             
-            # Format each line
             for line in unit_plan.split("\n"):
-                paragraph = doc.add_paragraph(line)
-                paragraph.paragraph_format.space_after = Pt(0)
+                stripped = line.strip()
             
-                # Indent bullets
-                if line.strip().startswith("•"):
-                    paragraph.paragraph_format.left_indent = Pt(18)
-
-                # Add spacing *after* section headings
-                elif line.strip().endswith(":"):
-                    paragraph.paragraph_format.space_after = Pt(8)
+                # Bullet line (starts with • but is not a heading)
+                if stripped.startswith("•") and not stripped.endswith(":"):
+                    p = doc.add_paragraph(stripped)
+                    p.paragraph_format.left_indent = Pt(18)
+                    p.paragraph_format.space_after = Pt(0)
+            
+                # Heading (ends with a colon)
+                elif stripped.endswith(":"):
+                    p = doc.add_paragraph(stripped)
+                    p.paragraph_format.space_after = Pt(8)
+            
+                # Regular text
+                elif stripped:
+                    p = doc.add_paragraph(stripped)
+                    p.paragraph_format.space_after = Pt(0)
             
             word_buffer = BytesIO()
             doc.save(word_buffer)
@@ -176,6 +182,7 @@ if tool == "Unit Planner":
             st.download_button("📝 Download Word", word_buffer,
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
 
 
             # Create PDF-safe version of the text (replace bullet with hyphen)
