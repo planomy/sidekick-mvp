@@ -164,6 +164,10 @@ if tool == "Unit Planner":
                 # Indent bullets
                 if line.strip().startswith("•"):
                     paragraph.paragraph_format.left_indent = Pt(18)
+
+                # Add spacing *after* section headings
+                elif line.strip().endswith(":"):
+                    paragraph.paragraph_format.space_after = Pt(8)
             
             word_buffer = BytesIO()
             doc.save(word_buffer)
