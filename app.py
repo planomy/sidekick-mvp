@@ -67,16 +67,15 @@ st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_
 st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
-# ---------- TOOL 0: UNIT PLANNER ----------
+# --- UNIT PLANNER TOOL ---
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
-    # Inputs
+    # Input fields
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
     subject = st.text_input("Subject (e.g. HASS, English, Science)")
     topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
     weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
-
     include_assessment = st.checkbox("Include Assessment Suggestions?")
     include_hook = st.checkbox("Include Hook Ideas for Lesson 1?")
     include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?")
@@ -84,25 +83,25 @@ if tool == "Unit Planner":
 
     if st.button("Generate Unit Plan"):
         # Build prompt
-        prompt_parts = [
+        prompt = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
             "Include the following sections:",
-            "1. A short Unit Overview (what it's about).",
-            "2. 3–5 clear Learning Intentions.",
-            "3. A suggested sequence of subtopics or concepts to explore each week.",
-            "4. A list of lesson types or activity ideas that would suit this unit."
+            "1. Unit Overview",
+            "2. 3–5 clear Learning Intentions",
+            "3. Suggested sequence of subtopics or concepts to explore each week",
+            "4. List of lesson types or activity ideas that would suit this unit"
         ]
         if include_assessment:
-            prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
+            prompt.append("5. Include 1–2 assessment ideas")
         if include_hook:
-            prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
+            prompt.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1")
         if include_fast_finishers:
-            prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
+            prompt.append("7. Suggest Fast Finisher or Extension Task ideas")
         if include_cheat_sheet:
-            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+            prompt.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts")
 
-        full_prompt = " ".join(prompt_parts)
+        full_prompt = " ".join(prompt)
 
         with st.spinner("Planning your unit..."):
             response = client.chat.completions.create(
@@ -115,91 +114,88 @@ if tool == "Unit Planner":
 
         if response and response.choices:
             import re
-
             unit_plan_raw = response.choices[0].message.content
 
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
+            # --- Clean formatting ---
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\\1", unit_plan_raw)
             unit_plan = re.sub(r"#+\s*", "", unit_plan)
             unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())
-            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)
+            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)  # double space after headings
 
             bullet_lines = []
             for line in unit_plan.splitlines():
                 stripped = line.strip()
-                if re.match(r'^(\d+\.\s+|-\s+)', stripped):
-                    bullet_lines.append("    • " + re.sub(r'^(\d+\.\s+|-\s+)', '', stripped))
-                else:
+                if re.match(r'^\d+\.\s+|^-\s+', stripped):
+                    bullet_lines.append("    • " + re.sub(r'^\d+\.\s+|^-\s+', '', stripped))
+                elif stripped.endswith(":"):
+                    bullet_lines.append("\n" + stripped)
+                elif stripped:
                     bullet_lines.append(stripped)
-
             cleaned_plan = "\n".join(bullet_lines)
+
             st.session_state["unit_plan"] = cleaned_plan
 
-            st.text_area("Generated Unit Plan", cleaned_plan, height=400)
+    # Show unit plan if already generated
+    if "unit_plan" in st.session_state:
+        st.text_area("Generated Unit Plan", st.session_state["unit_plan"], height=400)
 
-            st.markdown("---")
-            st.subheader("📄 Export Options")
+        # --- Export Options ---
+        st.markdown("---")
+        st.subheader("📄 Export Options")
 
-            if "unit_plan" in st.session_state:
-                export_text = st.session_state["unit_plan"]
+        export_text = st.session_state["unit_plan"]
 
-                from docx import Document
-                from docx.shared import Pt
-                from io import BytesIO
+        # Word export
+        from docx import Document
+        from docx.shared import Pt
+        from io import BytesIO
 
-                doc = Document()
-                style = doc.styles['Normal']
-                font = style.font
-                font.name = 'Calibri'
-                font.size = Pt(11)
+        doc = Document()
+        style = doc.styles['Normal']
+        font = style.font
+        font.name = 'Calibri'
+        font.size = Pt(11)
 
-                lines = export_text.split("\n")
-                for i, line in enumerate(lines):
-                    stripped = line.strip()
-                    if not stripped:
-                        continue
-                    if stripped.startswith("•") and not stripped.endswith(":"):
-                        p = doc.add_paragraph(stripped)
-                        p.paragraph_format.left_indent = Pt(18)
-                        p.paragraph_format.space_after = Pt(0)
-                    elif stripped.endswith(":"):
-                        p = doc.add_paragraph(stripped)
-                        p.paragraph_format.space_after = Pt(10)
-                    else:
-                        p = doc.add_paragraph(stripped)
-                        p.paragraph_format.space_after = Pt(0)
+        for line in export_text.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("\u2022") and not stripped.endswith(":"):
+                p = doc.add_paragraph(stripped)
+                p.paragraph_format.left_indent = Pt(18)
+                p.paragraph_format.space_after = Pt(0)
+            elif stripped.endswith(":"):
+                p = doc.add_paragraph(stripped)
+                p.paragraph_format.space_after = Pt(8)
+            elif stripped:
+                p = doc.add_paragraph(stripped)
+                p.paragraph_format.space_after = Pt(0)
 
-                word_buffer = BytesIO()
-                doc.save(word_buffer)
-                word_buffer.seek(0)
+        word_buffer = BytesIO()
+        doc.save(word_buffer)
+        word_buffer.seek(0)
 
-                st.download_button("📝 Download Word", word_buffer,
-                                   file_name="unit_plan.docx",
-                                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-                from fpdf import FPDF
-                import textwrap
+        # PDF export
+        from fpdf import FPDF
+        import textwrap
 
-                pdf = FPDF()
-                pdf.add_page()
-                pdf.set_auto_page_break(auto=True, margin=15)
-                pdf.set_font("Arial", size=11)
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Arial", size=11)
+        pdf_text = export_text.replace("\u2022", "-")
 
-                pdf_text = export_text.replace("•", "-")
+        for line in pdf_text.split("\n"):
+            for wrapped in textwrap.wrap(line, width=90):
+                pdf.cell(0, 8, txt=wrapped, ln=True)
 
-                for line in pdf_text.split("\n"):
-                    line = line.strip()
-                    if not line:
-                        continue
-                    for wrapped in textwrap.wrap(line, width=90):
-                        pdf.cell(0, 8, txt=wrapped, ln=True)
-                    if line.endswith(":"):
-                        pdf.cell(0, 4, txt="", ln=True)
+        pdf_bytes = pdf.output(dest='S').encode('latin1')
+        st.download_button("📌 Download PDF", data=pdf_bytes,
+                           file_name="unit_plan.pdf",
+                           mime="application/pdf")
 
-                pdf_bytes = pdf.output(dest='S').encode('latin1')
-                st.download_button("📌 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
-
-        else:
-            st.warning("⚠️ Unit plan generation failed. Please try again.")
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
