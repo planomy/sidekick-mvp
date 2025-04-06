@@ -176,9 +176,15 @@ if tool == "Unit Glossary Generator":
 
     if st.button("Generate Glossary"):
         glossary_prompt = (
-            f"Create a 3-tier glossary for a Year {year} {subject} unit on '{topic}'. "
-            f"Include Tier 1 (General), Tier 2 (Core), and Tier 3 (Stretch) vocabulary. "
-            f"Use simple, student-friendly definitions, especially if the year level is in primary school."
+           "Create a 3-tier vocabulary glossary for a Year {year} {subject} unit on '{topic}'. 
+Use this structure:
+
+Tier 1 (General): 5 basic words students must know.
+Tier 2 (Core): 5 subject-specific words they will encounter in lessons.
+Tier 3 (Stretch): 5 challenge words that extend thinking or link to deeper understanding.
+
+Use bullet points. Keep each definition under 20 words and use student-friendly language."
+
         )
 
         with st.spinner("Generating vocabulary list..."):
