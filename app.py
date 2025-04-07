@@ -271,13 +271,13 @@ if "unit_plan_text" in st.session_state:
 import textwrap
 
 # Bullet points section
-elif stripped.startswith("•") or stripped.startswith("    •"):  # Ensure the bullet points are detected properly
+elif stripped.startswith("•") or stripped.startswith("*"):  # Ensure the bullet points are detected properly
     clean = stripped.replace("•", "").strip()  # Remove the bullet symbol if necessary
-
     # Process wrapped text for each bullet point
     for i, wrapped in enumerate(textwrap.wrap(clean, width=90)):
         # Indent continuation lines with cell(10) and normal cell for others
         pdf.cell(10 if i == 0 else 14, 6, wrapped, ln=True)  # Fix indentation handling
+
 
 # Regular paragraph text (non-bullet)
 else:
