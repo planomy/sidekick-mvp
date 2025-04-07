@@ -238,8 +238,6 @@ from fpdf import FPDF
 import textwrap
 from io import BytesIO
 
-# Check the content of the unit plan
-st.write(unit_plan)  # Temporary debug line to inspect the content
 
 # Ensure unit_plan is not empty
 if unit_plan:
