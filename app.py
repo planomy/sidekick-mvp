@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Timer", "Feeling Peckish"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Timer", "Feeling Peckish", "Self Care Tool"]
 )
 
 # ========== HELPER FUNCTION ==========
@@ -331,4 +331,22 @@ elif tool == "Feeling Peckish":
             )
         st.markdown(recipe, unsafe_allow_html=True)
 
-
+# ========== SELF CARE ==========
+elif tool == "Self Care Tool":
+    st.header("💖 Self Care Tool")
+    # Optionally ask how the user is feeling
+    mood = st.selectbox("How are you feeling today?", ["Stressed", "Happy", "Tired", "Lonely", "Motivated", "Calm"])
+    if st.button("Get Self Care Tip"):
+        self_care_prompt = (
+            f"Provide a self care tip for someone who is feeling {mood}. "
+            "Include some amusing or uplifting advice about what they can do today, "
+            "and tell them something amazing about themselves."
+        )
+        with st.spinner("Generating self care tip..."):
+            tip = chat_completion_request(
+                system_msg="You are a caring self care advisor who offers thoughtful, humorous, and uplifting self care tips.",
+                user_msg=self_care_prompt,
+                max_tokens=300,
+                temperature=0.8
+            )
+        st.markdown(tip, unsafe_allow_html=True)
