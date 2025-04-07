@@ -69,6 +69,8 @@ teacher_facts = [
 
 st.title("📚 Planomy – Teacher Super Aid")
 st.info(random.choice(teacher_boosts))  # Show a random boost message
+
+
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
@@ -78,21 +80,30 @@ if tool != "Unit Planner":
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
 
-
-    # ---------- TOOL 0: UNIT PLANNER ---------
+# ---------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
-    # Input Fields for the Unit Planner (Only shown when Unit Planner is selected)
-    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
-    subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
-    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
-    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key="unit_weeks")
+    # Use dynamic keys to avoid conflicts across tools
+    year_key = f"unit_year_{tool}"
+    subject_key = f"unit_subject_{tool}"
+    topic_key = f"unit_topic_{tool}"
+    weeks_key = f"unit_weeks_{tool}"
+    assessment_key = f"unit_assessment_{tool}"
+    hook_key = f"unit_hook_{tool}"
+    fast_finishers_key = f"unit_fast_finishers_{tool}"
+    cheat_sheet_key = f"unit_cheat_sheet_{tool}"
 
-    include_assessment = st.checkbox("Include Assessment Suggestions?", key="unit_assessment")
-    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key="unit_hook")
-    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
-    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
+    # Input Fields for the Unit Planner (Only shown when Unit Planner is selected)
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key=year_key)
+    subject = st.text_input("Subject (e.g. HASS, English, Science)", key=subject_key)
+    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key=topic_key)
+    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key=weeks_key)
+
+    include_assessment = st.checkbox("Include Assessment Suggestions?", key=assessment_key)
+    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key=hook_key)
+    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key=fast_finishers_key)
+    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key=cheat_sheet_key)
 
     if st.button("Generate Unit Plan", key="generate_unit_plan"):
         # Construct the prompt
@@ -147,60 +158,58 @@ if tool == "Unit Planner":
         final_text = "\n".join(bullet_lines)
         st.session_state["unit_plan_text"] = final_text
 
-    # Unique Key for Selectbox
-year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key=f"unit_year_{random.randint(1000,9999)}")
-
-# Display Unit Plan after generation
-if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-    st.markdown("### Generated Unit Plan")
+    # Display Unit Plan after generation
+    if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
+        st.markdown("### Generated Unit Plan")
     
-    # Ensure unit plan is cleanly displayed
-    st.markdown(
-        f"""
-        <div style="background-color: #ffffff; padding: 20px; border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7; color: #222; white-space: pre-wrap; text-align: left;">
-            {st.session_state['unit_plan_text']}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        # Ensure unit plan is cleanly displayed
+        st.markdown(
+            f"""
+            <div style="background-color: #ffffff; padding: 20px; border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7; color: #222; white-space: pre-wrap; text-align: left;">
+                {st.session_state['unit_plan_text']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    # Word export button (buffer handling)
-    word_buffer = BytesIO()
-    doc = Document()
-    doc.add_paragraph(st.session_state["unit_plan_text"])
-    doc.save(word_buffer)
-    word_buffer.seek(0)
+        # Word export button (buffer handling)
+        word_buffer = BytesIO()
+        doc = Document()
+        doc.add_paragraph(st.session_state["unit_plan_text"])
+        doc.save(word_buffer)
+        word_buffer.seek(0)
 
-    # Word Download Button
-    st.download_button("📝 Download Word", word_buffer,
-                       file_name="unit_plan.docx",
-                       mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                       key="download_word")
+        # Word Download Button
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                           key="download_word")
 
-    # PDF export button (with custom font)
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-    pdf.set_font("DejaVu", size=10)
+        # PDF export button (with custom font)
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+        pdf.set_font("DejaVu", size=10)
 
-    # Write unit plan text to the PDF
-    for line in st.session_state["unit_plan_text"].split("\n"):
-        wrapped_lines = textwrap.wrap(line, width=90)
-        for wrapped_line in wrapped_lines:
-            pdf.cell(0, 8, txt=wrapped_line, ln=True)
+        # Write unit plan text to the PDF
+        for line in st.session_state["unit_plan_text"].split("\n"):
+            wrapped_lines = textwrap.wrap(line, width=90)
+            for wrapped_line in wrapped_lines:
+                pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-    # PDF buffer
-    pdf_buffer = BytesIO()
-    pdf_output = pdf.output(dest='S')
-    pdf_buffer.write(pdf_output.encode('latin1'))
-    pdf_buffer.seek(0)
+        # PDF buffer
+        pdf_buffer = BytesIO()
+        pdf_output = pdf.output(dest='S')
+        pdf_buffer.write(pdf_output.encode('latin1'))
+        pdf_buffer.seek(0)
 
-    # PDF Download Button
-    st.download_button("📎 Download PDF", data=pdf_buffer,
-                       file_name="unit_plan.pdf",
-                       mime="application/pdf",
-                       key="download_pdf")
+        # PDF Download Button
+        st.download_button("📎 Download PDF", data=pdf_buffer,
+                           file_name="unit_plan.pdf",
+                           mime="application/pdf",
+                           key="download_pdf")
+
 
 
     else:
