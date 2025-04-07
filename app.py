@@ -232,6 +232,8 @@ def format_unit_plan_text(text):
 
     return "\n".join(formatted_lines)
 
+
+
 from fpdf import FPDF
 import textwrap
 from io import BytesIO
@@ -243,9 +245,6 @@ if unit_plan:
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=11)
 
-    # Clear any previous buffer if it exists
-    pdf_buffer = BytesIO()
-
     # Write text line by line
     for line in unit_plan.split("\n"):
         wrapped_lines = textwrap.wrap(line, width=90)
@@ -253,7 +252,7 @@ if unit_plan:
             pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
     # Output the PDF to a buffer
-    pdf.output(pdf_buffer)
+    pdf_buffer = BytesIO(pdf.output(dest='S').encode('latin1'))
     pdf_buffer.seek(0)
 
     # Provide the PDF download button
