@@ -236,6 +236,7 @@ def format_unit_plan_text(text):
 
 from fpdf import FPDF
 import textwrap
+from io import BytesIO
 
 # Helper function to format the unit plan text
 def format_unit_plan_text(text):
@@ -249,9 +250,9 @@ def format_unit_plan_text(text):
         "Suggested Sequence of Subtopics:",
         "Lesson Types/Activities:",
         "Quick Content Cheat Sheet:",
-        "Assessment Suggestions:",  # New heading added
-        "Hook Ideas:",  # New heading added
-        "Fast Finisher Suggestions:"  # New heading added
+        "Assessment Suggestions:",
+        "Hook Ideas:",
+        "Fast Finisher Suggestions:"
     ]
 
     for line in lines:
@@ -313,8 +314,7 @@ if "unit_plan_text" in st.session_state:
             for wrapped in textwrap.wrap(stripped, width=95):
                 pdf.cell(0, 6, wrapped, ln=True)
 
-    # Output the PDF as bytes
-    from io import BytesIO
+    # Output the PDF as bytes (fixed for streamlit download)
     pdf_buffer = BytesIO()
     pdf.output(pdf_buffer)
     pdf_buffer.seek(0)
