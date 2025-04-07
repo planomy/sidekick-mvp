@@ -69,7 +69,6 @@ teacher_facts = [
 
 st.title("📚 Planomy – Teacher Super Aid")
 st.info(random.choice(teacher_boosts))  # Show a random boost message
-
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
@@ -124,8 +123,7 @@ if tool == "Unit Planner":
     else:
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
-# Input Fields for the Unit Planner (these should only show when Unit Planner is selected)
-if tool == "Unit Planner":
+    # Input Fields for the Unit Planner (Only shown when Unit Planner is selected)
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
     subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
     topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
@@ -187,6 +185,7 @@ if tool == "Unit Planner":
 
         final_text = "\n".join(bullet_lines)
         st.session_state["unit_plan_text"] = final_text
+
 
 
 # ---------- PDF Generation Check
