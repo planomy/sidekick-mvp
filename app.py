@@ -78,8 +78,7 @@ if tool != "Unit Planner":
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
 
-# ---------- TOOL 0: UNIT PLANNER ---------
-# This section should only load when "Unit Planner" is selected
+    # ---------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -90,6 +89,13 @@ if tool == "Unit Planner":
         st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
 
         # Word export button
+        word_buffer = BytesIO()
+        doc = Document()
+        doc.add_paragraph(st.session_state["unit_plan_text"])
+        doc.save(word_buffer)
+        word_buffer.seek(0)  # Rewind to the beginning of the buffer
+
+        # Word download button
         st.download_button("📝 Download Word", word_buffer,
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -114,7 +120,7 @@ if tool == "Unit Planner":
         pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
         pdf_buffer.seek(0)
 
-        # Provide the PDF download button
+        # PDF download button
         st.download_button("📎 Download PDF", data=pdf_buffer,
                            file_name="unit_plan.pdf",
                            mime="application/pdf",
@@ -122,6 +128,7 @@ if tool == "Unit Planner":
 
     else:
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+
 
     # Input Fields for the Unit Planner (Only shown when Unit Planner is selected)
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
