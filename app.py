@@ -233,6 +233,9 @@ def format_unit_plan_text(text):
     return "\n".join(formatted_lines)
 
 
+from fpdf import FPDF
+import textwrap
+from io import BytesIO
 
 # Before generating PDF, ensure that unit_plan is available
 if "unit_plan_text" in st.session_state:
