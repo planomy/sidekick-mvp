@@ -211,43 +211,40 @@ if tool == "Unit Planner":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             key="download_word")
 
-        # PDF EXPORT
-        from fpdf import FPDF
-        import textwrap
+      # PDF EXPORT
+from fpdf import FPDF
+import textwrap
 
-        export_text = st.session_state["unit_plan_text"]
+export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
 
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=11)
+pdf = FPDF()
+pdf.add_page()
+pdf.set_auto_page_break(auto=True, margin=15)
+pdf.set_font("Arial", size=11)
 
-        for line in export_text.split("\n"):
-            line = line.strip()
-            if line.endswith(":") and not line.startswith("•"):
-                pdf.ln(5)
-                pdf.set_font("Arial", style='B', size=11)
-                pdf.cell(0, 8, line, ln=True)
-                pdf.set_font("Arial", style='', size=11)
-                
-            elif line.startswith("•"):
-                text = line.replace("•", "•")
-                for i, wrapped in enumerate(textwrap.wrap(text, width=90)):
-                    if i == 0:
-                        pdf.cell(8)  # indent
-                    else:
-                        pdf.cell(12)
-                    pdf.cell(0, 7, wrapped, ln=True)
-                pdf.ln(1)  # only single line spacing between bullets
+for line in export_text.split("\n"):
+    stripped = line.strip()
+    
+    if not stripped:
+        pdf.ln(5)  # Blank line for spacing before section titles
+        continue
 
+    if not stripped.startswith("•") and not stripped.startswith("    •"):
+        # It's a section title or paragraph
+        pdf.set_font("Arial", style='B', size=11)
+        pdf.cell(0, 8, stripped, ln=True)
+        pdf.set_font("Arial", style='', size=11)
+    elif stripped.startswith("    •"):
+        bullet = stripped.replace("    •", "•").strip()
+        for i, wrapped in enumerate(textwrap.wrap(bullet, width=90)):
+            if i == 0:
+                pdf.cell(10)  # indent first line
+            else:
+                pdf.cell(14)  # further indent continuation lines
+            pdf.cell(0, 7, wrapped, ln=True)
 
-                    
-            elif line:
-                for wrapped in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, wrapped, ln=True)
-
-        pdf_bytes = pdf.output(dest='S').encode('latin1')
-        st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+pdf_bytes = pdf.output(dest='S').encode('latin1')
+st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
