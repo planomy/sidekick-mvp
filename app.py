@@ -72,11 +72,26 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Planner
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
+        
 
-# ---------- TOOL 0: UNIT PLANNER ----------
+# --------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
+    # Check if the unit plan exists in session state and is not empty
+    if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
+        # Display generated unit plan and allow for Word download
+        st.markdown("### Generated Unit Plan")
+        st.markdown(st.session_state["unit_plan_text"])  # Display the generated unit plan text
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                           key="download_word")
+    else:
+        # Show a warning if unit plan has not been generated
+        st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+
+    
     # Inputs
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
     subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
