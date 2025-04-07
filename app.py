@@ -6,34 +6,28 @@ from docx import Document
 from fpdf import FPDF
 import textwrap
 
-# This must be the very first Streamlit call!
+# This must be the very first Streamlit command!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
-# Now it's safe to use other st.* functions
-# Initialize OpenAI client using the modern approach
-openai.api_key = st.secrets.get("OPENAI_API_KEY")
-if not openai.api_key:
+# Initialize the client using the older pattern that worked for you
+client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
+if not client.api_key:
     st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
     st.stop()
-
-# Create a client object using the older pattern if needed (only use one approach!)
-# Uncomment the following line if you prefer the client object approach:
-# client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
 
 # --- SIDEBAR: TOOL SELECTION ---
 st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
-    "Choose a tool:", 
+    "Choose a tool:",
     ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
 )
 
-# ========== HELPER FUNCTION (Using ChatCompletion) ==========
+# ========== HELPER FUNCTION ==========
 def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0.7):
     """
-    A helper to call GPT-3.5-turbo with system & user messages.
-    Requires openai>=0.27.0.
+    A helper to call GPT-3.5-turbo with system & user messages using the client.
     """
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system_msg},
