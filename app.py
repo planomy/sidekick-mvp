@@ -95,6 +95,12 @@ if tool == "Unit Planner":
         doc.save(word_buffer)
         word_buffer.seek(0)  # Rewind the buffer
 
+        # Provide the Word download button
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                           key="download_word")
+
         # PDF export button
         pdf = FPDF()
         pdf.add_page()
@@ -119,15 +125,10 @@ if tool == "Unit Planner":
                            file_name="unit_plan.pdf",
                            mime="application/pdf",
                            key="download_pdf")
-
-        # Provide the Word download button below
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                           key="download_word")
         
     else:
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+
 
 
 
