@@ -1,15 +1,15 @@
 import streamlit as st
 import openai
 import re
+import textwrap
 from io import BytesIO
 from docx import Document
 from fpdf import FPDF
-import textwrap
 
-# This must be the very first Streamlit command!
+# This must be the very first Streamlit call!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
-# Initialize the client using the older pattern that worked for you
+# Initialize the client using the older pattern
 client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
 if not client.api_key:
     st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
@@ -170,6 +170,10 @@ elif tool == "Unit Planner":
     include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?")
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
+    # Use session_state to store the generated plan so it doesn't reset on download clicks
+    if "unit_plan" not in st.session_state:
+        st.session_state["unit_plan"] = None
+
     if st.button("Generate Unit Plan"):
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
@@ -201,39 +205,48 @@ elif tool == "Unit Planner":
             )
 
         if response and response.choices:
-            unit_plan = response.choices[0].message.content
-            st.markdown(unit_plan)
-
-            # --- EXPORT OPTIONS ---
-            st.markdown("---")
-            st.subheader("📄 Export Options")
-
-            # Markdown export
-            st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
-
-            # Word export
-            doc = Document()
-            doc.add_paragraph(unit_plan)
-            word_buffer = BytesIO()
-            doc.save(word_buffer)
-            word_buffer.seek(0)
-            st.download_button("📝 Download Word", word_buffer,
-                               file_name="unit_plan.docx",
-                               mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-            # PDF export
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_auto_page_break(auto=True, margin=15)
-            pdf.set_font("Arial", size=11)
-            for line in unit_plan.split("\n"):
-                for wrapped in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, txt=wrapped, ln=True)
-            pdf_buffer = BytesIO()
-            pdf.output(pdf_buffer)
-            pdf_buffer.seek(0)
-            st.download_button("📎 Download PDF", pdf_buffer,
-                               file_name="unit_plan.pdf",
-                               mime="application/pdf")
+            st.session_state["unit_plan"] = response.choices[0].message.content
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
+
+    # If the unit plan is generated, show it and provide download options
+    if st.session_state["unit_plan"]:
+        unit_plan = st.session_state["unit_plan"]
+        st.subheader("Your Generated Unit Plan")
+        st.markdown(unit_plan)
+        st.markdown("---")
+        st.subheader("📄 Export Options")
+
+        # PDF Export (default export)
+        pdf_buffer = BytesIO()
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Arial", size=11)
+        for line in unit_plan.split("\n"):
+            for wrapped_line in textwrap.wrap(line, width=90):
+                pdf.cell(0, 8, txt=wrapped_line, ln=True)
+        pdf_output = pdf.output(dest='S').encode('latin1')
+        pdf_buffer.write(pdf_output)
+        pdf_buffer.seek(0)
+        st.download_button(
+            label="📎 Download PDF",
+            data=pdf_buffer,
+            file_name="unit_plan.pdf",
+            mime="application/pdf",
+            key="pdf_download_btn"
+        )
+
+        # Word Export
+        word_buffer = BytesIO()
+        doc = Document()
+        doc.add_paragraph(unit_plan)
+        doc.save(word_buffer)
+        word_buffer.seek(0)
+        st.download_button(
+            label="📝 Download Word",
+            data=word_buffer,
+            file_name="unit_plan.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            key="word_download_btn"
+        )
