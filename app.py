@@ -208,8 +208,9 @@ if tool == "Unit Planner":
                 p.paragraph_format.space_after = Pt(0)
             elif s.endswith(":"):
                 p = doc.add_paragraph(s)
-                p.paragraph_format.space_before = Pt(10)
+                p.paragraph_format.space_before = Pt(11)
                 p.paragraph_format.space_after = Pt(0)
+                p.style.font.bold = True
             elif s:
                 p = doc.add_paragraph(s)
                 p.paragraph_format.space_after = Pt(0)
