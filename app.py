@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator"]
 )
 
 # ========== HELPER FUNCTION ==========
@@ -262,3 +262,31 @@ elif tool == "Unit Planner":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             key="word_download_btn"
         )
+
+
+
+    # ========== TOOL 6: WORKSHEET GENERATOR ==========
+elif tool == "Worksheet Generator":
+    st.header("📝 Worksheet Generator")
+    # Teacher can type or paste a learning goal or lesson plan excerpt
+    learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
+    # Option to choose number of questions
+    num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
+    
+    if st.button("Generate Worksheet"):
+        # Build the prompt for generating a worksheet
+        worksheet_prompt = (
+            f"Based on the following learning goal or lesson plan excerpt:\n\n"
+            f"{learning_goal}\n\n"
+            f"Generate a worksheet containing {num_questions} questions for students. "
+            "For each question, provide a sample answer for the teacher. "
+            "Include a mix of multiple choice and short answer questions."
+        )
+        with st.spinner("Generating worksheet..."):
+            worksheet = chat_completion_request(
+                system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
+                user_msg=worksheet_prompt,
+                max_tokens=1000
+            )
+            st.markdown(worksheet, unsafe_allow_html=True)
+
