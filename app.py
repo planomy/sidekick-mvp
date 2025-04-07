@@ -213,6 +213,7 @@ if "unit_plan_text" in st.session_state:
             p = doc.add_paragraph(s)
             p.paragraph_format.left_indent = Pt(18)
             p.paragraph_format.space_after = Pt(0)
+            p.style.font.bold = False
         elif s.endswith(":"):
             p = doc.add_paragraph(s)
             p.paragraph_format.space_before = Pt(11)
