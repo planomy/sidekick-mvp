@@ -192,7 +192,7 @@ elif tool == "Unit Planner":
         if include_fast_finishers:
             prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
         if include_cheat_sheet:
-            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 5–7 bullet-point facts a teacher should know to teach this unit.")
+            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
 
         full_prompt = " ".join(prompt_parts)
 
