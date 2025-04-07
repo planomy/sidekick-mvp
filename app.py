@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 import random
-st.session_state.clear()
+
 
 # ---------- CONFIG ----------
 st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
@@ -200,11 +200,11 @@ if tool == "Unit Planner":
 from fpdf import FPDF
 import textwrap
 
-export_text = st.session_state.get("unit_plan", "")
+export_text = st.session_state.get("unit_plan")
 
-if not export_text:
-    st.warning("No unit plan found. Please generate the unit plan first.")
-else:
+if export_text:
+    # PDF generation code...
+
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
