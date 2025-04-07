@@ -104,8 +104,6 @@ if tool == "Unit Planner":
 
         full_prompt = " ".join(prompt_parts)
 
-        client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
         with st.spinner("Planning your unit..."):
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
@@ -115,33 +113,29 @@ if tool == "Unit Planner":
                 ]
             )
 
-        if response and response.choices:
-            import re
-            unit_plan_raw = response.choices[0].message.content
+        import re
+        unit_plan_raw = response.choices[0].message.content
 
-            # ---- FORMATTING CLEANUP ----
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
-            unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
-            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
-            unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
+        # ---- FORMATTING CLEANUP ----
+        unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
+        unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
+        unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
+        unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
 
-            bullet_lines = []
-            for line in unit_plan.splitlines():
-                stripped = line.strip()
-                if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
-                    clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                    bullet_lines.append("    • " + clean)
-                elif stripped.endswith(":"):
-                    bullet_lines.append("")  # Add space BEFORE heading
-                    bullet_lines.append(stripped)
-                elif stripped:
-                    bullet_lines.append(stripped)
+        bullet_lines = []
+        for line in unit_plan.splitlines():
+            stripped = line.strip()
+            if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
+                clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
+                bullet_lines.append("    • " + clean)
+            elif stripped.endswith(":"):
+                bullet_lines.append("")  # Add space BEFORE heading
+                bullet_lines.append(stripped)
+            elif stripped:
+                bullet_lines.append(stripped)
 
-            formatted = "\n".join(bullet_lines)
-
-            formatted = st.session_state.get("unit_plan", "")
-
-
+        final_text = "\n".join(bullet_lines)
+        st.session_state["unit_plan_text"] = final_text
 
     # === IF PLAN EXISTS ===
     if "unit_plan_text" in st.session_state:
@@ -195,49 +189,35 @@ if tool == "Unit Planner":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             key="download_word")
 
-             # BETTER PDF EXPORT ✨
-# PDF EXPORT
-from fpdf import FPDF
-import textwrap
+        # PDF EXPORT
+        from fpdf import FPDF
+        import textwrap
 
-export_text = st.session_state.get("unit_plan")
+        export_text = st.session_state["unit_plan_text"]
 
-if export_text:
-    # PDF generation code...
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Arial", size=11)
 
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=11)
+        for line in export_text.split("\n"):
+            line = line.strip()
+            if line.endswith(":") and not line.startswith("•"):
+                pdf.ln(5)
+                pdf.set_font("Arial", style='B', size=11)
+                pdf.cell(0, 8, line, ln=True)
+                pdf.set_font("Arial", style='', size=11)
+            elif line.startswith("•"):
+                text = line.replace("•", "-")
+                for wrapped in textwrap.wrap(text, width=90):
+                    pdf.cell(10)
+                    pdf.cell(0, 8, wrapped, ln=True)
+            elif line:
+                for wrapped in textwrap.wrap(line, width=90):
+                    pdf.cell(0, 8, wrapped, ln=True)
 
-    for line in export_text.split("\n"):
-        line = line.strip()
-
-        # Headings – add space before, not after
-        if line.endswith(":") and not line.startswith("•"):
-            pdf.ln(5)
-            pdf.set_font("Arial", style='B', size=11)
-            pdf.cell(0, 8, line, ln=True)
-            pdf.set_font("Arial", style='', size=11)
-
-        # Bullet points
-        elif line.startswith("•"):
-            text = line.replace("•", "-")
-            for wrapped in textwrap.wrap(text, width=90):
-                pdf.cell(10)  # indent
-                pdf.cell(0, 8, wrapped, ln=True)
-
-        # Regular lines
-        elif line:
-            for wrapped in textwrap.wrap(line, width=90):
-                pdf.cell(0, 8, wrapped, ln=True)
-
-    # Finalise
-    pdf_bytes = pdf.output(dest='S').encode('latin1')
-
-    st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
-
-
+        pdf_bytes = pdf.output(dest='S').encode('latin1')
+        st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
