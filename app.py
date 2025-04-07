@@ -71,6 +71,7 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
+    # Inputs
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
     subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
     topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
@@ -81,7 +82,7 @@ if tool == "Unit Planner":
     include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
 
-    if st.button("Generate Unit Plan"):
+    if st.button("Generate Unit Plan", key="generate_unit_plan"):
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
@@ -115,43 +116,41 @@ if tool == "Unit Planner":
 
         if response and response.choices:
             import re
-            raw = response.choices[0].message.content
+            unit_plan_raw = response.choices[0].message.content
 
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)
-            unit_plan = re.sub(r"#+", "", unit_plan)
-            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())
-            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)
+            # ---- FORMATTING CLEANUP ----
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
+            unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
+            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
+            unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
 
-            lines = []
+            bullet_lines = []
             for line in unit_plan.splitlines():
                 stripped = line.strip()
-                if re.match(r'^(\d+\.\s+|-\s+)', stripped):
+                if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
                     clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                    lines.append("    • " + clean)
+                    bullet_lines.append("    • " + clean)
                 elif stripped.endswith(":"):
-                    lines.append(f"\n{stripped}\n")
+                    bullet_lines.append("")  # Add space BEFORE heading
+                    bullet_lines.append(stripped)
                 elif stripped:
-                    lines.append(stripped)
+                    bullet_lines.append(stripped)
 
-            formatted = "\n".join(lines).strip()
-            st.session_state["unit_plan"] = formatted
+            formatted = "\n".join(bullet_lines)
 
-    # Display + export area (persists across reruns)
-    if "unit_plan" in st.session_state:
+            # Save to session so it doesn't reset
+            st.session_state["unit_plan_text"] = formatted
+
+    # === IF PLAN EXISTS ===
+    if "unit_plan_text" in st.session_state:
         st.markdown("### Generated Unit Plan")
+
         st.markdown(
             f"""
-            <div style='
-                background-color: white;
-                color: black;
-                padding: 15px;
-                border-radius: 5px;
-                font-family: sans-serif;
-                white-space: pre-wrap;
-                line-height: 1.5;
-                font-size: 15px;
-            '>
-            {st.session_state["unit_plan"].replace("\n", "<br>")}
+            <div style='background-color:#ffffff; color:#000000; padding:15px;
+                        border-radius:5px; font-family:sans-serif;
+                        white-space:pre-wrap; line-height:1.6; font-size:15px;'>
+                {st.session_state["unit_plan_text"].replace("\n", "<br>")}
             </div>
             """,
             unsafe_allow_html=True
@@ -160,22 +159,18 @@ if tool == "Unit Planner":
         st.markdown("---")
         st.subheader("📄 Export Options")
 
+        # WORD EXPORT
         from docx import Document
         from docx.shared import Pt
         from io import BytesIO
-        from fpdf import FPDF
-        import textwrap
 
-        export_text = st.session_state["unit_plan"]
-
-        # --- WORD ---
         doc = Document()
         style = doc.styles['Normal']
         font = style.font
         font.name = 'Calibri'
         font.size = Pt(11)
 
-        for line in export_text.split("\n"):
+        for line in st.session_state["unit_plan_text"].split("\n"):
             s = line.strip()
             if s.startswith("•") and not s.endswith(":"):
                 p = doc.add_paragraph(s)
@@ -183,7 +178,8 @@ if tool == "Unit Planner":
                 p.paragraph_format.space_after = Pt(0)
             elif s.endswith(":"):
                 p = doc.add_paragraph(s)
-                p.paragraph_format.space_after = Pt(10)
+                p.paragraph_format.space_before = Pt(10)
+                p.paragraph_format.space_after = Pt(0)
             elif s:
                 p = doc.add_paragraph(s)
                 p.paragraph_format.space_after = Pt(0)
@@ -192,22 +188,34 @@ if tool == "Unit Planner":
         doc.save(word_buffer)
         word_buffer.seek(0)
 
-        st.download_button("📝 Download Word", word_buffer, file_name="unit_plan.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        st.download_button("📝 Download Word", word_buffer,
+            file_name="unit_plan.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            key="download_word")
 
-        # --- PDF ---
+        # PDF EXPORT
+        from fpdf import FPDF
+        import textwrap
+
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.set_font("Arial", size=11)
-        pdf_safe = export_text.replace("•", "-")
 
-        for line in pdf_safe.split("\n"):
-            for wrapped in textwrap.wrap(line, width=90):
-                pdf.cell(0, 8, txt=wrapped, ln=True)
+        safe_text = st.session_state["unit_plan_text"].replace("•", "-")
+        for line in safe_text.split("\n"):
+            try:
+                for wrap in textwrap.wrap(line, width=90):
+                    pdf.cell(0, 8, txt=wrap, ln=True)
+            except:
+                pdf.cell(0, 8, txt="[Unicode error – skipped line]", ln=True)
 
-        pdf_bytes = pdf.output(dest='S').encode('latin1', errors='ignore')
-        st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
+        pdf_bytes = pdf.output(dest='S').encode('latin1', 'replace')
 
+        st.download_button("📎 Download PDF", data=pdf_bytes,
+            file_name="unit_plan.pdf",
+            mime="application/pdf",
+            key="download_pdf")
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
