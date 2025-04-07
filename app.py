@@ -102,7 +102,6 @@ if tool == "Unit Planner":
         # If unit plan is empty or not generated, show warning only in Unit Planner
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
-
     
     
     
