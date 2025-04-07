@@ -217,6 +217,10 @@ elif tool == "Unit Planner":
         st.markdown("---")
         st.subheader("📄 Export Options")
 
+        
+        # Remove all asterisks and hashes for exports
+        export_plan = re.sub(r'[\*\#]', '', unit_plan)
+
         # PDF Export (default export)
         pdf_buffer = BytesIO()
         pdf = FPDF()
@@ -237,10 +241,17 @@ elif tool == "Unit Planner":
             key="pdf_download_btn"
         )
 
-        # Word Export
+         # ========== WORD EXPORT ==========
         word_buffer = BytesIO()
         doc = Document()
-        doc.add_paragraph(unit_plan)
+        doc.add_paragraph(export_plan)
+        # Remove document protection if it exists to avoid a locked/read-only file
+        try:
+            protection = doc.settings.element.xpath('//w:documentProtection')
+            if protection:
+                protection[0].getparent().remove(protection[0])
+        except Exception:
+            pass
         doc.save(word_buffer)
         word_buffer.seek(0)
         st.download_button(
