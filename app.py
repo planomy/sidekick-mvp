@@ -141,6 +141,19 @@ if tool == "Unit Planner":
     if "unit_plan_text" in st.session_state:
         st.markdown("### Generated Unit Plan")
 
+        def convert_to_html(text):
+            lines = text.split("\n")
+            html_lines = []
+            for i, line in enumerate(lines):
+                stripped = line.strip()
+                if stripped.endswith(":") and not stripped.startswith("•"):
+                    html_lines.append(f"<br><b>{stripped}</b><br>")  # Heading with spacing before
+                elif stripped.startswith("•"):
+                    html_lines.append(f"{stripped}<br>")  # Single line for bullets
+                elif stripped:
+                    html_lines.append(f"{stripped}<br>")
+            return "".join(html_lines)
+
         st.markdown(
             f"""
             <div style='
@@ -149,16 +162,17 @@ if tool == "Unit Planner":
                 border-radius: 6px;
                 font-family: "Segoe UI", sans-serif;
                 font-size: 16px;
-                line-height: 1.75;
+                line-height: 1.7;
                 color: #222;
                 white-space: pre-wrap;
                 text-align: left;
             '>
-                {st.session_state["unit_plan_text"].replace("\n", "<br><br>")}
+                {convert_to_html(st.session_state["unit_plan_text"])}
             </div>
             """,
             unsafe_allow_html=True
         )
+
 
         st.markdown("---")
         st.subheader("📄 Export Options")
@@ -215,14 +229,17 @@ if tool == "Unit Planner":
                 pdf.set_font("Arial", style='B', size=11)
                 pdf.cell(0, 8, line, ln=True)
                 pdf.set_font("Arial", style='', size=11)
+                
             elif line.startswith("•"):
                 text = line.replace("•", "•")
                 for i, wrapped in enumerate(textwrap.wrap(text, width=90)):
                     if i == 0:
                         pdf.cell(8)  # indent
                     else:
-                        pdf.cell(12)  # indent continuation lines more
-                    pdf.cell(0, 8, wrapped, ln=True)
+                        pdf.cell(12)
+                    pdf.cell(0, 7, wrapped, ln=True)
+                pdf.ln(1)  # only single line spacing between bullets
+
 
                     
             elif line:
