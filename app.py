@@ -68,6 +68,11 @@ st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_
 st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
+# Reset session state when changing tools
+if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Planner
+    if "unit_plan_text" in st.session_state:
+        del st.session_state["unit_plan_text"]
+
 # ---------- TOOL 0: UNIT PLANNER ----------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
