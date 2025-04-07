@@ -204,27 +204,28 @@ if tool == "Unit Planner":
         pdf.set_font("Arial", size=11)
         
         # Process lines and apply formatting
-        for line in formatted.split("\n"):
-            line = line.strip()
-        
-            # Headings - add space before, not after
-            if line.endswith(":") and not line.startswith("•"):
-                pdf.ln(5)  # space before heading
-                pdf.set_font("Arial", style='B', size=11)
-                pdf.cell(0, 8, line, ln=True)
-                pdf.set_font("Arial", style='', size=11)
-        
-            # Bullet points
-            elif line.startswith("•"):
-                text = line.replace("•", "-")  # clean bullet symbol
-                for wrapped in textwrap.wrap(text, width=90):
-                    pdf.cell(10)  # indent
-                    pdf.cell(0, 8, wrapped, ln=True)
-        
-            # Regular lines
-            elif line:
-                for wrapped in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, wrapped, ln=True)
+          for line in formatted.split("\n"):
+        line = line.strip()
+    
+        # HEADINGS – add a line BEFORE (not after)
+        if line.endswith(":") and not line.startswith("•"):
+            pdf.ln(5)  # Line BEFORE heading
+            pdf.set_font("Arial", style='B', size=11)
+            pdf.cell(0, 8, line, ln=True)
+            pdf.set_font("Arial", style='', size=11)
+    
+        # BULLET POINTS – add indent
+        elif line.startswith("•"):
+            text = line.replace("•", "-")
+            for wrapped in textwrap.wrap(text, width=90):
+                pdf.cell(10)  # indent
+                pdf.cell(0, 8, wrapped, ln=True)
+    
+        # REGULAR LINES
+        elif line:
+            for wrapped in textwrap.wrap(line, width=90):
+                pdf.cell(0, 8, wrapped, ln=True)
+
         
         # Finalise and encode
         pdf_bytes = pdf.output(dest='S').encode('latin1')
