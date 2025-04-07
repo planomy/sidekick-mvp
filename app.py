@@ -8,7 +8,6 @@ from fpdf import FPDF
 import textwrap
 import re
 
-
 # ---------- CONFIG ----------
 st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
 
@@ -29,6 +28,7 @@ teacher_boosts = [
     "You're someone's favourite part of the day. ✨",
     "You matter more than data ever could. 🧠❤️"
 ]
+
 funny_boosts = [
     "You survived Monday. That’s basically wizardry. 🧙‍♂️",
     "You taught a whole class without Googling. Power move. 💻🚫",
@@ -68,20 +68,18 @@ teacher_facts = [
 ]
 
 st.title("📚 Planomy – Teacher Super Aid")
-st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_boosts))
+st.info(random.choice(teacher_boosts))  # Show a random boost message
 
 # ---------- TOOL SELECTION ----------
 st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
-
-# Reset session state when changing tools
+# Reset session state when changing tools (ensure Unit Plan is cleared when switching tools)
 if tool != "Unit Planner":
-    # Ensure we clear the 'unit_plan_text' session state when changing tools
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
 
-# ---------- TOOL 0: UNIT PLANNER ----------
+# ---------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -91,13 +89,13 @@ if tool == "Unit Planner":
         st.markdown("### Generated Unit Plan")
         st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
 
-        # Word export
+        # Word export button
         st.download_button("📝 Download Word", word_buffer,
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
 
-        # PDF export
+        # PDF export button
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
@@ -121,12 +119,9 @@ if tool == "Unit Planner":
                            file_name="unit_plan.pdf",
                            mime="application/pdf",
                            key="download_pdf")
+
     else:
-        # If the unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
-
-
-
 
 # Input Fields for the Unit Planner
 year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
@@ -231,7 +226,6 @@ if "unit_plan_text" in st.session_state:
         """,
         unsafe_allow_html=True
     )
-
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
