@@ -77,7 +77,7 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 
 # Reset session state when changing tools
 if tool != "Unit Planner":
-    # Clear the generated unit plan if the tool is not Unit Planner
+    # Reset the unit plan when the tool is not "Unit Planner"
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
 
@@ -90,39 +90,50 @@ if tool == "Unit Planner":
         # If the unit plan exists, show it and provide the download button
         st.markdown("### Generated Unit Plan")
         st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
-        
-        # Show both Word and PDF download buttons only when unit plan exists
+
+        # Only show the Word and PDF download buttons when the unit plan exists
         st.download_button("📝 Download Word", word_buffer,
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
 
-        # PDF generation logic
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-        pdf.set_font("DejaVu", size=10)
-
-        # Write text line by line
-        for line in st.session_state["unit_plan_text"].split("\n"):
-            wrapped_lines = textwrap.wrap(line, width=90)
-            for wrapped_line in wrapped_lines:
-                pdf.cell(0, 8, txt=wrapped_line, ln=True)
-
-        # Output the PDF to a buffer (use dest='S' for string output)
-        pdf_buffer = BytesIO()
-        pdf_output = pdf.output(dest='S')  # Get PDF as string
-        pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
-        pdf_buffer.seek(0)
-
-        # Provide the PDF download button
-        st.download_button("📎 Download PDF", data=pdf_buffer,
+        st.download_button("📎 Download PDF", pdf_buffer,
                            file_name="unit_plan.pdf",
-                           mime="application/pdf")
+                           mime="application/pdf",
+                           key="download_pdf")
 
     else:
-        # If unit plan is empty or not generated, show warning
+        # If the unit plan is empty or not generated, show warning
+        st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+# Reset session state when changing tools
+if tool != "Unit Planner":
+    # Reset the unit plan when the tool is not "Unit Planner"
+    if "unit_plan_text" in st.session_state:
+        del st.session_state["unit_plan_text"]
+
+# --------- TOOL 0: UNIT PLANNER ---------
+if tool == "Unit Planner":
+    st.header("📘 Unit Planner")
+
+    # Check if unit plan exists and is not empty
+    if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
+        # If the unit plan exists, show it and provide the download button
+        st.markdown("### Generated Unit Plan")
+        st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
+
+        # Only show the Word and PDF download buttons when the unit plan exists
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                           key="download_word")
+
+        st.download_button("📎 Download PDF", pdf_buffer,
+                           file_name="unit_plan.pdf",
+                           mime="application/pdf",
+                           key="download_pdf")
+
+    else:
+        # If the unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
 
