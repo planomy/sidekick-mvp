@@ -147,49 +147,62 @@ if tool == "Unit Planner":
         final_text = "\n".join(bullet_lines)
         st.session_state["unit_plan_text"] = final_text
 
-    # If the unit plan exists, show it and display download buttons
-    if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-        # Display the generated unit plan
-        st.markdown("### Generated Unit Plan")
-        st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
+    # Unique Key for Selectbox
+year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key=f"unit_year_{random.randint(1000,9999)}")
 
-        # Word export button (buffer handling)
-        word_buffer = BytesIO()
-        doc = Document()
-        doc.add_paragraph(st.session_state["unit_plan_text"])
-        doc.save(word_buffer)
-        word_buffer.seek(0)  # Rewind the buffer
+# Display Unit Plan after generation
+if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
+    st.markdown("### Generated Unit Plan")
+    
+    # Ensure unit plan is cleanly displayed
+    st.markdown(
+        f"""
+        <div style="background-color: #ffffff; padding: 20px; border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7; color: #222; white-space: pre-wrap; text-align: left;">
+            {st.session_state['unit_plan_text']}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        # Provide the Word download button
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                           key="download_word")
+    # Word export button (buffer handling)
+    word_buffer = BytesIO()
+    doc = Document()
+    doc.add_paragraph(st.session_state["unit_plan_text"])
+    doc.save(word_buffer)
+    word_buffer.seek(0)
 
-        # PDF export button
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-        pdf.set_font("DejaVu", size=10)
+    # Word Download Button
+    st.download_button("📝 Download Word", word_buffer,
+                       file_name="unit_plan.docx",
+                       mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                       key="download_word")
 
-        # Write unit plan text to the PDF
-        for line in st.session_state["unit_plan_text"].split("\n"):
-            wrapped_lines = textwrap.wrap(line, width=90)
-            for wrapped_line in wrapped_lines:
-                pdf.cell(0, 8, txt=wrapped_line, ln=True)
+    # PDF export button (with custom font)
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+    pdf.set_font("DejaVu", size=10)
 
-        # Create PDF buffer
-        pdf_buffer = BytesIO()
-        pdf_output = pdf.output(dest='S')  # Get PDF as string
-        pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
-        pdf_buffer.seek(0)
+    # Write unit plan text to the PDF
+    for line in st.session_state["unit_plan_text"].split("\n"):
+        wrapped_lines = textwrap.wrap(line, width=90)
+        for wrapped_line in wrapped_lines:
+            pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-        # Provide the PDF download button
-        st.download_button("📎 Download PDF", data=pdf_buffer,
-                           file_name="unit_plan.pdf",
-                           mime="application/pdf",
-                           key="download_pdf")
+    # PDF buffer
+    pdf_buffer = BytesIO()
+    pdf_output = pdf.output(dest='S')
+    pdf_buffer.write(pdf_output.encode('latin1'))
+    pdf_buffer.seek(0)
+
+    # PDF Download Button
+    st.download_button("📎 Download PDF", data=pdf_buffer,
+                       file_name="unit_plan.pdf",
+                       mime="application/pdf",
+                       key="download_pdf")
+
+
     else:
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
