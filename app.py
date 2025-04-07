@@ -321,7 +321,6 @@ if "unit_plan_text" in st.session_state:
 
 
 
-
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
