@@ -142,44 +142,46 @@ if tool == "Unit Planner":
 if "unit_plan_text" in st.session_state:
     st.markdown("### Generated Unit Plan")
 
-    # Define the convert_to_html function (this is where it goes)
-    def convert_to_html(text):
-        lines = text.split("\n")
-        html_lines = []
+  # Convert plain text to HTML for Streamlit screen output
+def convert_to_html(text):
+    lines = text.split("\n")
+    html_lines = []
 
-        for line in lines:
-            stripped = line.strip()
+    for line in lines:
+        stripped = line.strip()
 
-            if stripped.endswith(":") and not stripped.startswith("•"):
-                # Heading formatting for screen display (use <b> for bold)
-                html_lines.append(f"<h2>{stripped}</h2>")
-            elif stripped.startswith("•"):
-                # Bulleted list formatting
-                html_lines.append(f"<li>{stripped[2:]}</li>")  # Remove bullet symbol
-            elif stripped:
-                html_lines.append(f"<p>{stripped}</p>")
+        # Handle headings (ends with ':')
+        if stripped.endswith(":") and not stripped.startswith("•"):
+            html_lines.append(f"<br><b>{stripped}</b><br>")  # Heading with spacing before
+        elif stripped.startswith("•"):
+            # Bullet point handling, removing the bullet symbol
+            html_lines.append(f"<li>{stripped[2:].strip()}</li>")
+        elif stripped:
+            # Regular text (normal content)
+            html_lines.append(f"<p>{stripped}</p>")
 
-        return "".join(html_lines)
+    return "".join(html_lines)
 
-    # Use convert_to_html in markdown (display unit plan with HTML formatting)
-    st.markdown(
-        f"""
-        <div style='
-            background-color: #ffffff;
-            padding: 24px 30px;
-            border-radius: 6px;
-            font-family: "Segoe UI", sans-serif;
-            font-size: 16px;
-            line-height: 1.7;
-            color: #222;
-            white-space: pre-wrap;
-            text-align: left;
-        '>
-            {convert_to_html(st.session_state["unit_plan_text"])}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+# Output HTML content to the Streamlit screen
+st.markdown(
+    f"""
+    <div style='
+        background-color: #ffffff;
+        padding: 24px 30px;
+        border-radius: 6px;
+        font-family: "Segoe UI", sans-serif;
+        font-size: 16px;
+        line-height: 1.7;
+        color: #222;
+        white-space: pre-wrap;
+        text-align: left;
+    '>
+        {convert_to_html(st.session_state["unit_plan_text"])}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
     st.markdown("---")
     st.subheader("📄 Export Options")
