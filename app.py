@@ -289,7 +289,34 @@ if tool == "Lesson Builder":
                     {"role": "user", "content": full_prompt}
                 ]
             )
-            st.markdown(response.choices[0].message.content)
+            import re
+
+formatted = response.choices[0].message.content
+
+# Fix markdown: bullets → real bullets
+formatted = formatted.replace("* ", "• ")
+
+# Headings: replace markdown with bold HTML and spacing
+formatted = re.sub(r"^### (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
+formatted = re.sub(r"^## (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
+formatted = re.sub(r"^# (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
+
+# Display it cleanly in Streamlit
+st.markdown(f"""
+<div style='
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: sans-serif;
+    font-size: 16px;
+    color: #111;
+    line-height: 1.6;
+    white-space: pre-wrap;
+'>
+{formatted.replace("\n", "<br>")}
+</div>
+""", unsafe_allow_html=True)
+
 
 
 # ---------- TOOL 2: FEEDBACK ASSISTANT ----------
