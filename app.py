@@ -204,7 +204,7 @@ if tool == "Unit Planner":
         pdf.set_font("Arial", size=11)
         
         # Process lines and apply formatting
-          for line in formatted.split("\n"):
+        for line in formatted.split("\n"):
         line = line.strip()
     
         # HEADINGS – add a line BEFORE (not after)
