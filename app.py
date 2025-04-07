@@ -192,28 +192,21 @@ if "unit_plan_text" in st.session_state:
 
 
     # WORD EXPORT
-    from docx import Document
-    from docx.shared import Pt
-    from io import BytesIO
+from docx import Document  # Ensure this is at the top of your file
+from docx.shared import Pt
+from io import BytesIO
 
+# Word export
+doc = Document()  # Create a new Document instance
 
-    
-try:
-    # Your logic here for document creation
-    doc = Document()
-    sections = doc.sections
-    for section in sections:
-        section._sectPr.pgMar.top = Pt(40)
-        section._sectPr.pgMar.bottom = Pt(60)
-        section._sectPr.pgMar.left = Pt(40)
-        section._sectPr.pgMar.right = Pt(60)
-except Exception as e:
-    st.error(f"An error occurred: {e}")
-    # Optionally log this error for later debugging or diagnostics
+# Get the section and set the margins
+sections = doc.sections
+for section in sections:
+    section._sectPr.pgMar.top = Pt(40)  # Top margin
+    section._sectPr.pgMar.bottom = Pt(60)  # Bottom margin
+    section._sectPr.pgMar.left = Pt(40)  # Left margin
+    section._sectPr.pgMar.right = Pt(60)  # Right margin
 
-
-
-    
 # Set font and add content
 style = doc.styles['Normal']
 font = style.font
@@ -224,25 +217,22 @@ font.size = Pt(10)
 for line in st.session_state["unit_plan_text"].split("\n"):
     s = line.strip()
 
-    # If line is a bullet point (starts with '•') and not a heading (ends with ':')
     if s.startswith("•") and not s.endswith(":"):
         p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
         p.paragraph_format.left_indent = Pt(18)
         p.paragraph_format.space_after = Pt(0)
         p.style.font.bold = False  # No bold for bullets
 
-    # If line is a heading (ends with ':')
     elif s.endswith(":"):
         p = doc.add_paragraph(s)
         p.paragraph_format.space_before = Pt(11)
         p.paragraph_format.space_after = Pt(0)
         p.style.font.bold = True  # Bold for headings
 
-    # If it's just normal text, add it without bullet or bold
     elif s:
         p = doc.add_paragraph(s)
         p.paragraph_format.space_after = Pt(0)
-        p.style.font.bold = False  # Ensure normal text is not bold
+        p.style.font.bold = False  # Normal text is not bold
 
 # Create Word buffer and save the document
 word_buffer = BytesIO()
@@ -254,6 +244,7 @@ st.download_button("📝 Download Word", word_buffer,
                    file_name="unit_plan.docx",
                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                    key="download_word")
+
 
 
 # ---------- FORMATTER FUNCTION ----------
