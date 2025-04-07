@@ -97,26 +97,25 @@ if tool == "Unit Planner":
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
 
-        # --- PDF Generation ---
-        # Create PDF instance
+        # PDF Export
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Arial", size=12)
 
-        # Set font for PDF
-        pdf.set_font("Arial", size=10)
+        # Write text line by line for PDF generation
+        for line in st.session_state["unit_plan_text"].splitlines():
+            wrapped_lines = textwrap.wrap(line, width=90)  # Wrap long lines
+            for wrapped_line in wrapped_lines:
+                pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-        # Write unit plan content to PDF
-        for line in st.session_state["unit_plan_text"].split("\n"):
-            pdf.cell(200, 10, txt=line, ln=True)
-
-        # Output the PDF to buffer
-        pdf_output = pdf.output(dest='S')
+        # Output the PDF to a buffer
         pdf_buffer = BytesIO()
-        pdf_buffer.write(pdf_output.encode('latin1'))
+        pdf_output = pdf.output(dest='S')  # Get PDF as string
+        pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
         pdf_buffer.seek(0)
 
-        # Provide the download button for the PDF
+        # Provide the PDF download button
         st.download_button("📎 Download PDF", data=pdf_buffer,
                            file_name="unit_plan.pdf",
                            mime="application/pdf")
@@ -124,6 +123,7 @@ if tool == "Unit Planner":
     else:
         # If the unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+
 
 
 # Input Fields for the Unit Planner
