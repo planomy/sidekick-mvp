@@ -211,72 +211,70 @@ if tool == "Unit Planner":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             key="download_word")
 
+# ---------- FORMATTER FUNCTION ----------
 def format_unit_plan_text(text):
     lines = text.split("\n")
     formatted_lines = []
 
-    for i, line in enumerate(lines):
+    for line in lines:
         stripped = line.strip()
 
-        # Add space before section headings (ending in colon, not bullet)
-        if stripped.endswith(":") and not stripped.startswith("•"):
+        if not stripped:
+            formatted_lines.append("")  # Keep blank lines
+        elif stripped.endswith(":") and not stripped.startswith("•"):
             formatted_lines.append("")  # Blank line before headings
             formatted_lines.append(stripped)
-        # Bullet points, indented
         elif stripped.startswith("•"):
             clean = stripped.replace("•", "").strip()
             formatted_lines.append(f"    • {clean}")
-        # Normal paragraph
-        elif stripped:
+        else:
             formatted_lines.append(stripped)
 
     return "\n".join(formatted_lines)
 
 
-      # PDF EXPORT
-from fpdf import FPDF
-import textwrap
 
-export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
+# ---------- PDF EXPORT ----------
+if "unit_plan_text" in st.session_state:
+    from fpdf import FPDF
+    import textwrap
 
-pdf = FPDF()
-pdf.add_page()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=10)
+    export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
 
-for line in export_text.split("\n"):
-    stripped = line.strip()
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Arial", size=10)  # 10pt font
 
-    # Blank line
-    if not stripped:
-        pdf.ln(5)
-        continue
+    for line in export_text.split("\n"):
+        stripped = line.strip()
 
-    # Section headings (end in colon)
-    if stripped.endswith(":") and not stripped.startswith("•"):
-        pdf.ln(2)  # space before heading
-        pdf.set_font("Arial", style='B', size=10)
-        pdf.cell(0, 7, stripped, ln=True)
-        pdf.set_font("Arial", style='', size=10)
+        if not stripped:
+            pdf.ln(5)
+            continue
 
-    # Bullet points (indented and wrapped)
-    elif stripped.startswith("•") or stripped.startswith("    •"):
-        clean = stripped.replace("    •", "•").replace("•", "•").strip()
-        wrapped_lines = textwrap.wrap(clean, width=90)
-        for i, wrapped in enumerate(wrapped_lines):
-            if i == 0:
-                pdf.cell(10)  # indent bullet
-            else:
-                pdf.cell(14)  # indent wrapped lines
-            pdf.cell(0, 6, wrapped, ln=True)
+        # Headings
+        if stripped.endswith(":") and not stripped.startswith("•"):
+            pdf.ln(2)
+            pdf.set_font("Arial", style='B', size=10)
+            pdf.cell(0, 7, stripped, ln=True)
+            pdf.set_font("Arial", style='', size=10)
 
-    # Regular paragraph text
-    else:
-        for wrapped in textwrap.wrap(stripped, width=95):
-            pdf.cell(0, 6, wrapped, ln=True)
+        # Bullets
+        elif stripped.startswith("•") or stripped.startswith("    •"):
+            bullet = stripped.replace("    •", "•").replace("•", "•").strip()
+            for i, wrapped in enumerate(textwrap.wrap(bullet, width=90)):
+                pdf.cell(10 if i == 0 else 14)
+                pdf.cell(0, 6, wrapped, ln=True)
 
-pdf_bytes = pdf.output(dest='S').encode('latin1')
-st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+        # Paragraphs
+        else:
+            for wrapped in textwrap.wrap(stripped, width=95):
+                pdf.cell(0, 6, wrapped, ln=True)
+
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
