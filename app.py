@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 import random
+st.session_state.clear()
 
 # ---------- CONFIG ----------
 st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
