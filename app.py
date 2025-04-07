@@ -185,9 +185,9 @@ if "unit_plan_text" in st.session_state:
 
 
         # WORD EXPORT
-        from docx import Document
-        from docx.shared import Pt
-        from io import BytesIO
+    from docx import Document
+    from docx.shared import Pt
+    from io import BytesIO
 
         doc = Document()
 
