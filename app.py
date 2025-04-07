@@ -11,11 +11,11 @@ from fpdf import FPDF
 import streamlit as st
 import openai
 
+st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
+
 st.write("OpenAI library version:", openai.__version__)
 
 
-# --- SETUP ---
-st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
 
 # Load API key from secrets
 openai.api_key = st.secrets.get("OPENAI_API_KEY")
