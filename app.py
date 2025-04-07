@@ -235,70 +235,30 @@ def format_unit_plan_text(text):
 
 
 from fpdf import FPDF
+import textwrap
 from io import BytesIO
 
-# PDF export logic (don't touch formatting code)
-if "unit_plan_text" in st.session_state:
-    export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
+# PDF Generation Setup
+pdf = FPDF()
+pdf.add_page()
+pdf.set_auto_page_break(auto=True, margin=15)
+pdf.set_font("Arial", size=11)
 
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=10)  # 10pt font size
+# Write text line by line
+for line in unit_plan.split("\n"):
+    wrapped_lines = textwrap.wrap(line, width=90)  # Wrap text
+    for wrapped_line in wrapped_lines:
+        pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-    for line in export_text.split("\n"):
-        stripped = line.strip()
+# Save PDF to a buffer instead of encoding it
+pdf_buffer = BytesIO()
+pdf.output(pdf_buffer)
+pdf_buffer.seek(0)
 
-        if not stripped:
-            pdf.ln(5)  # Add a blank line between paragraphs
-            continue
-
-        # Bold section headings (those that are defined explicitly)
-        if stripped in [
-            "Unit Plan Overview:",
-            "Learning Intentions:",
-            "Lesson Types/Activities:",
-            "Quick Content Cheat Sheet:",
-            "Assessment Suggestions:",
-            "Hook Ideas:",
-            "Fast Finisher Suggestions:"
-        ]:
-            pdf.ln(2)
-            pdf.set_font("Arial", style='B', size=10)  # Bold headings
-            pdf.cell(0, 6, stripped, ln=True)
-            pdf.set_font("Arial", style='', size=10)  # Regular font after heading
-
-import textwrap
-
-# Bullet points section
-elif stripped.startswith("•") or stripped.startswith("*"):  # Ensure the bullet points are detected properly
-    clean = stripped.replace("•", "").strip()  # Remove the bullet symbol if necessary
-    # Process wrapped text for each bullet point
-    for i, wrapped in enumerate(textwrap.wrap(clean, width=90)):
-        # Indent continuation lines with cell(10) and normal cell for others
-        pdf.cell(10 if i == 0 else 14, 6, wrapped, ln=True)  # Fix indentation handling
-
-
-# Regular paragraph text (non-bullet)
-else:
-    # Text wrapping for regular content
-    for wrapped in textwrap.wrap(stripped, width=95):
-        pdf.cell(0, 6, wrapped, ln=True)  # Adjusted cell width and line spacing
-
-
-    # Output the PDF to a buffer (BytesIO)
-    pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_buffer.seek(0)
-
-    # Add the download button for the PDF
-    st.download_button(
-        label="📎 Download PDF", 
-        data=pdf_buffer, 
-        file_name="unit_plan.pdf", 
-        mime="application/pdf", 
-        key="download_pdf"
-    )
+# Provide the PDF download button
+st.download_button("📎 Download PDF", data=pdf_buffer,
+                   file_name="unit_plan.pdf",
+                   mime="application/pdf")
 
 
 
