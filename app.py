@@ -118,7 +118,7 @@ if tool == "Unit Planner":
             raw = response.choices[0].message.content
 
             # Clean and format
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)  # Remove bold
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", response.choices[0].message.content)
             unit_plan = re.sub(r"#+", "", unit_plan)  # Remove markdown headers
             unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Remove extra spacing
             unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)  # Space after colons
