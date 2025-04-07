@@ -220,28 +220,38 @@ export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
 pdf = FPDF()
 pdf.add_page()
 pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=11)
+pdf.set_font("Arial", size=10)
 
 for line in export_text.split("\n"):
     stripped = line.strip()
-    
+
+    # Blank line
     if not stripped:
-        pdf.ln(5)  # Blank line for spacing before section titles
+        pdf.ln(5)
         continue
 
-    if not stripped.startswith("•") and not stripped.startswith("    •"):
-        # It's a section title or paragraph
-        pdf.set_font("Arial", style='B', size=11)
-        pdf.cell(0, 8, stripped, ln=True)
-        pdf.set_font("Arial", style='', size=11)
-    elif stripped.startswith("    •"):
-        bullet = stripped.replace("    •", "•").strip()
-        for i, wrapped in enumerate(textwrap.wrap(bullet, width=90)):
+    # Section headings (end in colon)
+    if stripped.endswith(":") and not stripped.startswith("•"):
+        pdf.ln(2)  # space before heading
+        pdf.set_font("Arial", style='B', size=10)
+        pdf.cell(0, 7, stripped, ln=True)
+        pdf.set_font("Arial", style='', size=10)
+
+    # Bullet points (indented and wrapped)
+    elif stripped.startswith("•") or stripped.startswith("    •"):
+        clean = stripped.replace("    •", "•").replace("•", "•").strip()
+        wrapped_lines = textwrap.wrap(clean, width=90)
+        for i, wrapped in enumerate(wrapped_lines):
             if i == 0:
-                pdf.cell(10)  # indent first line
+                pdf.cell(10)  # indent bullet
             else:
-                pdf.cell(14)  # further indent continuation lines
-            pdf.cell(0, 7, wrapped, ln=True)
+                pdf.cell(14)  # indent wrapped lines
+            pdf.cell(0, 6, wrapped, ln=True)
+
+    # Regular paragraph text
+    else:
+        for wrapped in textwrap.wrap(stripped, width=95):
+            pdf.cell(0, 6, wrapped, ln=True)
 
 pdf_bytes = pdf.output(dest='S').encode('latin1')
 st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
