@@ -240,7 +240,9 @@ font.size = Pt(10)
 # Check if unit_plan_text exists in session state before accessing it
 if "unit_plan_text" in st.session_state:
     # Loop through the lines of the unit plan
+    if "unit_plan_text" in st.session_state:
     for line in st.session_state["unit_plan_text"].split("\n"):
+
         s = line.strip()
 
         if s.startswith("•") and not s.endswith(":"):
