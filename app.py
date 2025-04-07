@@ -228,7 +228,7 @@ pdf_bytes = pdf.output(dest='S').encode('latin1')
 
         
         # Download button
-        st.download_button("📎 Download PDF", data=pdf_bytes,
+st.download_button("📎 Download PDF", data=pdf_bytes,
                            file_name="unit_plan.pdf",
                            mime="application/pdf",
                            key="download_pdf")
