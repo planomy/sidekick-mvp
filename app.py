@@ -9,20 +9,39 @@ from docx.shared import Pt
 from fpdf import FPDF
 
 # --- SETUP ---
+st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
 
+# Load API key from secrets
 openai.api_key = st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
-    st.warning("Please enter your OpenAI API key in the sidebar to use the app.")
+    st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
     st.stop()
 
 # --- SIDEBAR: TOOL SELECTION ---
-st.sidebar.title("PLANNERME - Where you're the ✨ Star ✨")
+st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:", 
     ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
 )
 
-# ---------- TOOL 1: LESSON BUILDER ----------
+# ========== HELPER FUNCTION ==========
+def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0.7):
+    """
+    A helper to call GPT-3.5-turbo with system & user messages.
+    Make sure your environment has openai>=0.27.0.
+    """
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg}
+        ],
+        max_tokens=max_tokens,
+        temperature=temperature
+    )
+    return response.choices[0].message.content.strip()
+
+# ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
     year = st.selectbox("Year Level", ["7", "8", "9", "10", "11", "12"])
@@ -43,8 +62,8 @@ if tool == "Lesson Builder":
             f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
             f"Start each lesson with a clear Learning Goal aligned to a {goal_focus.lower()} outcome.",
             "Structure each lesson with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket.",
-            f"Use {device_use.lower()} and have students work in {grouping.lower()}.",
-            f"Adopt a {lesson_style.lower()} approach."
+            f"The lesson should use {device_use.lower()}. Students should work in {grouping.lower()}.",
+            f"Use a {lesson_style.lower()} approach."
         ]
         if differentiation:
             prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
@@ -52,17 +71,16 @@ if tool == "Lesson Builder":
             prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
         if include_curriculum:
             prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
-        
+
         full_prompt = " ".join(prompt_parts)
+
         with st.spinner("Planning your lesson(s)..."):
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=full_prompt,
-                max_tokens=1000,
-                temperature=0.7
+            lesson_plan = chat_completion_request(
+                system_msg="You are a practical, creative Australian teacher.",
+                user_msg=full_prompt,
+                max_tokens=1200
             )
-            lesson_plan = response.choices[0].text.strip()
-            # Basic formatting: replace asterisks with bullets and convert headers to bold text
+            # Simple formatting
             formatted_plan = lesson_plan.replace("* ", "• ")
             formatted_plan = re.sub(r"^#+\s*(.+)$", r"<br><b>\1</b>", formatted_plan, flags=re.MULTILINE)
             st.markdown(
@@ -72,76 +90,78 @@ if tool == "Lesson Builder":
                             line-height: 1.6; white-space: pre-wrap;'>
                     {formatted_plan.replace("\n", "<br>")}
                 </div>
-                """, unsafe_allow_html=True)
+                """,
+                unsafe_allow_html=True
+            )
 
-# ---------- TOOL 2: FEEDBACK ASSISTANT ----------
+# ========== TOOL 2: FEEDBACK ASSISTANT ==========
 elif tool == "Feedback Assistant":
     st.header("🧠 Feedback Assistant")
     student_text = st.text_area("Paste student writing here:")
     tone = st.selectbox("Choose feedback tone", ["Gentle", "Firm", "Colloquial"])
+
     if st.button("Generate Feedback"):
         feedback_prompt = (
-            f"Provide feedback on the following student writing using the Star and 2 Wishes model. "
-            f"Highlight errors in spelling, grammar, cohesion, repetition, and sentence structure by surrounding them with **bold** markers. "
-            f"Use a {tone.lower()} tone.\n\nStudent text:\n{student_text}"
+            f"Give feedback on the following student writing using the Star and 2 Wishes model. "
+            f"Highlight errors in spelling, grammar, cohesion, repetition, and sentence structure by surrounding them with **bold**. "
+            f"Use a {tone.lower()} tone.\n\n"
+            f"Student text:\n{student_text}"
         )
         with st.spinner("Analysing writing..."):
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=feedback_prompt,
-                max_tokens=700,
-                temperature=0.7
+            feedback = chat_completion_request(
+                system_msg="You are a kind, helpful teacher giving writing feedback.",
+                user_msg=feedback_prompt,
+                max_tokens=800
             )
-            feedback = response.choices[0].text.strip()
-            st.markdown(feedback)
+            st.markdown(feedback, unsafe_allow_html=True)
 
-# ---------- TOOL 3: EMAIL ASSISTANT ----------
+# ========== TOOL 3: EMAIL ASSISTANT ==========
 elif tool == "Email Assistant":
     st.header("✉️ Email Assistant")
     recipient = st.selectbox("Who is the email to?", ["Parent", "Student", "Staff", "Other"])
     context = st.text_area("Briefly describe the situation or what you want to say:")
     tone = st.selectbox("Choose tone", ["Supportive", "Professional", "Friendly"])
+
     if st.button("Generate Email"):
         email_prompt = (
             f"Write a {tone.lower()} email to a {recipient.lower()} about the following situation:\n"
-            f"{context}\n\nKeep the email clear, respectful, and well-structured."
+            f"{context}\n\n"
+            f"Keep the email clear, respectful, and well-structured."
         )
         with st.spinner("Writing your email..."):
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=email_prompt,
-                max_tokens=700,
-                temperature=0.7
+            email_content = chat_completion_request(
+                system_msg="You are an experienced teacher writing professional school emails.",
+                user_msg=email_prompt,
+                max_tokens=800
             )
-            email_content = response.choices[0].text.strip()
             st.markdown(email_content)
 
-# ---------- TOOL 4: UNIT GLOSSARY GENERATOR ----------
+# ========== TOOL 4: UNIT GLOSSARY GENERATOR ==========
 elif tool == "Unit Glossary Generator":
     st.header("📘 Unit Glossary Generator")
     subject = st.text_input("Subject (e.g. Science, HASS)")
     topic = st.text_input("Topic or Unit Focus (e.g. Body Systems, Volcanoes)")
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+
     if st.button("Generate Glossary"):
         glossary_prompt = (
             f"Create a 3-tier vocabulary glossary for a Year {year} {subject} unit on '{topic}'. "
-            "Structure it as follows:\n"
+            "Use this structure:\n"
             "Tier 1 (General): 10 basic words students must know.\n"
-            "Tier 2 (Core): 7 subject-specific words encountered in lessons.\n"
-            "Tier 3 (Stretch): 5 challenge words to extend thinking.\n\n"
-            "Format the glossary with bullet points and keep each definition under 20 words."
+            "Tier 2 (Core): 7 subject-specific words they will encounter in lessons.\n"
+            "Tier 3 (Stretch): 5 challenge words that extend thinking.\n\n"
+            "Use bullet points. Keep each definition under 20 words. "
+            "Use student-friendly language, especially for primary year levels."
         )
         with st.spinner("Generating vocabulary list..."):
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=glossary_prompt,
-                max_tokens=500,
-                temperature=0.7
+            glossary = chat_completion_request(
+                system_msg="You are a helpful and experienced curriculum-aligned teacher.",
+                user_msg=glossary_prompt,
+                max_tokens=700
             )
-            glossary = response.choices[0].text.strip()
             st.markdown(glossary)
 
-# ---------- TOOL 5: UNIT PLANNER ----------
+# ========== TOOL 5: UNIT PLANNER ==========
 elif tool == "Unit Planner":
     st.header("📘 Unit Planner")
     unit_year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
@@ -156,36 +176,36 @@ elif tool == "Unit Planner":
     if st.button("Generate Unit Plan"):
         prompt_parts = [
             f"Create a unit plan overview for a Year {unit_year} {unit_subject} unit on '{unit_topic}'.",
-            f"The unit lasts for approximately {unit_weeks} weeks.",
+            f"The unit runs for approximately {unit_weeks} weeks.",
             "Include the following sections:",
             "1. A short Unit Overview (what it's about).",
             "2. 3–5 clear Learning Intentions.",
-            "3. A list of lesson types or activity ideas that suit this unit."
+            "3. A list of lesson types or activity ideas that would suit this unit."
         ]
         if include_assessment:
-            prompt_parts.append("4. Include 1–2 brief assessment ideas.")
+            prompt_parts.append("4. Include 1–2 assessment ideas (format only, keep it brief).")
         if include_hook:
             prompt_parts.append("5. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
         if include_fast_finishers:
             prompt_parts.append("6. Suggest Fast Finisher or Extension Task ideas.")
         if include_cheat_sheet:
-            prompt_parts.append("7. Provide a Quick Content Cheat Sheet with 10 key bullet-point facts for teachers.")
-        
+            prompt_parts.append("7. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+
         full_prompt = " ".join(prompt_parts)
+
         with st.spinner("Planning your unit..."):
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=full_prompt,
-                max_tokens=1000,
-                temperature=0.7
+            unit_plan_raw = chat_completion_request(
+                system_msg="You are a practical and experienced curriculum-aligned teacher in Australia.",
+                user_msg=full_prompt,
+                max_tokens=1200
             )
-            unit_plan_raw = response.choices[0].text.strip()
             st.session_state["unit_plan_text"] = unit_plan_raw
 
-    # Display and offer downloads if a unit plan exists in session state
+    # If we have a generated plan, display it
     if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
         unit_plan_raw = st.session_state["unit_plan_text"]
-        # Clean up formatting (remove markdown syntax and extra newlines)
+
+        # Clean up formatting (remove markdown syntax, etc.)
         unit_plan_clean = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
         unit_plan_clean = re.sub(r"^#+\s*", "", unit_plan_clean, flags=re.MULTILINE)
         unit_plan_clean = re.sub(r"\n{2,}", "\n", unit_plan_clean.strip())
@@ -198,7 +218,9 @@ elif tool == "Unit Planner":
                         color: #222; white-space: pre-wrap;">
                 {unit_plan_clean}
             </div>
-            """, unsafe_allow_html=True)
+            """, 
+            unsafe_allow_html=True
+        )
 
         # --- DOCX EXPORT ---
         word_buffer = BytesIO()
@@ -222,8 +244,9 @@ elif tool == "Unit Planner":
         try:
             pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
             pdf.set_font("DejaVu", size=10)
-        except Exception as e:
+        except Exception:
             pdf.set_font("Arial", size=10)
+
         for line in unit_plan_clean.split("\n"):
             pdf.multi_cell(0, 8, line)
         pdf_buffer = BytesIO()
