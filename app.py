@@ -80,6 +80,7 @@ if tool != "Unit Planner":
         del st.session_state["unit_plan_text"]
 
 # ---------- TOOL 0: UNIT PLANNER ---------
+# This section should only load when "Unit Planner" is selected
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -123,68 +124,70 @@ if tool == "Unit Planner":
     else:
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
-# Input Fields for the Unit Planner
-year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
-subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
-topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
-weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key="unit_weeks")
+# Input Fields for the Unit Planner (these should only show when Unit Planner is selected)
+if tool == "Unit Planner":
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
+    subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
+    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
+    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key="unit_weeks")
 
-include_assessment = st.checkbox("Include Assessment Suggestions?", key="unit_assessment")
-include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key="unit_hook")
-include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
-include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
+    include_assessment = st.checkbox("Include Assessment Suggestions?", key="unit_assessment")
+    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key="unit_hook")
+    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
+    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
 
-if st.button("Generate Unit Plan", key="generate_unit_plan"):
-    prompt_parts = [
-        f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
-        f"The unit runs for approximately {weeks} weeks.",
-        "Include the following sections:",
-        "1. A short Unit Overview (what it's about).",
-        "2. 3–5 clear Learning Intentions.",
-        "3. A list of lesson types or activity ideas that would suit this unit."
-    ]
-    if include_assessment:
-        prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
-    if include_hook:
-        prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
-    if include_fast_finishers:
-        prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
-    if include_cheat_sheet:
-        prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+    if st.button("Generate Unit Plan", key="generate_unit_plan"):
+        prompt_parts = [
+            f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
+            f"The unit runs for approximately {weeks} weeks.",
+            "Include the following sections:",
+            "1. A short Unit Overview (what it's about).",
+            "2. 3–5 clear Learning Intentions.",
+            "3. A list of lesson types or activity ideas that would suit this unit."
+        ]
+        if include_assessment:
+            prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
+        if include_hook:
+            prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
+        if include_fast_finishers:
+            prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
+        if include_cheat_sheet:
+            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
 
-    full_prompt = " ".join(prompt_parts)
+        full_prompt = " ".join(prompt_parts)
 
-    with st.spinner("Planning your unit..."):
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
-                {"role": "user", "content": full_prompt}
-            ]
-        )
+        with st.spinner("Planning your unit..."):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
+                    {"role": "user", "content": full_prompt}
+                ]
+            )
 
-    unit_plan_raw = response.choices[0].message.content
+        unit_plan_raw = response.choices[0].message.content
 
-    # ---- FORMATTING CLEANUP ----
-    unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
-    unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
-    unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
-    unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
+        # ---- FORMATTING CLEANUP ----
+        unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
+        unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
+        unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
+        unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
 
-    bullet_lines = []
-    for line in unit_plan.splitlines():
-        stripped = line.strip()
-        if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
-            clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-            bullet_lines.append("    • " + clean)
-        elif stripped.endswith(":"):
-            bullet_lines.append("")  # Add space BEFORE heading
-            bullet_lines.append(stripped)
-        elif stripped:
-            bullet_lines.append(stripped)
+        bullet_lines = []
+        for line in unit_plan.splitlines():
+            stripped = line.strip()
+            if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
+                clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
+                bullet_lines.append("    • " + clean)
+            elif stripped.endswith(":"):
+                bullet_lines.append("")  # Add space BEFORE heading
+                bullet_lines.append(stripped)
+            elif stripped:
+                bullet_lines.append(stripped)
 
-    final_text = "\n".join(bullet_lines)
-    st.session_state["unit_plan_text"] = final_text
+        final_text = "\n".join(bullet_lines)
+        st.session_state["unit_plan_text"] = final_text
+
 
 # ---------- PDF Generation Check
 if "unit_plan_text" in st.session_state:
