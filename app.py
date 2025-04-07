@@ -241,7 +241,7 @@ font.size = Pt(10)
 if "unit_plan_text" in st.session_state:
     # Loop through the lines of the unit plan
     if "unit_plan_text" in st.session_state:
-    for line in st.session_state["unit_plan_text"].split("\n"):
+        for line in st.session_state["unit_plan_text"].split("\n"):
 
         s = line.strip()
 
