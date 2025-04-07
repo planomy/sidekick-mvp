@@ -319,6 +319,7 @@ if tool == "Feedback Assistant":
             )
             st.markdown(response.choices[0].message.content)
 
+
 # ---------- TOOL 3: EMAIL ASSISTANT ----------
 if tool == "Email Assistant":
     st.header("✉️ Email Assistant")
