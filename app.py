@@ -7,6 +7,7 @@ from io import BytesIO
 from fpdf import FPDF
 import textwrap
 import re
+import time
 
 from docx import Document
 from docx.shared import Pt
