@@ -229,14 +229,14 @@ for line in st.session_state["unit_plan_text"].split("\n"):
         p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
         p.paragraph_format.left_indent = Pt(18)
         p.paragraph_format.space_after = Pt(0)
-         = False  # No bold for bullets
+        p.style.font.bold = False  # No bold for bullets
 
     # If line is a heading (ends with ':')
     elif s.endswith(":"):
         p = doc.add_paragraph(s)
         p.paragraph_format.space_before = Pt(11)
         p.paragraph_format.space_after = Pt(0)
-         = True  # Bold for headings
+        p.style.font.bold = True  # Bold for headings
 
     # If it's just normal text, add it without bullet or bold
     elif s:
