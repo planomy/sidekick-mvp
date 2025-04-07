@@ -158,102 +158,112 @@ elif tool == "Unit Glossary Generator":
             )
             st.markdown(glossary)
 
-# ========== TOOL 5: UNIT PLANNER ==========
-elif tool == "Unit Planner":
+import streamlit as st
+import openai
+import re
+from io import BytesIO
+from docx import Document
+from fpdf import FPDF
+
+# Must be the first Streamlit command!
+st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
+
+# Initialize your client (using the older pattern that worked)
+client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
+if not client.api_key:
+    st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
+    st.stop()
+
+# --- SIDEBAR: TOOL SELECTION ---
+st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
+tool = st.sidebar.radio(
+    "Choose a tool:", 
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
+)
+
+# ---------- TOOL 5: UNIT PLANNER (Working Version) ----------
+if tool == "Unit Planner":
     st.header("📘 Unit Planner")
-    unit_year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-    unit_subject = st.text_input("Subject (e.g. HASS, English, Science)")
-    unit_topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
-    unit_weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
+
+    # Inputs
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    subject = st.text_input("Subject (e.g. HASS, English, Science)")
+    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
+    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
+
     include_assessment = st.checkbox("Include Assessment Suggestions?")
     include_hook = st.checkbox("Include Hook Ideas for Lesson 1?")
     include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?")
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
     if st.button("Generate Unit Plan"):
+        # Build the prompt
         prompt_parts = [
-            f"Create a unit plan overview for a Year {unit_year} {unit_subject} unit on '{unit_topic}'.",
-            f"The unit runs for approximately {unit_weeks} weeks.",
+            f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
+            f"The unit runs for approximately {weeks} weeks.",
             "Include the following sections:",
             "1. A short Unit Overview (what it's about).",
             "2. 3–5 clear Learning Intentions.",
-            "3. A list of lesson types or activity ideas that would suit this unit."
+            "3. A suggested sequence of subtopics or concepts to explore each week.",
+            "4. A list of lesson types or activity ideas that would suit this unit."
         ]
+
         if include_assessment:
-            prompt_parts.append("4. Include 1–2 assessment ideas (format only, keep it brief).")
+            prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
         if include_hook:
-            prompt_parts.append("5. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
+            prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
         if include_fast_finishers:
-            prompt_parts.append("6. Suggest Fast Finisher or Extension Task ideas.")
+            prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
         if include_cheat_sheet:
-            prompt_parts.append("7. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 5–7 bullet-point facts a teacher should know to teach this unit.")
 
         full_prompt = " ".join(prompt_parts)
 
         with st.spinner("Planning your unit..."):
-            unit_plan_raw = chat_completion_request(
-                system_msg="You are a practical and experienced curriculum-aligned teacher in Australia.",
-                user_msg=full_prompt,
-                max_tokens=1200
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
+                    {"role": "user", "content": full_prompt}
+                ]
             )
-            st.session_state["unit_plan_text"] = unit_plan_raw
 
-    # If we have a generated plan, display it
-    if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-        unit_plan_raw = st.session_state["unit_plan_text"]
+        if response and response.choices:
+            unit_plan = response.choices[0].message.content
+            st.markdown(unit_plan)
 
-        # Clean up formatting (remove markdown syntax, etc.)
-        unit_plan_clean = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
-        unit_plan_clean = re.sub(r"^#+\s*", "", unit_plan_clean, flags=re.MULTILINE)
-        unit_plan_clean = re.sub(r"\n{2,}", "\n", unit_plan_clean.strip())
+            # --- EXPORT OPTIONS ---
+            st.markdown("---")
+            st.subheader("📄 Export Options")
 
-        st.markdown("### Generated Unit Plan")
-        st.markdown(
-            f"""
-            <div style="background-color: #ffffff; padding: 20px; border-radius: 6px;
-                        font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7;
-                        color: #222; white-space: pre-wrap;">
-                {unit_plan_clean}
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
+            # Markdown
+            st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
 
-        # --- DOCX EXPORT ---
-        word_buffer = BytesIO()
-        doc = Document()
-        for line in unit_plan_clean.split("\n"):
-            if line.strip():
-                doc.add_paragraph(line.strip())
-        doc.save(word_buffer)
-        word_buffer.seek(0)
-        st.download_button(
-            label="📝 Download Word",
-            data=word_buffer,
-            file_name="unit_plan.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            key="download_word_btn"
-        )
+            # Word
+            doc = Document()
+            doc.add_paragraph(unit_plan)
+            word_buffer = BytesIO()
+            doc.save(word_buffer)
+            word_buffer.seek(0)
+            st.download_button("📝 Download Word", word_buffer,
+                               file_name="unit_plan.docx",
+                               mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-        # --- PDF EXPORT ---
-        pdf = FPDF()
-        pdf.add_page()
-        try:
-            pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-            pdf.set_font("DejaVu", size=10)
-        except Exception:
-            pdf.set_font("Arial", size=10)
+            # PDF
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_auto_page_break(auto=True, margin=15)
+            pdf.set_font("Arial", size=11)
+            import textwrap
+            for line in unit_plan.split("\n"):
+                for wrapped in textwrap.wrap(line, width=90):
+                    pdf.cell(0, 8, txt=wrapped, ln=True)
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer)
+            pdf_buffer.seek(0)
+            st.download_button("📎 Download PDF", pdf_buffer,
+                               file_name="unit_plan.pdf",
+                               mime="application/pdf")
+        else:
+            st.warning("⚠️ Unit plan generation failed. Please try again.")
 
-        for line in unit_plan_clean.split("\n"):
-            pdf.multi_cell(0, 8, line)
-        pdf_buffer = BytesIO()
-        pdf_output = pdf.output(dest='S').encode('latin-1')
-        pdf_buffer.write(pdf_output)
-        pdf_buffer.seek(0)
-        st.download_button(
-            label="📎 Download PDF",
-            data=pdf_buffer,
-            file_name="unit_plan.pdf",
-            mime="application/pdf",
-            key="download_pdf_btn"
-        )
