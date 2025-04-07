@@ -313,6 +313,7 @@ if st.button("Start Timer"):
     st.audio("https://www.soundjay.com/button/beep-07.wav")
 
 
+# ========== PECKISH ==========
 elif tool == "Feeling Peckish":
     st.header("🍽️ Feeling Peckish")
     dish = st.text_input("Enter a dish or beverage (e.g., chicken curry or espresso martini):")
@@ -321,7 +322,7 @@ elif tool == "Feeling Peckish":
             f"Provide a detailed recipe for {dish}. Include a list of ingredients, step-by-step instructions, "
             "and any useful tips for preparation."
         )
-        with st.spinner("Fetching recipe..."):
+        with st.spinner("Messing up the kitchen..."):
             recipe = chat_completion_request(
                 system_msg="You are an expert chef who provides creative and detailed recipes.",
                 user_msg=recipe_prompt,
