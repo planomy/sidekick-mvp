@@ -214,6 +214,7 @@ if tool == "Unit Planner":
             elif s:
                 p = doc.add_paragraph(s)
                 p.paragraph_format.space_after = Pt(0)
+                p.style.font.bold = False
 
         word_buffer = BytesIO()
         doc.save(word_buffer)
