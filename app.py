@@ -78,7 +78,7 @@ if tool != "Unit Planner":
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
 
-  # ---------- TOOL 0: UNIT PLANNER ---------
+# ---------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
@@ -94,12 +94,6 @@ if tool == "Unit Planner":
         doc.add_paragraph(st.session_state["unit_plan_text"])
         doc.save(word_buffer)
         word_buffer.seek(0)  # Rewind the buffer
-
-        # Word download button
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                           key="download_word")
 
         # PDF export button
         pdf = FPDF()
@@ -126,8 +120,15 @@ if tool == "Unit Planner":
                            mime="application/pdf",
                            key="download_pdf")
 
+        # Provide the Word download button below
+        st.download_button("📝 Download Word", word_buffer,
+                           file_name="unit_plan.docx",
+                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                           key="download_word")
+        
     else:
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+
 
 
 
