@@ -74,6 +74,7 @@ st.info(random.choice(teacher_boosts + teacher_facts + funny_boosts + sarcastic_
 st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
+
 # Reset session state when changing tools
 if tool != "Unit Planner":
     # Clear the generated unit plan if the tool is not Unit Planner
@@ -89,26 +90,27 @@ if tool == "Unit Planner":
         # If the unit plan exists, show it and provide the download button
         st.markdown("### Generated Unit Plan")
         st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
-
-        # Only show the Word download button when the unit plan exists
+        
+        # Show both Word and PDF download buttons only when unit plan exists
         st.download_button("📝 Download Word", word_buffer,
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
 
-        # PDF Export
+        # PDF generation logic
         pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=12)
+        pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+        pdf.set_font("DejaVu", size=10)
 
-        # Write text line by line for PDF generation
-        for line in st.session_state["unit_plan_text"].splitlines():
-            wrapped_lines = textwrap.wrap(line, width=90)  # Wrap long lines
+        # Write text line by line
+        for line in st.session_state["unit_plan_text"].split("\n"):
+            wrapped_lines = textwrap.wrap(line, width=90)
             for wrapped_line in wrapped_lines:
                 pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-        # Output the PDF to a buffer
+        # Output the PDF to a buffer (use dest='S' for string output)
         pdf_buffer = BytesIO()
         pdf_output = pdf.output(dest='S')  # Get PDF as string
         pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
@@ -120,7 +122,7 @@ if tool == "Unit Planner":
                            mime="application/pdf")
 
     else:
-        # If the unit plan is empty or not generated, show warning
+        # If unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
 
