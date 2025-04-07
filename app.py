@@ -139,7 +139,7 @@ if tool == "Unit Planner":
 
         st.markdown("### Generated Unit Plan")
         st.markdown(
-            f"<div style='background-color: #f2f2f2; padding: 15px; border-radius: 5px; font-family: sans-serif; white-space: pre-wrap;'>" +
+            f"<div style='background-color: #f2f2f2; color: #000000; padding: 15px; border-radius: 5px; font-family: sans-serif; white-space: pre-wrap;'>" +
             formatted.replace("\n", "<br>") + "</div>",
             unsafe_allow_html=True
         )
