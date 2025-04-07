@@ -141,8 +141,8 @@ if tool == "Unit Planner":
         st.markdown("### Generated Unit Plan")
 
     def convert_to_html(text):
-    lines = text.split("\n")
-    html_lines = []
+        lines = text.split("\n")
+        html_lines = []
     
     for line in lines:
         stripped = line.strip()
