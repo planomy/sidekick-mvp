@@ -4,15 +4,21 @@ import re
 from io import BytesIO
 from docx import Document
 from fpdf import FPDF
+import textwrap
 
-# This must be the first Streamlit call!
+# This must be the very first Streamlit call!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
 # Now it's safe to use other st.* functions
+# Initialize OpenAI client using the modern approach
 openai.api_key = st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
     st.stop()
+
+# Create a client object using the older pattern if needed (only use one approach!)
+# Uncomment the following line if you prefer the client object approach:
+# client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
 
 # --- SIDEBAR: TOOL SELECTION ---
 st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
@@ -21,11 +27,11 @@ tool = st.sidebar.radio(
     ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
 )
 
-# ========== HELPER FUNCTION ==========
+# ========== HELPER FUNCTION (Using ChatCompletion) ==========
 def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0.7):
     """
     A helper to call GPT-3.5-turbo with system & user messages.
-    Make sure your environment has openai>=0.27.0.
+    Requires openai>=0.27.0.
     """
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -77,7 +83,6 @@ if tool == "Lesson Builder":
                 user_msg=full_prompt,
                 max_tokens=1200
             )
-            # Simple formatting
             formatted_plan = lesson_plan.replace("* ", "• ")
             formatted_plan = re.sub(r"^#+\s*(.+)$", r"<br><b>\1</b>", formatted_plan, flags=re.MULTILINE)
             st.markdown(
@@ -158,34 +163,9 @@ elif tool == "Unit Glossary Generator":
             )
             st.markdown(glossary)
 
-import streamlit as st
-import openai
-import re
-from io import BytesIO
-from docx import Document
-from fpdf import FPDF
-
-# Must be the first Streamlit command!
-st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
-
-# Initialize your client (using the older pattern that worked)
-client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
-if not client.api_key:
-    st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
-    st.stop()
-
-# --- SIDEBAR: TOOL SELECTION ---
-st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
-tool = st.sidebar.radio(
-    "Choose a tool:", 
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
-)
-
-# ---------- TOOL 5: UNIT PLANNER (Working Version) ----------
-if tool == "Unit Planner":
+# ========== TOOL 5: UNIT PLANNER ==========
+elif tool == "Unit Planner":
     st.header("📘 Unit Planner")
-
-    # Inputs
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
     subject = st.text_input("Subject (e.g. HASS, English, Science)")
     topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
@@ -197,7 +177,6 @@ if tool == "Unit Planner":
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
     if st.button("Generate Unit Plan"):
-        # Build the prompt
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
@@ -207,7 +186,6 @@ if tool == "Unit Planner":
             "3. A suggested sequence of subtopics or concepts to explore each week.",
             "4. A list of lesson types or activity ideas that would suit this unit."
         ]
-
         if include_assessment:
             prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
         if include_hook:
@@ -236,10 +214,10 @@ if tool == "Unit Planner":
             st.markdown("---")
             st.subheader("📄 Export Options")
 
-            # Markdown
+            # Markdown export
             st.download_button("📋 Copy Markdown", unit_plan, file_name="unit_plan.md")
 
-            # Word
+            # Word export
             doc = Document()
             doc.add_paragraph(unit_plan)
             word_buffer = BytesIO()
@@ -249,12 +227,11 @@ if tool == "Unit Planner":
                                file_name="unit_plan.docx",
                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-            # PDF
+            # PDF export
             pdf = FPDF()
             pdf.add_page()
             pdf.set_auto_page_break(auto=True, margin=15)
             pdf.set_font("Arial", size=11)
-            import textwrap
             for line in unit_plan.split("\n"):
                 for wrapped in textwrap.wrap(line, width=90):
                     pdf.cell(0, 8, txt=wrapped, ln=True)
@@ -266,4 +243,3 @@ if tool == "Unit Planner":
                                mime="application/pdf")
         else:
             st.warning("⚠️ Unit plan generation failed. Please try again.")
-
