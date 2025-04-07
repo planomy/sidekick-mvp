@@ -238,9 +238,8 @@ import textwrap
 from io import BytesIO
 import streamlit as st
 
-# Ensure unit_plan is not empty
-if unit_plan:
-    # Initialize PDF
+# Ensure unit_plan exists and is not empty
+if 'unit_plan' in locals() and unit_plan:
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -263,6 +262,7 @@ if unit_plan:
                        mime="application/pdf")
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
+
 
 
 
