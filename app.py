@@ -189,7 +189,7 @@ if "unit_plan_text" in st.session_state:
     from docx.shared import Pt
     from io import BytesIO
 
-        doc = Document()
+    doc = Document()
 
           # Get the section and set the margins
         sections = doc.sections
