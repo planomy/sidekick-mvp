@@ -138,7 +138,7 @@ if tool == "Unit Planner":
 
             formatted = "\n".join(bullet_lines)
 
-           formatted = st.session_state.get("unit_plan", "")
+            formatted = st.session_state.get("unit_plan", "")
 
 
 
