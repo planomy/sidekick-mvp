@@ -268,17 +268,23 @@ if "unit_plan_text" in st.session_state:
             pdf.cell(0, 6, stripped, ln=True)
             pdf.set_font("Arial", style='', size=10)  # Regular font after heading
 
-        # Bullet points
-        elif stripped.startswith("•") or stripped.startswith("    •"):
-            clean = stripped.replace("•", "").strip()
-            for i, wrapped in enumerate(textwrap.wrap(clean, width=90)):
-                pdf.cell(10 if i == 0 else 14)  # Indent continuation lines
-                pdf.cell(0, 6, wrapped, ln=True)
+import textwrap
 
-        # Regular paragraph text
-        else:
-            for wrapped in textwrap.wrap(stripped, width=95):
-                pdf.cell(0, 6, wrapped, ln=True)
+# Bullet points section
+elif stripped.startswith("•") or stripped.startswith("    •"):  # Ensure the bullet points are detected properly
+    clean = stripped.replace("•", "").strip()  # Remove the bullet symbol if necessary
+
+    # Process wrapped text for each bullet point
+    for i, wrapped in enumerate(textwrap.wrap(clean, width=90)):
+        # Indent continuation lines with cell(10) and normal cell for others
+        pdf.cell(10 if i == 0 else 14, 6, wrapped, ln=True)  # Fix indentation handling
+
+# Regular paragraph text (non-bullet)
+else:
+    # Text wrapping for regular content
+    for wrapped in textwrap.wrap(stripped, width=95):
+        pdf.cell(0, 6, wrapped, ln=True)  # Adjusted cell width and line spacing
+
 
     # Output the PDF to a buffer (BytesIO)
     pdf_buffer = BytesIO()
