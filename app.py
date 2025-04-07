@@ -291,7 +291,7 @@ if st.button("Generate Unit Plan", key="generate_unit_plan_button"):
 
         final_text = "\n".join(bullet_lines)
         st.session_state["unit_plan_text"] = final_text
-
+        formatted = final_text
 
 
 
