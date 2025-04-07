@@ -237,18 +237,30 @@ def format_unit_plan_text(text):
 from fpdf import FPDF
 import textwrap
 
-# Helper formatter function
+# Helper function to format the unit plan text
 def format_unit_plan_text(text):
     lines = text.split("\n")
     formatted_lines = []
 
+    # Explicitly bold headings that are the same each time
+    bold_headings = [
+        "Unit Plan Overview:",
+        "Learning Intentions:",
+        "Suggested Sequence of Subtopics:",
+        "Lesson Types/Activities:",
+        "Quick Content Cheat Sheet:",
+        "Assessment Suggestions:",  # New heading added
+        "Hook Ideas:",  # New heading added
+        "Fast Finisher Suggestions:"  # New heading added
+    ]
+
     for line in lines:
         stripped = line.strip()
 
-        # Adding space before headings and making sure they are bold
-        if stripped.endswith(":") and not stripped.startswith("•"):
-            formatted_lines.append("")  # blank line before heading
-            formatted_lines.append(f"<b>{stripped}</b>")  # bold headings
+        # Check if the line is one of the bold headings
+        if stripped in bold_headings:
+            formatted_lines.append("")  # Add blank line before heading
+            formatted_lines.append(f"<b>{stripped}</b>")  # Apply bold
         elif stripped.startswith("•"):
             # Indented bullet points
             formatted_lines.append(f"    • {stripped.replace('•', '').strip()}")
@@ -257,14 +269,14 @@ def format_unit_plan_text(text):
 
     return "\n".join(formatted_lines)
 
-# PDF Export logic
+# PDF export logic
 if "unit_plan_text" in st.session_state:
     export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
 
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=10)  # Use 10pt font
+    pdf.set_font("Arial", size=10)  # 10pt font size
 
     for line in export_text.split("\n"):
         stripped = line.strip()
@@ -273,8 +285,17 @@ if "unit_plan_text" in st.session_state:
             pdf.ln(5)  # Add a blank line between paragraphs
             continue
 
-        # Bold all section headings (lines that end with `:`)
-        if stripped.endswith(":") and not stripped.startswith("•"):
+        # Bold section headings (those that are defined explicitly)
+        if stripped in [
+            "Unit Plan Overview:",
+            "Learning Intentions:",
+            "Suggested Sequence of Subtopics:",
+            "Lesson Types/Activities:",
+            "Quick Content Cheat Sheet:",
+            "Assessment Suggestions:",
+            "Hook Ideas:",
+            "Fast Finisher Suggestions:"
+        ]:
             pdf.ln(2)
             pdf.set_font("Arial", style='B', size=10)  # Bold headings
             pdf.cell(0, 6, stripped, ln=True)
@@ -283,8 +304,7 @@ if "unit_plan_text" in st.session_state:
         # Bullet points
         elif stripped.startswith("•") or stripped.startswith("    •"):
             clean = stripped.replace("•", "").strip()
-            wrapped_lines = textwrap.wrap(clean, width=90)
-            for i, wrapped in enumerate(wrapped_lines):
+            for i, wrapped in enumerate(textwrap.wrap(clean, width=90)):
                 pdf.cell(10 if i == 0 else 14)  # Indent continuation lines
                 pdf.cell(0, 6, wrapped, ln=True)
 
@@ -300,6 +320,7 @@ if "unit_plan_text" in st.session_state:
     pdf_buffer.seek(0)
 
     st.download_button("📎 Download PDF", data=pdf_buffer, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+
 
 
 
