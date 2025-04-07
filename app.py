@@ -252,9 +252,10 @@ if unit_plan:  # Ensure unit_plan is not empty
 
     # Write text line by line
     for line in unit_plan.split("\n"):
-        wrapped_lines = textwrap.wrap(line, width=90)
-        for wrapped_line in wrapped_lines:
-            pdf.cell(0, 8, txt=wrapped_line, ln=True)
+    wrapped_lines = textwrap.wrap(line, width=90)
+    for wrapped_line in wrapped_lines:
+        pdf.cell(0, 8, txt=wrapped_line.encode('utf-8').decode('latin-1'), ln=True)
+
 
     # Output the PDF to a buffer
     pdf_buffer = BytesIO(pdf.output(dest='S'))
