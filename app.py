@@ -211,6 +211,28 @@ if tool == "Unit Planner":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             key="download_word")
 
+def format_unit_plan_text(text):
+    lines = text.split("\n")
+    formatted_lines = []
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        # Add space before section headings (ending in colon, not bullet)
+        if stripped.endswith(":") and not stripped.startswith("•"):
+            formatted_lines.append("")  # Blank line before headings
+            formatted_lines.append(stripped)
+        # Bullet points, indented
+        elif stripped.startswith("•"):
+            clean = stripped.replace("•", "").strip()
+            formatted_lines.append(f"    • {clean}")
+        # Normal paragraph
+        elif stripped:
+            formatted_lines.append(stripped)
+
+    return "\n".join(formatted_lines)
+
+
       # PDF EXPORT
 from fpdf import FPDF
 import textwrap
