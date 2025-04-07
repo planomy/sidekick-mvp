@@ -79,18 +79,6 @@ if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Plan
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
         
-
-
-
-# --------- TOOL 0: UNIT PLANNER ---------
-if tool == "Unit Planner":
-    st.header("📘 Unit Planner")
-
-# Reset session state when changing tools
-if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Planner
-    if "unit_plan_text" in st.session_state:
-        del st.session_state["unit_plan_text"]
-        
 # --------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
@@ -108,7 +96,6 @@ if tool == "Unit Planner":
     else:
         # If unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
-
 
     
     
