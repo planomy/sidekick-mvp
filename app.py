@@ -272,6 +272,7 @@ else:
 
 
 
+
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
