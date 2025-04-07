@@ -313,7 +313,7 @@ if st.button("Start Timer"):
     st.audio("https://www.soundjay.com/button/beep-07.wav")
 
 
-elif tool == "Feeling Peckish?":
+elif tool == "Feeling Peckish":
     st.header("🍽️ Feeling Peckish")
     dish = st.text_input("Enter a dish or beverage (e.g., chicken curry or espresso martini):")
     if st.button("Get Recipe"):
