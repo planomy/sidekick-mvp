@@ -196,16 +196,23 @@ if "unit_plan_text" in st.session_state:
     from docx.shared import Pt
     from io import BytesIO
 
-    doc = Document()
 
-    # Get the section and set the margins
+    
+try:
+    # Your logic here for document creation
+    doc = Document()
     sections = doc.sections
     for section in sections:
-        # Access the section's page settings and change margins
-        section._sectPr.pgMar.top = Pt(40)  # Top margin
-        section._sectPr.pgMar.bottom = Pt(60)  # Bottom margin
-        section._sectPr.pgMar.left = Pt(40)  # Left margin
-        section._sectPr.pgMar.right = Pt(60)  # Right margin
+        section._sectPr.pgMar.top = Pt(40)
+        section._sectPr.pgMar.bottom = Pt(60)
+        section._sectPr.pgMar.left = Pt(40)
+        section._sectPr.pgMar.right = Pt(60)
+except Exception as e:
+    st.error(f"An error occurred: {e}")
+    # Optionally log this error for later debugging or diagnostics
+
+
+
     
 # Set font and add content
 style = doc.styles['Normal']
@@ -222,14 +229,14 @@ for line in st.session_state["unit_plan_text"].split("\n"):
         p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
         p.paragraph_format.left_indent = Pt(18)
         p.paragraph_format.space_after = Pt(0)
-        p.style.font.bold = False  # No bold for bullets
+         = False  # No bold for bullets
 
     # If line is a heading (ends with ':')
     elif s.endswith(":"):
         p = doc.add_paragraph(s)
         p.paragraph_format.space_before = Pt(11)
         p.paragraph_format.space_after = Pt(0)
-        p.style.font.bold = True  # Bold for headings
+         = True  # Bold for headings
 
     # If it's just normal text, add it without bullet or bold
     elif s:
