@@ -163,6 +163,7 @@ elif tool == "Unit Glossary Generator":
             )
             st.markdown(response.choices[0].message.content, unsafe_allow_html=True)
 
+
 # --- TOOL 5: UNIT PLANNER ---
 elif tool == "Unit Planner":
     st.header("📘 Unit Planner")
@@ -201,28 +202,35 @@ elif tool == "Unit Planner":
                     {"role": "user", "content": full_prompt}
                 ]
             )
-            unit_plan_raw = response.choices[0].message.content
-            st.session_state["unit_plan_text"] = unit_plan_raw
+            # Store the generated unit plan text in session state
+            st.session_state["unit_plan_text"] = response.choices[0].message.content
 
-    # Display the Unit Plan and provide download options if available
+    # If a unit plan has been generated, display it and create download buttons
     if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-        st.markdown("### Generated Unit Plan")
-        # Clean up formatting: remove markdown bold and headings if desired
-        unit_plan_clean = re.sub(r"\*\*(.*?)\*\*", r"\1", st.session_state["unit_plan_text"])
+        unit_plan_raw = st.session_state["unit_plan_text"]
+
+        # Clean up formatting (remove markdown syntax if necessary)
+        unit_plan_clean = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
         unit_plan_clean = re.sub(r"^#+\s*", "", unit_plan_clean, flags=re.MULTILINE)
         unit_plan_clean = re.sub(r"\n{2,}", "\n", unit_plan_clean.strip())
+
+        st.markdown("### Generated Unit Plan")
         st.markdown(
             f"""
-            <div style="background-color: #ffffff; padding: 20px; border-radius: 6px; font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7; color: #222; white-space: pre-wrap; text-align: left;">
+            <div style="background-color: #ffffff; padding: 20px; border-radius: 6px;
+                        font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7;
+                        color: #222; white-space: pre-wrap;">
                 {unit_plan_clean}
             </div>
             """, unsafe_allow_html=True)
 
-        # --- WORD DOWNLOAD ---
+        # --- DOCX EXPORT ---
         word_buffer = BytesIO()
         doc = Document()
-        # You could parse headings/bullet points here using add_heading/add_bullet_points if needed.
-        doc.add_paragraph(unit_plan_clean)
+        # Split by newlines to create separate paragraphs for better formatting
+        for line in unit_plan_clean.split("\n"):
+            if line.strip():
+                doc.add_paragraph(line.strip())
         doc.save(word_buffer)
         word_buffer.seek(0)
         st.download_button(
@@ -233,7 +241,7 @@ elif tool == "Unit Planner":
             key="download_word_btn"
         )
 
-        # --- PDF DOWNLOAD ---
+        # --- PDF EXPORT ---
         pdf = FPDF()
         pdf.add_page()
         try:
@@ -241,6 +249,7 @@ elif tool == "Unit Planner":
             pdf.set_font("DejaVu", size=10)
         except Exception as e:
             pdf.set_font("Arial", size=10)
+        # Use multi_cell to handle text wrapping properly
         for line in unit_plan_clean.split("\n"):
             pdf.multi_cell(0, 8, line)
         pdf_buffer = BytesIO()
@@ -254,3 +263,4 @@ elif tool == "Unit Planner":
             mime="application/pdf",
             key="download_pdf_btn"
         )
+
