@@ -159,7 +159,7 @@ if tool == "Unit Planner":
     return "".join(html_lines)
 
 
-    st.markdown(
+        st.markdown(
             f"""
             <div style='
                 background-color: #ffffff;
@@ -179,7 +179,7 @@ if tool == "Unit Planner":
         )
 
 
-    st.markdown("---")
+        st.markdown("---")
         st.subheader("📄 Export Options")
 
         # WORD EXPORT
