@@ -188,10 +188,10 @@ if tool == "Unit Planner":
         sections = doc.sections
         for section in sections:
         # Access the section's page settings and change margins
-            section._sectPr.pgMar.top = Pt(20)  # Top margin
-            section._sectPr.pgMar.bottom = Pt(20)  # Bottom margin
-            section._sectPr.pgMar.left = Pt(20)  # Left margin
-            section._sectPr.pgMar.right = Pt(20)  # Right margin
+            section._sectPr.pgMar.top = Pt(40)  # Top margin
+            section._sectPr.pgMar.bottom = Pt(40)  # Bottom margin
+            section._sectPr.pgMar.left = Pt(40)  # Left margin
+            section._sectPr.pgMar.right = Pt(40)  # Right margin
     
     # Set font and add content
         
