@@ -247,7 +247,6 @@ def format_unit_plan_text(text):
     bold_headings = [
         "Unit Plan Overview:",
         "Learning Intentions:",
-        "Suggested Sequence of Subtopics:",
         "Lesson Types/Activities:",
         "Quick Content Cheat Sheet:",
         "Assessment Suggestions:",
@@ -290,7 +289,6 @@ if "unit_plan_text" in st.session_state:
         if stripped in [
             "Unit Plan Overview:",
             "Learning Intentions:",
-            "Suggested Sequence of Subtopics:",
             "Lesson Types/Activities:",
             "Quick Content Cheat Sheet:",
             "Assessment Suggestions:",
