@@ -5,15 +5,6 @@ from io import BytesIO
 from docx import Document
 from fpdf import FPDF
 
-
-import streamlit as st
-import openai
-
-st.write("OpenAI library version:", openai.__version__)
-st.write("OpenAI file location:", openai.__file__)
-
-
-
 # This must be the first Streamlit call!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
