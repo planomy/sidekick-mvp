@@ -213,26 +213,34 @@ font = style.font
 font.name = 'Calibri'
 font.size = Pt(10)
 
-# Loop through the lines of the unit plan
-for line in st.session_state["unit_plan_text"].split("\n"):
-    s = line.strip()
 
-    if s.startswith("•") and not s.endswith(":"):
-        p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
-        p.paragraph_format.left_indent = Pt(18)
-        p.paragraph_format.space_after = Pt(0)
-        p.style.font.bold = False  # No bold for bullets
+# Check if unit_plan_text exists in session state before accessing it
+if "unit_plan_text" in st.session_state:
+    # Loop through the lines of the unit plan
+    for line in st.session_state["unit_plan_text"].split("\n"):
+        s = line.strip()
 
-    elif s.endswith(":"):
-        p = doc.add_paragraph(s)
-        p.paragraph_format.space_before = Pt(11)
-        p.paragraph_format.space_after = Pt(0)
-        p.style.font.bold = True  # Bold for headings
+        if s.startswith("•") and not s.endswith(":"):
+            p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
+            p.paragraph_format.left_indent = Pt(18)
+            p.paragraph_format.space_after = Pt(0)
+            p.style.font.bold = False  # No bold for bullets
 
-    elif s:
-        p = doc.add_paragraph(s)
-        p.paragraph_format.space_after = Pt(0)
-        p.style.font.bold = False  # Normal text is not bold
+        elif s.endswith(":"):
+            p = doc.add_paragraph(s)
+            p.paragraph_format.space_before = Pt(11)
+            p.paragraph_format.space_after = Pt(0)
+            p.style.font.bold = True  # Bold for headings
+
+        elif s:
+            p = doc.add_paragraph(s)
+            p.paragraph_format.space_after = Pt(0)
+            p.style.font.bold = False  # Normal text is not bold
+
+else:
+    st.warning("Unit plan text is not available. Please generate the unit plan first.")
+
+
 
 # Create Word buffer and save the document
 word_buffer = BytesIO()
