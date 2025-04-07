@@ -186,7 +186,7 @@ if tool == "Unit Planner":
         style = doc.styles['Normal']
         font = style.font
         font.name = 'Calibri'
-        font.size = Pt(11)
+        font.size = Pt(10)
 
         for line in st.session_state["unit_plan_text"].split("\n"):
             s = line.strip()
@@ -251,7 +251,7 @@ if unit_plan:  # Ensure unit_plan is not empty
 
     # Switch to DejaVu font for better Unicode support
     pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-    pdf.set_font("DejaVu", size=11)
+    pdf.set_font("DejaVu", size=10)
 
     # Write text line by line
     for line in unit_plan.split("\n"):
