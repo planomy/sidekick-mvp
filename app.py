@@ -183,6 +183,17 @@ if tool == "Unit Planner":
         from io import BytesIO
 
         doc = Document()
+
+        # Set the margins for the document (top, left, right, bottom)
+        sections = doc.sections
+        for section in sections:
+            section.top_margin = Pt(10)  # Top margin
+            section.bottom_margin = Pt(10)  # Bottom margin
+            section.left_margin = Pt(10)  # Left margin
+            section.right_margin = Pt(10)  # Right margin
+        
+        # Set font and add content
+        
         style = doc.styles['Normal']
         font = style.font
         font.name = 'Calibri'
