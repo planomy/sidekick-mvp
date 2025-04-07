@@ -82,6 +82,12 @@ if tool == "Unit Planner":
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
 
     if st.button("Generate Unit Plan", key="generate_unit_plan"):
+        import openai, re, textwrap
+        from io import BytesIO
+        from docx import Document
+        from docx.shared import Pt
+        from fpdf import FPDF
+
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
@@ -91,7 +97,6 @@ if tool == "Unit Planner":
             "3. A suggested sequence of subtopics or concepts to explore each week.",
             "4. A list of lesson types or activity ideas that would suit this unit."
         ]
-
         if include_assessment:
             prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
         if include_hook:
@@ -102,7 +107,6 @@ if tool == "Unit Planner":
             prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
 
         full_prompt = " ".join(prompt_parts)
-
         client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
         with st.spinner("Planning your unit..."):
@@ -114,100 +118,88 @@ if tool == "Unit Planner":
                 ]
             )
 
-        raw = response.choices[0].message.content
+        if response and response.choices:
+            raw = response.choices[0].message.content
 
-        import re
-        unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)  # Remove bold
-        unit_plan = re.sub(r"#+", "", unit_plan)          # Remove markdown headers
-        unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse extra newlines
-        unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)       # Ensure space after headings
+            # Clean text
+            text = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)
+            text = re.sub(r"#+", "", text)
+            text = re.sub(r"\n{3,}", "\n\n", text.strip())
+            text = re.sub(r'(?<=:)\n', '\n\n', text)
 
-        # Format bullets and spacing
-        lines = []
-        for line in unit_plan.splitlines():
-            stripped = line.strip()
-            if re.match(r'^(\d+\.\s+|-\s+)', stripped):
-                clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                lines.append("    • " + clean)
-            elif stripped.endswith(":"):
-                lines.append(f"<b>{stripped}</b>")
-            elif stripped:
-                lines.append(stripped)
+            final_lines = []
+            for line in text.splitlines():
+                stripped = line.strip()
+                if re.match(r'^(\d+\.\s+|-\s+)', stripped):
+                    clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
+                    final_lines.append("    • " + clean)
+                elif stripped.endswith(":"):
+                    final_lines.append("")
+                    final_lines.append(stripped)
+                    final_lines.append("")
+                elif stripped:
+                    final_lines.append(stripped)
 
-        formatted = "\n".join(lines).strip()
-        st.session_state["unit_plan"] = formatted
+            cleaned = "\n".join(final_lines).strip()
+            st.session_state["unit_plan"] = cleaned
 
-        st.markdown(
-        f"""
-        <div style="
-            color: #000000;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: sans-serif;
-            white-space: pre-wrap;
-            line-height: 1.5;
-            font-size: 15px;
-        ">
-        {formatted.replace("\n", "<br>")}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            # Streamlit display
+            st.markdown("### Generated Unit Plan")
+            st.text_area("📄 Unit Plan Output", cleaned, height=400)
 
+            # --- EXPORT SECTION ---
+            st.markdown("---")
+            st.subheader("📄 Export Options")
 
+            export_text = st.session_state["unit_plan"]
 
-        st.markdown("---")
-        st.subheader("📄 Export Options")
+            # Word export
+            doc = Document()
+            style = doc.styles['Normal']
+            font = style.font
+            font.name = 'Calibri'
+            font.size = Pt(11)
 
-        # === Word Export ===
-        from docx import Document
-        from docx.shared import Pt
-        from io import BytesIO
+            for line in export_text.split("\n"):
+                s = line.strip()
+                if s.startswith("•") and not s.endswith(":"):
+                    p = doc.add_paragraph(s)
+                    p.paragraph_format.left_indent = Pt(18)
+                    p.paragraph_format.space_after = Pt(0)
+                elif s.endswith(":"):
+                    p = doc.add_paragraph(s)
+                    p.paragraph_format.space_after = Pt(8)
+                elif s:
+                    p = doc.add_paragraph(s)
+                    p.paragraph_format.space_after = Pt(0)
 
-        doc = Document()
-        style = doc.styles['Normal']
-        font = style.font
-        font.name = 'Calibri'
-        font.size = Pt(11)
+            word_buffer = BytesIO()
+            doc.save(word_buffer)
+            word_buffer.seek(0)
 
-        for line in formatted.split("\n"):
-            s = line.strip()
-            if s.startswith("•") and not s.endswith(":"):
-                p = doc.add_paragraph(s)
-                p.paragraph_format.left_indent = Pt(18)
-                p.paragraph_format.space_after = Pt(0)
-            elif s.startswith("**") and s.endswith("**"):
-                p = doc.add_paragraph(s.strip("*"))
-                p.paragraph_format.space_after = Pt(10)
-            elif s:
-                p = doc.add_paragraph(s)
-                p.paragraph_format.space_after = Pt(0)
+            st.download_button("📝 Download Word", word_buffer,
+                               file_name="unit_plan.docx",
+                               mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                               key="download_word")
 
-        word_buffer = BytesIO()
-        doc.save(word_buffer)
-        word_buffer.seek(0)
+            # PDF export
+            class SafePDF(FPDF):
+                def __init__(self):
+                    super().__init__()
+                    self.set_auto_page_break(auto=True, margin=15)
+                    self.set_font("Arial", size=11)
 
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                           key="download_word")
+                def safe_text(self, text):
+                    return text.encode('latin-1', 'replace').decode('latin-1')
 
-        # === PDF Export ===
-        from fpdf import FPDF
-        import textwrap
+            pdf = SafePDF()
+            pdf.add_page()
+            for line in export_text.replace("•", "-").split("\n"):
+                for wrapped in textwrap.wrap(line, width=90):
+                    pdf.cell(0, 8, txt=pdf.safe_text(wrapped), ln=True)
 
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=11)
-        pdf_safe = formatted.replace("•", "-")
-
-        for line in pdf_safe.split("\n"):
-            for wrapped in textwrap.wrap(line, width=90):
-                pdf.cell(0, 8, txt=wrapped, ln=True)
-
-        pdf_bytes = pdf.output(dest='S').encode('utf-8')
-        st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+            pdf_bytes = pdf.output(dest='S').encode('latin-1')
+            st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
 
 
 # ---------- TOOL 1: LESSON BUILDER ----------
