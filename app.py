@@ -76,11 +76,10 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 
 # Reset session state when changing tools
 if tool != "Unit Planner":
-    # Ensure we delete only 'unit_plan_text' session state key
+    # Clear the generated unit plan if the tool is not Unit Planner
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
 
-        
 # --------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
