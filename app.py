@@ -56,6 +56,7 @@ doc.save('formatted_unit_plan.docx')
 st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
 
 # ---------- API KEY INPUT ----------
+st.sidebar.title("PLANOMY")
 st.sidebar.title("Where you're the ✨ Star ✨")
 api_key = st.secrets["OPENAI_API_KEY"]
 if not api_key:
