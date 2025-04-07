@@ -2,26 +2,20 @@ import streamlit as st
 import openai
 import re
 import textwrap
-import time
 from io import BytesIO
 from docx import Document
 from docx.shared import Pt
 from fpdf import FPDF
 
-import streamlit as st
-import openai
-
+# This must be the first Streamlit call!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
-st.write("OpenAI library version:", openai.__version__)
-
-
-
-# Load API key from secrets
+# Now it's safe to use other st.* functions
 openai.api_key = st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
     st.stop()
+
 
 # --- SIDEBAR: TOOL SELECTION ---
 st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
