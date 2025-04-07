@@ -29,7 +29,8 @@ def add_bullet_points(doc, points):
         run.font.size = Pt(10)
 
 # --- SIDEBAR: TOOL SELECTION ---
-st.sidebar.title("✏️ Tools")
+st.sidebar.title("PLANOMY")
+st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:", 
     ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
