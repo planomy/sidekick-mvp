@@ -194,46 +194,47 @@ if tool == "Unit Planner":
             key="download_word")
 
              # BETTER PDF EXPORT ✨
+# PDF EXPORT
 from fpdf import FPDF
 import textwrap
 
-pdf = FPDF()
-pdf.add_page()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=11)
+export_text = st.session_state.get("unit_plan", "")
 
-formatted = st.session_state["unit_plan"]
+if not export_text:
+    st.warning("No unit plan found. Please generate the unit plan first.")
+else:
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Arial", size=11)
 
-for line in formatted.split("\n"):
-    line = line.strip()
+    for line in export_text.split("\n"):
+        line = line.strip()
 
-    # HEADINGS — Add space BEFORE heading, not after
-    if line.endswith(":") and not line.startswith("•"):
-        pdf.ln(5)
-        pdf.set_font("Arial", style='B', size=11)
-        pdf.cell(0, 8, line, ln=True)
-        pdf.set_font("Arial", style='', size=11)
+        # Headings – add space before, not after
+        if line.endswith(":") and not line.startswith("•"):
+            pdf.ln(5)
+            pdf.set_font("Arial", style='B', size=11)
+            pdf.cell(0, 8, line, ln=True)
+            pdf.set_font("Arial", style='', size=11)
 
-    # BULLET POINTS — Indented dash
-    elif line.startswith("•"):
-        text = line.replace("•", "-")
-        for wrapped in textwrap.wrap(text, width=90):
-            pdf.cell(10)
-            pdf.cell(0, 8, wrapped, ln=True)
+        # Bullet points
+        elif line.startswith("•"):
+            text = line.replace("•", "-")
+            for wrapped in textwrap.wrap(text, width=90):
+                pdf.cell(10)  # indent
+                pdf.cell(0, 8, wrapped, ln=True)
 
-    # REGULAR TEXT
-    elif line:
-        for wrapped in textwrap.wrap(line, width=90):
-            pdf.cell(0, 8, wrapped, ln=True)
+        # Regular lines
+        elif line:
+            for wrapped in textwrap.wrap(line, width=90):
+                pdf.cell(0, 8, wrapped, ln=True)
 
-pdf_bytes = pdf.output(dest='S').encode('latin1')
+    # Finalise
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
 
-        
-        # Download button
-st.download_button("📎 Download PDF", data=pdf_bytes,
-                           file_name="unit_plan.pdf",
-                           mime="application/pdf",
-                           key="download_pdf")
+    st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+
 
 
 # ---------- TOOL 1: LESSON BUILDER ----------
