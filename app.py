@@ -238,7 +238,7 @@ if tool == "Lesson Builder":
     lesson_style = st.selectbox("Lesson Style", ["Hands-On", "Discussion-Based", "Quiet/Reflective", "Creative"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
 
-if st.button("Generate Unit Plan", key="generate_unit_plan"):
+if st.button("Generate Unit Plan", key="generate_unit_plan_button"):
     prompt_parts = [
         f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
         f"The unit runs for approximately {weeks} weeks.",
