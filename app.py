@@ -75,27 +75,31 @@ st.sidebar.title("✏️ Tools")
 tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"])
 
 # Reset session state when changing tools
-if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Planner
+if tool != "Unit Planner":
+    # Ensure we delete only 'unit_plan_text' session state key
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
+
         
 # --------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
-    # Check if unit plan exists in session state and is not empty
+    # Check if unit plan exists and is not empty
     if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-        # If the unit plan exists and is not empty, show it and provide download button
+        # If the unit plan exists, show it and provide the download button
         st.markdown("### Generated Unit Plan")
-        st.markdown(st.session_state["unit_plan_text"])  # Display unit plan
+        st.markdown(st.session_state["unit_plan_text"])  # Display the unit plan
+
         # Only show the Word download button when the unit plan exists
         st.download_button("📝 Download Word", word_buffer,
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
     else:
-        # If unit plan is empty or not generated, show warning
+        # If the unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+
 
     
     
