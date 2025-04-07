@@ -8,6 +8,12 @@ from docx import Document
 from docx.shared import Pt
 from fpdf import FPDF
 
+import streamlit as st
+import openai
+
+st.write("OpenAI library version:", openai.__version__)
+
+
 # --- SETUP ---
 st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
 
