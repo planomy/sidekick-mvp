@@ -299,8 +299,6 @@ if st.button("Generate Unit Plan", key="generate_unit_plan_button"):
             
 import re
 
-formatted = response.choices[0].message.content
-
 # Fix markdown: bullets → real bullets
 formatted = formatted.replace("* ", "• ")
 
