@@ -232,29 +232,25 @@ def format_unit_plan_text(text):
 
     return "\n".join(formatted_lines)
 
-
 from fpdf import FPDF
 import textwrap
 from io import BytesIO
 
-# Check if unit_plan is defined and not empty
+# Ensure unit_plan is not empty
 if 'unit_plan' in locals() and unit_plan:
-    # Debug line to inspect unit_plan content
-    st.write(unit_plan)
-
     # PDF generation setup
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=11)
 
-    # Write the unit plan content line by line
+    # Write text line by line to the PDF
     for line in unit_plan.split("\n"):
         wrapped_lines = textwrap.wrap(line, width=90)
         for wrapped_line in wrapped_lines:
             pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-    # Save the PDF to a buffer
+    # Save PDF to a buffer
     pdf_buffer = BytesIO()
     pdf.output(pdf_buffer)
     pdf_buffer.seek(0)
