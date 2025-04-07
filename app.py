@@ -192,8 +192,8 @@ if "unit_plan_text" in st.session_state:
     doc = Document()
 
           # Get the section and set the margins
-        sections = doc.sections
-        for section in sections:
+    sections = doc.sections
+    for section in sections:
         # Access the section's page settings and change margins
             section._sectPr.pgMar.top = Pt(40)  # Top margin
             section._sectPr.pgMar.bottom = Pt(60)  # Bottom margin
