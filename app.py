@@ -254,8 +254,8 @@ if unit_plan:
 
     # Save PDF to a buffer instead of encoding it
     pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_buffer.seek(0)
+    pdf.output(pdf_buffer)  # Direct output to the buffer
+    pdf_buffer.seek(0)  # Ensure we are at the beginning of the buffer
 
     # Provide the PDF download button
     st.download_button("📎 Download PDF", data=pdf_buffer,
@@ -263,6 +263,7 @@ if unit_plan:
                        mime="application/pdf")
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
+
 
 
 
