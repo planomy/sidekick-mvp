@@ -184,15 +184,16 @@ if tool == "Unit Planner":
 
         doc = Document()
 
-        # Set the margins for the document (top, left, right, bottom)
+          # Get the section and set the margins
         sections = doc.sections
         for section in sections:
-            section.top_margin = Pt(10)  # Top margin
-            section.bottom_margin = Pt(10)  # Bottom margin
-            section.left_margin = Pt(10)  # Left margin
-            section.right_margin = Pt(10)  # Right margin
-        
-        # Set font and add content
+        # Access the section's page settings and change margins
+        section._sectPr.pgMar.top = Pt(10)  # Top margin
+        section._sectPr.pgMar.bottom = Pt(10)  # Bottom margin
+        section._sectPr.pgMar.left = Pt(10)  # Left margin
+        section._sectPr.pgMar.right = Pt(10)  # Right margin
+    
+    # Set font and add content
         
         style = doc.styles['Normal']
         font = style.font
