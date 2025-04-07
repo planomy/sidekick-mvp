@@ -1,6 +1,12 @@
 import streamlit as st
 import openai
 import random
+from docx import Document
+from docx.shared import Pt
+from io import BytesIO
+from fpdf import FPDF
+import textwrap
+import re
 
 
 # ---------- CONFIG ----------
@@ -72,7 +78,6 @@ tool = st.sidebar.radio("Choose a tool:", ["Lesson Builder", "Feedback Assistant
 if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Planner
     if "unit_plan_text" in st.session_state:
         del st.session_state["unit_plan_text"]
-        
 
 # --------- TOOL 0: UNIT PLANNER ---------
 if tool == "Unit Planner":
@@ -92,8 +97,6 @@ if tool == "Unit Planner":
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
     
     # Continue with your inputs...
-
-
     
     # Inputs
     year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
@@ -159,8 +162,6 @@ if tool == "Unit Planner":
         final_text = "\n".join(bullet_lines)
         st.session_state["unit_plan_text"] = final_text
 
-   
-
 # === IF PLAN EXISTS ===
 if "unit_plan_text" in st.session_state:
     st.markdown("### Generated Unit Plan")
@@ -212,9 +213,7 @@ if "unit_plan_text" in st.session_state:
     st.markdown("---")  # This should be aligned with the rest of the code
     st.subheader("📄 Export Options")
 
-
-
-    # WORD EXPORT
+# WORD EXPORT
 from docx import Document  # Ensure this is at the top of your file
 from docx.shared import Pt
 from io import BytesIO
@@ -235,7 +234,6 @@ style = doc.styles['Normal']
 font = style.font
 font.name = 'Calibri'
 font.size = Pt(10)
-
 
 # Check if unit_plan_text exists in session state before accessing it
 if "unit_plan_text" in st.session_state:
@@ -263,9 +261,6 @@ if "unit_plan_text" in st.session_state:
 else:
     st.warning("Unit plan text is not available. Please generate the unit plan first.")
 
-
-
-
 # Create Word buffer and save the document
 word_buffer = BytesIO()
 doc.save(word_buffer)
@@ -276,82 +271,6 @@ st.download_button("📝 Download Word", word_buffer,
                    file_name="unit_plan.docx",
                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                    key="download_word")
-
-
-
-# ---------- FORMATTER FUNCTION ----------
-def format_unit_plan_text(text):
-    lines = text.split("\n")
-    formatted_lines = []
-
-    for line in lines:
-        stripped = line.strip()
-
-        if not stripped:
-            formatted_lines.append("")  # Keep blank lines
-        elif stripped.endswith(":") and not stripped.startswith("•"):
-            formatted_lines.append("")  # Blank line before headings
-            formatted_lines.append(stripped)
-        elif stripped.startswith("•"):
-            clean = stripped.replace("•", "").strip()
-            formatted_lines.append(f"    • {clean}")
-        else:
-            formatted_lines.append(stripped)
-
-    return "\n".join(formatted_lines)
-
-
-from fpdf import FPDF
-import textwrap
-from io import BytesIO
-
-# Before generating PDF, ensure that unit_plan is available
-if "unit_plan_text" in st.session_state:
-    unit_plan = st.session_state["unit_plan_text"]
-else:
-    unit_plan = ""
-
-# Proceed only if unit_plan is not empty
-if unit_plan:  # Ensure unit_plan is not empty
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-
-    # Switch to DejaVu font for better Unicode support
-    pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-    pdf.set_font("DejaVu", size=10)
-
-    # Write text line by line
-    for line in unit_plan.split("\n"):
-        wrapped_lines = textwrap.wrap(line, width=90)
-        for wrapped_line in wrapped_lines:
-            pdf.cell(0, 8, txt=wrapped_line, ln=True)
-
-    # Output the PDF to a buffer (use dest='S' for string output)
-    pdf_buffer = BytesIO()
-    pdf_output = pdf.output(dest='S')  # Get PDF as string
-    pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
-    pdf_buffer.seek(0)
-
-    # Provide the PDF download button
-    st.download_button("📎 Download PDF", data=pdf_buffer,
-                       file_name="unit_plan.pdf",
-                       mime="application/pdf")
-else:
-    st.warning("⚠️ Unit plan is empty or failed to generate.")
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
@@ -427,9 +346,6 @@ if tool == "Lesson Builder":
             </div>
             """, unsafe_allow_html=True)
 
-
-
-
 # ---------- TOOL 2: FEEDBACK ASSISTANT ----------
 if tool == "Feedback Assistant":
     st.header("🧠 Feedback Assistant")
@@ -452,7 +368,6 @@ if tool == "Feedback Assistant":
                 ]
             )
             st.markdown(response.choices[0].message.content)
-
 
 # ---------- TOOL 3: EMAIL ASSISTANT ----------
 if tool == "Email Assistant":
@@ -504,6 +419,3 @@ if tool == "Unit Glossary Generator":
                 ]
             )
             st.markdown(response.choices[0].message.content)
-
-
-
