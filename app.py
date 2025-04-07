@@ -196,42 +196,45 @@ if tool == "Unit Planner":
              # BETTER PDF EXPORT ✨
         from fpdf import FPDF
         import textwrap
-
-        class PDF(FPDF):
-            def header(self):
-                self.set_font("Arial", "B", 14)
-                self.cell(0, 10, "Unit Plan", ln=True, align='C')
-                self.ln(4)
-
-        pdf = PDF()
+        
+        # PDF setup
+        pdf = FPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.set_font("Arial", size=11)
-
-        for line in st.session_state["unit_plan_text"].split("\n"):
+        
+        # Process lines and apply formatting
+        for line in export_text.split("\n"):
             line = line.strip()
-            if not line:
-                pdf.ln(4)
-            elif line.endswith(":"):
-                pdf.set_font("Arial", "B", 11)
-                pdf.ln(3)
-                pdf.multi_cell(0, 8, line)
-                pdf.set_font("Arial", size=11)
+        
+            # Headings - add space before, not after
+            if line.endswith(":") and not line.startswith("•"):
+                pdf.ln(5)  # space before heading
+                pdf.set_font("Arial", style='B', size=11)
+                pdf.cell(0, 8, line, ln=True)
+                pdf.set_font("Arial", style='', size=11)
+        
+            # Bullet points
             elif line.startswith("•"):
-                text = line.replace("•", "-")
+                text = line.replace("•", "-")  # clean bullet symbol
                 for wrapped in textwrap.wrap(text, width=90):
-                    pdf.cell(10)  # Indent
+                    pdf.cell(10)  # indent
                     pdf.cell(0, 8, wrapped, ln=True)
-                pdf.ln(1)
-            else:
+        
+            # Regular lines
+            elif line:
                 for wrapped in textwrap.wrap(line, width=90):
                     pdf.cell(0, 8, wrapped, ln=True)
-                pdf.ln(2)
-
+        
+        # Finalise and encode
+        pdf_bytes = pdf.output(dest='S').encode('latin1')
+        
+        # Download button
         st.download_button("📎 Download PDF", data=pdf_bytes,
-            file_name="unit_plan.pdf",
-            mime="application/pdf",
-            key="download_pdf")
+                           file_name="unit_plan.pdf",
+                           mime="application/pdf",
+                           key="download_pdf")
+
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
