@@ -2,10 +2,28 @@ import streamlit as st
 import openai
 import random
 from docx import Document
+from docx.shared import Pt
 from io import BytesIO
 from fpdf import FPDF
 import textwrap
 import re
+
+
+# Function to add bold headings with a specific size (11pt)
+def add_heading(doc, text):
+    heading = doc.add_paragraph()
+    run = heading.add_run(text)
+    run.bold = True  # Make the heading bold
+    run.font.size = Pt(11)  # Set font size for the heading (11pt)
+
+# Function to add bullet points with smaller text (10pt)
+def add_bullet_points(doc, points):
+    for point in points:
+        para = doc.add_paragraph(style='List Bullet')
+        run = para.add_run(point)
+        run.font.size = Pt(10)  # Set font size for bullet points (10pt)
+
+
 
 # ---------- CONFIG ----------
 st.set_page_config(page_title="Planomy Teacher Super Aid", layout="wide")
@@ -215,6 +233,41 @@ if tool == "Unit Planner":
 
         unit_plan_raw = response.choices[0].message.content
 
+# After user clicks "Generate Unit Plan" and we’ve generated the text dynamically
+if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
+    # Create a Document object
+    doc = Document()
+
+    # Add formatted headings and bullet points
+
+    # Example for "Unit Overview" heading and bullet points
+    add_heading(doc, "Unit Plan Overview:")
+    add_bullet_points(doc, [
+        "• Introduction to the unit and its main themes.",
+        "• Overview of the activities and assessments."
+    ])
+
+    # Example for "Learning Intentions" heading and bullet points
+    add_heading(doc, "Learning Intentions:")
+    add_bullet_points(doc, [
+        "• Identify the key concepts of the unit.",
+        "• Understand how the subject matter connects to real-world applications."
+    ])
+
+    # Continue for other sections dynamically, based on user input
+    add_heading(doc, "Lesson Types/Activity Ideas:")
+    add_bullet_points(doc, [
+        "• Research Project: Investigate a specific aspect of the unit.",
+        "• Group Activity: Discussion on key themes and topics."
+    ])
+
+    # Add more sections based on your dynamic content (e.g., Quick Cheat Sheet, Assessment Ideas, etc.)
+
+    # Save the document
+    doc.save('generated_unit_plan.docx')
+
+
+        
         # ---- FORMATTING CLEANUP ----
         unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
         unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
