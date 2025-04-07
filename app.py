@@ -164,103 +164,112 @@ elif tool == "Unit Glossary Generator":
             st.markdown(response.choices[0].message.content, unsafe_allow_html=True)
 
 
-# --- TOOL 5: UNIT PLANNER ---
-elif tool == "Unit Planner":
-    st.header("📘 Unit Planner")
-    unit_year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
-    unit_subject = st.text_input("Subject (e.g. HASS, English, Science)")
-    unit_topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
-    unit_weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
-    include_assessment = st.checkbox("Include Assessment Suggestions?")
-    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?")
-    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?")
-    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
+import streamlit as st
+import openai
+import re
+from io import BytesIO
+from docx import Document
+from docx.shared import Pt
+from fpdf import FPDF
 
-    if st.button("Generate Unit Plan"):
-        prompt_parts = [
-            f"Create a unit plan overview for a Year {unit_year} {unit_subject} unit on '{unit_topic}'.",
-            f"The unit runs for approximately {unit_weeks} weeks.",
-            "Include the following sections:",
-            "1. A short Unit Overview (what it's about).",
-            "2. 3–5 clear Learning Intentions.",
-            "3. A list of lesson types or activity ideas that would suit this unit."
-        ]
-        if include_assessment:
-            prompt_parts.append("4. Include 1–2 assessment ideas (format only, keep it brief).")
-        if include_hook:
-            prompt_parts.append("5. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
-        if include_fast_finishers:
-            prompt_parts.append("6. Suggest Fast Finisher or Extension Task ideas.")
-        if include_cheat_sheet:
-            prompt_parts.append("7. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
-        full_prompt = " ".join(prompt_parts)
-        with st.spinner("Planning your unit..."):
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
-                    {"role": "user", "content": full_prompt}
-                ]
-            )
-            # Store the generated unit plan text in session state
-            st.session_state["unit_plan_text"] = response.choices[0].message.content
+# --- UNIT PLANNER ---
+st.header("📘 Unit Planner")
+unit_year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+unit_subject = st.text_input("Subject (e.g. HASS, English, Science)")
+unit_topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
+unit_weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
+include_assessment = st.checkbox("Include Assessment Suggestions?")
+include_hook = st.checkbox("Include Hook Ideas for Lesson 1?")
+include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?")
+include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?")
 
-    # If a unit plan has been generated, display it and create download buttons
-    if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-        unit_plan_raw = st.session_state["unit_plan_text"]
-
-        # Clean up formatting (remove markdown syntax if necessary)
-        unit_plan_clean = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
-        unit_plan_clean = re.sub(r"^#+\s*", "", unit_plan_clean, flags=re.MULTILINE)
-        unit_plan_clean = re.sub(r"\n{2,}", "\n", unit_plan_clean.strip())
-
-        st.markdown("### Generated Unit Plan")
-        st.markdown(
-            f"""
-            <div style="background-color: #ffffff; padding: 20px; border-radius: 6px;
-                        font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7;
-                        color: #222; white-space: pre-wrap;">
-                {unit_plan_clean}
-            </div>
-            """, unsafe_allow_html=True)
-
-        # --- DOCX EXPORT ---
-        word_buffer = BytesIO()
-        doc = Document()
-        # Split by newlines to create separate paragraphs for better formatting
-        for line in unit_plan_clean.split("\n"):
-            if line.strip():
-                doc.add_paragraph(line.strip())
-        doc.save(word_buffer)
-        word_buffer.seek(0)
-        st.download_button(
-            label="📝 Download Word",
-            data=word_buffer,
-            file_name="unit_plan.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            key="download_word_btn"
+# Generate the unit plan when button is clicked
+if st.button("Generate Unit Plan"):
+    prompt_parts = [
+        f"Create a unit plan overview for a Year {unit_year} {unit_subject} unit on '{unit_topic}'.",
+        f"The unit runs for approximately {unit_weeks} weeks.",
+        "Include the following sections:",
+        "1. A short Unit Overview (what it's about).",
+        "2. 3–5 clear Learning Intentions.",
+        "3. A list of lesson types or activity ideas that would suit this unit."
+    ]
+    if include_assessment:
+        prompt_parts.append("4. Include 1–2 assessment ideas (format only, keep it brief).")
+    if include_hook:
+        prompt_parts.append("5. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
+    if include_fast_finishers:
+        prompt_parts.append("6. Suggest Fast Finisher or Extension Task ideas.")
+    if include_cheat_sheet:
+        prompt_parts.append("7. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+    
+    full_prompt = " ".join(prompt_parts)
+    
+    with st.spinner("Planning your unit..."):
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
+                {"role": "user", "content": full_prompt}
+            ]
         )
+        # Store the generated unit plan text in session state
+        st.session_state["unit_plan_text"] = response.choices[0].message.content
 
-        # --- PDF EXPORT ---
-        pdf = FPDF()
-        pdf.add_page()
-        try:
-            pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
-            pdf.set_font("DejaVu", size=10)
-        except Exception as e:
-            pdf.set_font("Arial", size=10)
-        # Use multi_cell to handle text wrapping properly
-        for line in unit_plan_clean.split("\n"):
-            pdf.multi_cell(0, 8, line)
-        pdf_buffer = BytesIO()
-        pdf_output = pdf.output(dest='S').encode('latin-1')
-        pdf_buffer.write(pdf_output)
-        pdf_buffer.seek(0)
-        st.download_button(
-            label="📎 Download PDF",
-            data=pdf_buffer,
-            file_name="unit_plan.pdf",
-            mime="application/pdf",
-            key="download_pdf_btn"
-        )
+# Only display and generate downloads if we have a unit plan
+if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
+    unit_plan_raw = st.session_state["unit_plan_text"]
 
+    # Clean up formatting: remove markdown bold, headings, and extra newlines
+    unit_plan_clean = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)
+    unit_plan_clean = re.sub(r"^#+\s*", "", unit_plan_clean, flags=re.MULTILINE)
+    unit_plan_clean = re.sub(r"\n{2,}", "\n", unit_plan_clean.strip())
+
+    st.markdown("### Generated Unit Plan")
+    st.markdown(
+        f"""
+        <div style="background-color: #ffffff; padding: 20px; border-radius: 6px;
+                    font-family: 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.7;
+                    color: #222; white-space: pre-wrap;">
+            {unit_plan_clean}
+        </div>
+        """, unsafe_allow_html=True)
+
+    # --- DOCX EXPORT ---
+    word_buffer = BytesIO()
+    doc = Document()
+    # Add each line as a separate paragraph for clarity
+    for line in unit_plan_clean.split("\n"):
+        if line.strip():
+            doc.add_paragraph(line.strip())
+    doc.save(word_buffer)
+    word_buffer.seek(0)
+    st.download_button(
+        label="📝 Download Word",
+        data=word_buffer,
+        file_name="unit_plan.docx",
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        key="download_word_btn"
+    )
+
+    # --- PDF EXPORT ---
+    pdf = FPDF()
+    pdf.add_page()
+    try:
+        pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+        pdf.set_font("DejaVu", size=10)
+    except Exception as e:
+        pdf.set_font("Arial", size=10)
+    # Use multi_cell to properly wrap text
+    for line in unit_plan_clean.split("\n"):
+        pdf.multi_cell(0, 8, line)
+    pdf_buffer = BytesIO()
+    pdf_output = pdf.output(dest='S').encode('latin-1')
+    pdf_buffer.write(pdf_output)
+    pdf_buffer.seek(0)
+    st.download_button(
+        label="📎 Download PDF",
+        data=pdf_buffer,
+        file_name="unit_plan.pdf",
+        mime="application/pdf",
+        key="download_pdf_btn"
+    )
