@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Timer"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Timer", "Feeling Peckish"]
 )
 
 # ========== HELPER FUNCTION ==========
@@ -311,4 +311,23 @@ if st.button("Start Timer"):
     timer_placeholder.text("Time's up!")
     # Play a beep sound (you can replace the URL with a local file if needed)
     st.audio("https://www.soundjay.com/button/beep-07.wav")
+
+
+elif tool == "Feeling Peckish?":
+    st.header("🍽️ Feeling Peckish")
+    dish = st.text_input("Enter a dish or beverage (e.g., chicken curry or espresso martini):")
+    if st.button("Get Recipe"):
+        recipe_prompt = (
+            f"Provide a detailed recipe for {dish}. Include a list of ingredients, step-by-step instructions, "
+            "and any useful tips for preparation."
+        )
+        with st.spinner("Fetching recipe..."):
+            recipe = chat_completion_request(
+                system_msg="You are an expert chef who provides creative and detailed recipes.",
+                user_msg=recipe_prompt,
+                max_tokens=800,
+                temperature=0.7
+            )
+        st.markdown(recipe, unsafe_allow_html=True)
+
 
