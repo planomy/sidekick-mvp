@@ -257,7 +257,7 @@ if unit_plan:  # Ensure unit_plan is not empty
             pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
     # Output the PDF to a buffer
-    pdf_buffer = BytesIO(pdf.output(dest='S').encode('latin1'))
+    pdf_buffer = BytesIO(pdf.output(dest='S'))
     pdf_buffer.seek(0)
 
     # Provide the PDF download button
