@@ -78,18 +78,21 @@ if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Plan
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
-    # Check if the unit plan exists in session state and is not empty
+    # Check if unit plan exists and is not empty
     if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
-        # Display generated unit plan and allow for Word download
+        # If the unit plan is available, show it and provide download button
         st.markdown("### Generated Unit Plan")
-        st.markdown(st.session_state["unit_plan_text"])  # Display the generated unit plan text
+        st.markdown(st.session_state["unit_plan_text"])  # Display unit plan
         st.download_button("📝 Download Word", word_buffer,
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
     else:
-        # Show a warning if unit plan has not been generated
+        # If unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
+    
+    # Continue with your inputs...
+
 
     
     # Inputs
