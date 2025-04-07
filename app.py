@@ -299,7 +299,7 @@ response = client.chat.completions.create(
 )
 
             
-            import re
+import re
 
 formatted = response.choices[0].message.content
 
