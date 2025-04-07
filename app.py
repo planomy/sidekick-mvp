@@ -259,9 +259,10 @@ if unit_plan:  # Ensure unit_plan is not empty
         for wrapped_line in wrapped_lines:
             pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-    # Output the PDF directly to the buffer
+    # Output the PDF to a buffer (use dest='S' for string output)
     pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer)
+    pdf_output = pdf.output(dest='S')  # Get PDF as string
+    pdf_buffer.write(pdf_output.encode('latin1'))  # Write the output to the buffer
     pdf_buffer.seek(0)
 
     # Provide the PDF download button
@@ -270,6 +271,7 @@ if unit_plan:  # Ensure unit_plan is not empty
                        mime="application/pdf")
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
+
 
 
 
