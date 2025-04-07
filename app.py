@@ -248,14 +248,13 @@ if unit_plan:  # Ensure unit_plan is not empty
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=11)
+    pdf.set_font("Arial", size=11, encoding='UTF-8')  # Ensure the font supports UTF-8 encoding
 
     # Write text line by line
     for line in unit_plan.split("\n"):
         wrapped_lines = textwrap.wrap(line, width=90)
-    for wrapped_line in wrapped_lines:
-        pdf.cell(0, 8, txt=wrapped_line.encode('utf-8').decode('latin-1'), ln=True)
-
+        for wrapped_line in wrapped_lines:
+            pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
     # Output the PDF to a buffer
     pdf_buffer = BytesIO(pdf.output(dest='S'))
@@ -267,6 +266,7 @@ if unit_plan:  # Ensure unit_plan is not empty
                        mime="application/pdf")
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
+
 
 
 
