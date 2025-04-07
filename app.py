@@ -201,37 +201,47 @@ if "unit_plan_text" in st.session_state:
         section._sectPr.pgMar.left = Pt(40)  # Left margin
         section._sectPr.pgMar.right = Pt(60)  # Right margin
     
-    # Set font and add content
-    style = doc.styles['Normal']
-    font = style.font
-    font.name = 'Calibri'
-    font.size = Pt(10)
+# Set font and add content
+style = doc.styles['Normal']
+font = style.font
+font.name = 'Calibri'
+font.size = Pt(10)
 
-    for line in st.session_state["unit_plan_text"].split("\n"):
-        s = line.strip()
-        if s.startswith("•") and not s.endswith(":"):
-            p = doc.add_paragraph(s)
-            p.paragraph_format.left_indent = Pt(18)
-            p.paragraph_format.space_after = Pt(0)
-            p.style.font.bold = False
-        elif s.endswith(":"):
-            p = doc.add_paragraph(s)
-            p.paragraph_format.space_before = Pt(11)
-            p.paragraph_format.space_after = Pt(0)
-            p.style.font.bold = True
-        elif s:
-            p = doc.add_paragraph(s)
-            p.paragraph_format.space_after = Pt(0)
-            p.style.font.bold = False
+# Loop through the lines of the unit plan
+for line in st.session_state["unit_plan_text"].split("\n"):
+    s = line.strip()
 
-    word_buffer = BytesIO()
-    doc.save(word_buffer)
-    word_buffer.seek(0)
+    # If line is a bullet point (starts with '•') and not a heading (ends with ':')
+    if s.startswith("•") and not s.endswith(":"):
+        p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
+        p.paragraph_format.left_indent = Pt(18)
+        p.paragraph_format.space_after = Pt(0)
+        p.style.font.bold = False  # No bold for bullets
 
-    st.download_button("📝 Download Word", word_buffer,
-        file_name="unit_plan.docx",
-        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        key="download_word")
+    # If line is a heading (ends with ':')
+    elif s.endswith(":"):
+        p = doc.add_paragraph(s)
+        p.paragraph_format.space_before = Pt(11)
+        p.paragraph_format.space_after = Pt(0)
+        p.style.font.bold = True  # Bold for headings
+
+    # If it's just normal text, add it without bullet or bold
+    elif s:
+        p = doc.add_paragraph(s)
+        p.paragraph_format.space_after = Pt(0)
+        p.style.font.bold = False  # Ensure normal text is not bold
+
+# Create Word buffer and save the document
+word_buffer = BytesIO()
+doc.save(word_buffer)
+word_buffer.seek(0)
+
+# Provide the download button for the Word file
+st.download_button("📝 Download Word", word_buffer,
+                   file_name="unit_plan.docx",
+                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                   key="download_word")
+
 
 # ---------- FORMATTER FUNCTION ----------
 def format_unit_plan_text(text):
