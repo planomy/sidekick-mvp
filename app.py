@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Timer"]
 )
 
 # ========== HELPER FUNCTION ==========
@@ -291,4 +291,24 @@ elif tool == "Worksheet Generator":
                 max_tokens=1000
             )
             st.markdown(worksheet, unsafe_allow_html=True)
+
+
+# ========== TIMER ==========
+import time  # make sure to import time if not already done
+
+st.header("⏰ Timer")
+timer_minutes = st.number_input("Enter timer duration (minutes)", min_value=1, max_value=60, value=5, step=1)
+
+if st.button("Start Timer"):
+    # Convert minutes to seconds
+    countdown = int(timer_minutes * 60)
+    timer_placeholder = st.empty()
+    while countdown > 0:
+        minutes, seconds = divmod(countdown, 60)
+        timer_placeholder.text(f"Time remaining: {minutes:02d}:{seconds:02d}")
+        time.sleep(1)
+        countdown -= 1
+    timer_placeholder.text("Time's up!")
+    # Play a beep sound (you can replace the URL with a local file if needed)
+    st.audio("https://www.soundjay.com/button/beep-07.wav")
 
