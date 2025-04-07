@@ -90,8 +90,7 @@ if tool == "Unit Planner":
             "Include the following sections:",
             "1. A short Unit Overview (what it's about).",
             "2. 3–5 clear Learning Intentions.",
-            "3. A suggested sequence of subtopics or concepts to explore each week.",
-            "4. A list of lesson types or activity ideas that would suit this unit."
+            "3. A list of lesson types or activity ideas that would suit this unit."
         ]
         if include_assessment:
             prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
