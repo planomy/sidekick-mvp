@@ -235,41 +235,9 @@ def format_unit_plan_text(text):
 
 
 from fpdf import FPDF
-import textwrap
 from io import BytesIO
 
-# Helper function to format the unit plan text
-def format_unit_plan_text(text):
-    lines = text.split("\n")
-    formatted_lines = []
-
-    # Explicitly bold headings that are the same each time
-    bold_headings = [
-        "Unit Plan Overview:",
-        "Learning Intentions:",
-        "Lesson Types/Activities:",
-        "Quick Content Cheat Sheet:",
-        "Assessment Suggestions:",
-        "Hook Ideas:",
-        "Fast Finisher Suggestions:"
-    ]
-
-    for line in lines:
-        stripped = line.strip()
-
-        # Check if the line is one of the bold headings
-        if stripped in bold_headings:
-            formatted_lines.append("")  # Add blank line before heading
-            formatted_lines.append(f"<b>{stripped}</b>")  # Apply bold
-        elif stripped.startswith("•"):
-            # Indented bullet points
-            formatted_lines.append(f"    • {stripped.replace('•', '').strip()}")
-        else:
-            formatted_lines.append(stripped)
-
-    return "\n".join(formatted_lines)
-
-# PDF export logic
+# PDF export logic (don't touch formatting code)
 if "unit_plan_text" in st.session_state:
     export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
 
@@ -312,12 +280,20 @@ if "unit_plan_text" in st.session_state:
             for wrapped in textwrap.wrap(stripped, width=95):
                 pdf.cell(0, 6, wrapped, ln=True)
 
-    # Output the PDF as bytes (fixed for streamlit download)
+    # Output the PDF to a buffer (BytesIO)
     pdf_buffer = BytesIO()
     pdf.output(pdf_buffer)
     pdf_buffer.seek(0)
 
-    st.download_button("📎 Download PDF", data=pdf_buffer, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+    # Add the download button for the PDF
+    st.download_button(
+        label="📎 Download PDF", 
+        data=pdf_buffer, 
+        file_name="unit_plan.pdf", 
+        mime="application/pdf", 
+        key="download_pdf"
+    )
+
 
 
 
