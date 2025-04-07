@@ -14,7 +14,6 @@ if not openai.api_key:
     st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
     st.stop()
 
-
 # --- SIDEBAR: TOOL SELECTION ---
 st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
@@ -28,14 +27,16 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     A helper to call GPT-3.5-turbo with system & user messages.
     Make sure your environment has openai>=0.27.0.
     """
-    response = openai.Completion.create(
-        model="gpt-3.5-turbo",  # Make sure you’re using the correct model
-        prompt=f"{system_msg}\n{user_msg}",
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg}
+        ],
         max_tokens=max_tokens,
         temperature=temperature
     )
-    return response.choices[0].text.strip()
-
+    return response.choices[0].message.content.strip()
 
 # ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
