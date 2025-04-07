@@ -8,6 +8,8 @@ from fpdf import FPDF
 import textwrap
 import re
 
+from docx import Document
+from docx.shared import Pt
 
 # Function to add bold headings with a specific size (11pt)
 def add_heading(doc, text):
@@ -22,6 +24,30 @@ def add_bullet_points(doc, points):
         para = doc.add_paragraph(style='List Bullet')
         run = para.add_run(point)
         run.font.size = Pt(10)  # Set font size for bullet points (10pt)
+
+# Create a Document object
+doc = Document()
+
+# Example formatting for the existing sections and content
+# Add formatted headings and bullet points as needed
+
+# Unit Plan Overview heading
+add_heading(doc, "Unit Plan Overview:")
+# Assuming content comes from elsewhere (as you're not adding more content here)
+# Add bullet points for content (no content added here, just formatting)
+add_bullet_points(doc, ["<existing bullet points here>"])
+
+# Repeat for other sections like Learning Intentions, Lesson Ideas, etc.
+add_heading(doc, "Learning Intentions:")
+add_bullet_points(doc, ["<existing bullet points here>"])
+
+# Continue for other sections like Assessment, Cheat Sheets, etc.
+add_heading(doc, "Assessment Ideas:")
+add_bullet_points(doc, ["<existing bullet points here>"])
+
+# Save the document after formatting
+doc.save('formatted_unit_plan.docx')
+
 
 
 
@@ -233,6 +259,9 @@ if tool == "Unit Planner":
 
         unit_plan_raw = response.choices[0].message.content
 
+
+
+
 # After user clicks "Generate Unit Plan" and we’ve generated the text dynamically
 if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
     # Create a Document object
@@ -267,6 +296,7 @@ if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
     doc.save('generated_unit_plan.docx')
 
 
+    
         
         # ---- FORMATTING CLEANUP ----
         unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
