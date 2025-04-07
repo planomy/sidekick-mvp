@@ -137,7 +137,7 @@ if tool == "Unit Planner":
         st.session_state["unit_plan_text"] = final_text
 
    
-  # === IF PLAN EXISTS ===
+# === IF PLAN EXISTS ===
 if "unit_plan_text" in st.session_state:
     st.markdown("### Generated Unit Plan")
 
@@ -183,54 +183,52 @@ if "unit_plan_text" in st.session_state:
     st.markdown("---")
     st.subheader("📄 Export Options")
 
-
-        # WORD EXPORT
+    # WORD EXPORT
     from docx import Document
     from docx.shared import Pt
     from io import BytesIO
 
     doc = Document()
 
-          # Get the section and set the margins
+    # Get the section and set the margins
     sections = doc.sections
     for section in sections:
         # Access the section's page settings and change margins
-            section._sectPr.pgMar.top = Pt(40)  # Top margin
-            section._sectPr.pgMar.bottom = Pt(60)  # Bottom margin
-            section._sectPr.pgMar.left = Pt(40)  # Left margin
-            section._sectPr.pgMar.right = Pt(60)  # Right margin
+        section._sectPr.pgMar.top = Pt(40)  # Top margin
+        section._sectPr.pgMar.bottom = Pt(60)  # Bottom margin
+        section._sectPr.pgMar.left = Pt(40)  # Left margin
+        section._sectPr.pgMar.right = Pt(60)  # Right margin
     
     # Set font and add content
-        
-        style = doc.styles['Normal']
-        font = style.font
-        font.name = 'Calibri'
-        font.size = Pt(10)
+    style = doc.styles['Normal']
+    font = style.font
+    font.name = 'Calibri'
+    font.size = Pt(10)
 
-        for line in st.session_state["unit_plan_text"].split("\n"):
-            s = line.strip()
-            if s.startswith("•") and not s.endswith(":"):
-                p = doc.add_paragraph(s)
-                p.paragraph_format.left_indent = Pt(18)
-                p.paragraph_format.space_after = Pt(0)
-            elif s.endswith(":"):
-                p = doc.add_paragraph(s)
-                p.paragraph_format.space_before = Pt(11)
-                p.paragraph_format.space_after = Pt(0)
-                p.style.font.bold = True
-            elif s:
-                p = doc.add_paragraph(s)
-                p.paragraph_format.space_after = Pt(0)
-                p.style.font.bold = False
+    for line in st.session_state["unit_plan_text"].split("\n"):
+        s = line.strip()
+        if s.startswith("•") and not s.endswith(":"):
+            p = doc.add_paragraph(s)
+            p.paragraph_format.left_indent = Pt(18)
+            p.paragraph_format.space_after = Pt(0)
+        elif s.endswith(":"):
+            p = doc.add_paragraph(s)
+            p.paragraph_format.space_before = Pt(11)
+            p.paragraph_format.space_after = Pt(0)
+            p.style.font.bold = True
+        elif s:
+            p = doc.add_paragraph(s)
+            p.paragraph_format.space_after = Pt(0)
+            p.style.font.bold = False
 
-        word_buffer = BytesIO()
-        doc.save(word_buffer)
-        word_buffer.seek(0)
+    word_buffer = BytesIO()
+    doc.save(word_buffer)
+    word_buffer.seek(0)
 
-        st.download_button("📝 Download Word", word_buffer,
-            file_name="unit_plan.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            key="download_word")
+    st.download_button("📝 Download Word", word_buffer,
+        file_name="unit_plan.docx",
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        key="download_word")
 
 # ---------- FORMATTER FUNCTION ----------
 def format_unit_plan_text(text):
