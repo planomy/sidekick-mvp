@@ -137,11 +137,12 @@ if tool == "Unit Planner":
         st.session_state["unit_plan_text"] = final_text
 
    
+
 # === IF PLAN EXISTS ===
 if "unit_plan_text" in st.session_state:
     st.markdown("### Generated Unit Plan")
 
-    # Define the convert_to_html function
+    # Define the convert_to_html function (this is where it goes)
     def convert_to_html(text):
         lines = text.split("\n")
         html_lines = []
@@ -151,7 +152,7 @@ if "unit_plan_text" in st.session_state:
 
             if stripped.endswith(":") and not stripped.startswith("•"):
                 # Heading formatting for screen display (use <b> for bold)
-                html_lines.append(f"<br><b>{stripped}</b><br>")
+                html_lines.append(f"<h2>{stripped}</h2>")
             elif stripped.startswith("•"):
                 # Bulleted list formatting
                 html_lines.append(f"<li>{stripped[2:]}</li>")  # Remove bullet symbol
@@ -160,7 +161,7 @@ if "unit_plan_text" in st.session_state:
 
         return "".join(html_lines)
 
-    # Use convert_to_html in markdown
+    # Use convert_to_html in markdown (display unit plan with HTML formatting)
     st.markdown(
         f"""
         <div style='
@@ -182,6 +183,7 @@ if "unit_plan_text" in st.session_state:
 
     st.markdown("---")
     st.subheader("📄 Export Options")
+
 
     # WORD EXPORT
     from docx import Document
