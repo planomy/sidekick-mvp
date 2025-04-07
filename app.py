@@ -139,7 +139,12 @@ if tool == "Unit Planner":
             formatted = "\n".join(bullet_lines)
 
             # Save to session so it doesn't reset
-            st.session_state["unit_plan_text"] = formatted
+            if "unit_plan" not in st.session_state or not st.session_state["unit_plan"]:
+    st.warning("No unit plan found. Please generate the unit plan first.")
+    st.stop()
+else:
+    formatted = st.session_state["unit_plan"]
+
 
     # === IF PLAN EXISTS ===
     if "unit_plan_text" in st.session_state:
