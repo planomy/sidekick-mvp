@@ -238,27 +238,33 @@ from fpdf import FPDF
 import textwrap
 from io import BytesIO
 
-# PDF Generation Setup
-pdf = FPDF()
-pdf.add_page()
-pdf.set_auto_page_break(auto=True, margin=15)
-pdf.set_font("Arial", size=11)
+# Check the content of the unit plan
+st.write(unit_plan)  # Temporary debug line to inspect the content
 
-# Write text line by line
-for line in unit_plan.split("\n"):
-    wrapped_lines = textwrap.wrap(line, width=90)  # Wrap text
-    for wrapped_line in wrapped_lines:
-        pdf.cell(0, 8, txt=wrapped_line, ln=True)
+# Ensure unit_plan is not empty
+if unit_plan:
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Arial", size=11)
 
-# Save PDF to a buffer instead of encoding it
-pdf_buffer = BytesIO()
-pdf.output(pdf_buffer)
-pdf_buffer.seek(0)
+    # Write text line by line
+    for line in unit_plan.split("\n"):
+        wrapped_lines = textwrap.wrap(line, width=90)  # Wrap text
+        for wrapped_line in wrapped_lines:
+            pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-# Provide the PDF download button
-st.download_button("📎 Download PDF", data=pdf_buffer,
-                   file_name="unit_plan.pdf",
-                   mime="application/pdf")
+    # Save PDF to a buffer instead of encoding it
+    pdf_buffer = BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+
+    # Provide the PDF download button
+    st.download_button("📎 Download PDF", data=pdf_buffer,
+                       file_name="unit_plan.pdf",
+                       mime="application/pdf")
+else:
+    st.warning("⚠️ Unit plan is empty or failed to generate.")
 
 
 
