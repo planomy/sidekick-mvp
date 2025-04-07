@@ -234,17 +234,36 @@ def format_unit_plan_text(text):
 
 
 
-# ---------- PDF EXPORT ----------
-if "unit_plan_text" in st.session_state:
-    from fpdf import FPDF
-    import textwrap
+from fpdf import FPDF
+import textwrap
 
+# Helper formatter
+def format_unit_plan_text(text):
+    lines = text.split("\n")
+    formatted = []
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            formatted.append("")
+        elif stripped.endswith(":") and not stripped.startswith("•"):
+            formatted.append("")  # add spacing before heading
+            formatted.append(stripped)
+        elif stripped.startswith("•"):
+            formatted.append("    " + stripped.strip())
+        else:
+            formatted.append(stripped)
+
+    return "\n".join(formatted)
+
+# PDF generation
+if "unit_plan_text" in st.session_state:
     export_text = format_unit_plan_text(st.session_state["unit_plan_text"])
 
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=10)  # 10pt font
+    pdf.set_font("Arial", size=10)
 
     for line in export_text.split("\n"):
         stripped = line.strip()
@@ -253,27 +272,38 @@ if "unit_plan_text" in st.session_state:
             pdf.ln(5)
             continue
 
-        # Headings
-        if stripped.endswith(":") and not stripped.startswith("•"):
+        # Bold headings
+        if (
+            stripped.endswith(":") and not stripped.startswith("•")
+        ) or stripped in [
+            "Unit Plan Overview", "Learning Intentions", "Weekly Subtopics",
+            "Lesson Types/Activities", "Quick Content Cheat Sheet"
+        ]:
             pdf.ln(2)
             pdf.set_font("Arial", style='B', size=10)
-            pdf.cell(0, 7, stripped, ln=True)
+            pdf.cell(0, 6, stripped, ln=True)
             pdf.set_font("Arial", style='', size=10)
 
         # Bullets
         elif stripped.startswith("•") or stripped.startswith("    •"):
-            bullet = stripped.replace("    •", "•").replace("•", "•").strip()
-            for i, wrapped in enumerate(textwrap.wrap(bullet, width=90)):
+            clean = stripped.replace("•", "-").strip()
+            for i, wrapped in enumerate(textwrap.wrap(clean, width=90)):
                 pdf.cell(10 if i == 0 else 14)
                 pdf.cell(0, 6, wrapped, ln=True)
 
-        # Paragraphs
+        # Regular paragraph text
         else:
             for wrapped in textwrap.wrap(stripped, width=95):
                 pdf.cell(0, 6, wrapped, ln=True)
 
-    pdf_bytes = pdf.output(dest='S').encode('latin1')
-    st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+    # Don't encode to Latin1 — use buffer directly
+    from io import BytesIO
+    pdf_buffer = BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+
+    st.download_button("📎 Download PDF", data=pdf_buffer, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+
 
 
 # ---------- TOOL 1: LESSON BUILDER ----------
