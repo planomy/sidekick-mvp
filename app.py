@@ -238,90 +238,61 @@ if tool == "Lesson Builder":
     lesson_style = st.selectbox("Lesson Style", ["Hands-On", "Discussion-Based", "Quiet/Reflective", "Creative"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
 
-if st.button("Generate Unit Plan", key="generate_unit_plan_button"):
-    prompt_parts = [
-        f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
-        f"The unit runs for approximately {weeks} weeks.",
-        "Include the following sections:",
-        "1. A short Unit Overview (what it's about).",
-        "2. 3–5 clear Learning Intentions.",
-        "3. A suggested sequence of subtopics or concepts to explore each week.",
-        "4. A list of lesson types or activity ideas that would suit this unit."
-    ]
-    if include_assessment:
-        prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
-    if include_hook:
-        prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
-    if include_fast_finishers:
-        prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
-    if include_cheat_sheet:
-        prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+    if st.button("Generate Lesson Plan", key="generate_lesson_plan_button"):
+        lesson_count = sequence.split()[0]
 
-    full_prompt = " ".join(prompt_parts)
+        prompt_parts = [
+            f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
+            f"Start the lesson with a clear Learning Goal aligned to a {goal_focus.lower()} outcome.",
+            f"Structure each lesson with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket.",
+            f"The lesson should use {device_use.lower()}.",
+            f"Students should work in {grouping.lower()}.",
+            f"Use a {lesson_style.lower()} approach."
+        ]
 
-    with st.spinner("Planning your unit..."):
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
-                {"role": "user", "content": full_prompt}
-            ]
-        )
+        if differentiation:
+            prompt_parts.append(f"Include differentiation strategies for: {', '.join(differentiation)}.")
 
-        import re
-        unit_plan_raw = response.choices[0].message.content
+        if assessment != "No Assessment":
+            prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
 
-        # ---- FORMATTING CLEANUP ----
-        unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
-        unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
-        unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
-        unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
+        if include_curriculum:
+            prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
 
-        bullet_lines = []
-        for line in unit_plan.splitlines():
-            stripped = line.strip()
-            if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
-                clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                bullet_lines.append("    • " + clean)
-            elif stripped.endswith(":"):
-                bullet_lines.append("")  # Add space BEFORE heading
-                bullet_lines.append(stripped)
-            elif stripped:
-                bullet_lines.append(stripped)
+        full_prompt = " ".join(prompt_parts)
 
-        final_text = "\n".join(bullet_lines)
-        st.session_state["unit_plan_text"] = final_text
-        formatted = final_text
+        with st.spinner("Planning your lesson(s)..."):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a practical, creative Australian teacher."},
+                    {"role": "user", "content": full_prompt}
+                ]
+            )
 
+            import re
+            formatted = response.choices[0].message.content
 
+            formatted = formatted.replace("* ", "• ")
+            formatted = re.sub(r"^### (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
+            formatted = re.sub(r"^## (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
+            formatted = re.sub(r"^# (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
 
+            st.markdown(f"""
+            <div style='
+                background-color: #f9f9f9;
+                padding: 20px;
+                border-radius: 8px;
+                font-family: sans-serif;
+                font-size: 16px;
+                color: #111;
+                line-height: 1.6;
+                white-space: pre-wrap;
+            '>
+            {formatted.replace("\n", "<br>")}
+            </div>
+            """, unsafe_allow_html=True)
 
-            
-import re
-
-# Fix markdown: bullets → real bullets
-formatted = formatted.replace("* ", "• ")
-
-# Headings: replace markdown with bold HTML and spacing
-formatted = re.sub(r"^### (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
-formatted = re.sub(r"^## (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
-formatted = re.sub(r"^# (.+)$", r"<br><b>\1</b>", formatted, flags=re.MULTILINE)
-
-# Display it cleanly in Streamlit
-st.markdown(f"""
-<div style='
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    font-family: sans-serif;
-    font-size: 16px;
-    color: #111;
-    line-height: 1.6;
-    white-space: pre-wrap;
-'>
-{formatted.replace("\n", "<br>")}
-</div>
-""", unsafe_allow_html=True)
 
 
 
