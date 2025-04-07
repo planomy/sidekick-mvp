@@ -342,11 +342,17 @@ for line in unit_plan.splitlines():  # This line must have the same indentation 
         doc.save(word_buffer)
         word_buffer.seek(0)
 
-        # Word Download Button
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                           key="download_word")
+
+
+       # Word Download Button with a unique key
+st.download_button(
+    "📝 Download Word", 
+    word_buffer,
+    file_name="unit_plan.docx",
+    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    key=f"download_word_{int(time.time())}"  # Use a timestamp to ensure uniqueness
+)
+
 
         # PDF export button (with custom font)
         pdf = FPDF()
