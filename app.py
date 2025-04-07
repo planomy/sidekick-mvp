@@ -193,24 +193,40 @@ if tool == "Unit Planner":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             key="download_word")
 
-        # PDF EXPORT
+             # BETTER PDF EXPORT ✨
         from fpdf import FPDF
         import textwrap
 
-        pdf = FPDF()
+        class PDF(FPDF):
+            def header(self):
+                self.set_font("Arial", "B", 14)
+                self.cell(0, 10, "Unit Plan", ln=True, align='C')
+                self.ln(4)
+
+        pdf = PDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.set_font("Arial", size=11)
 
-        safe_text = st.session_state["unit_plan_text"].replace("•", "-")
-        for line in safe_text.split("\n"):
-            try:
-                for wrap in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, txt=wrap, ln=True)
-            except:
-                pdf.cell(0, 8, txt="[Unicode error – skipped line]", ln=True)
-
-        pdf_bytes = pdf.output(dest='S').encode('latin1', 'replace')
+        for line in st.session_state["unit_plan_text"].split("\n"):
+            line = line.strip()
+            if not line:
+                pdf.ln(4)
+            elif line.endswith(":"):
+                pdf.set_font("Arial", "B", 11)
+                pdf.ln(3)
+                pdf.multi_cell(0, 8, line)
+                pdf.set_font("Arial", size=11)
+            elif line.startswith("•"):
+                text = line.replace("•", "-")
+                for wrapped in textwrap.wrap(text, width=90):
+                    pdf.cell(10)  # Indent
+                    pdf.cell(0, 8, wrapped, ln=True)
+                pdf.ln(1)
+            else:
+                for wrapped in textwrap.wrap(line, width=90):
+                    pdf.cell(0, 8, wrapped, ln=True)
+                pdf.ln(2)
 
         st.download_button("📎 Download PDF", data=pdf_bytes,
             file_name="unit_plan.pdf",
