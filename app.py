@@ -248,7 +248,10 @@ if unit_plan:  # Ensure unit_plan is not empty
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=11, encoding='UTF-8')  # Ensure the font supports UTF-8 encoding
+
+    # Switch to DejaVu font for better Unicode support
+    pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+    pdf.set_font("DejaVu", size=11)
 
     # Write text line by line
     for line in unit_plan.split("\n"):
@@ -266,6 +269,7 @@ if unit_plan:  # Ensure unit_plan is not empty
                        mime="application/pdf")
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
+
 
 
 
