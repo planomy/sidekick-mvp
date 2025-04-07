@@ -289,6 +289,16 @@ if tool == "Lesson Builder":
                     {"role": "user", "content": full_prompt}
                 ]
             )
+
+response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a practical, creative Australian teacher."},
+        {"role": "user", "content": full_prompt}
+    ]
+)
+
+            
             import re
 
 formatted = response.choices[0].message.content
