@@ -293,13 +293,7 @@ if st.button("Generate Unit Plan", key="generate_unit_plan_button"):
         st.session_state["unit_plan_text"] = final_text
 
 
-response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "system", "content": "You are a practical, creative Australian teacher."},
-        {"role": "user", "content": full_prompt}
-    ]
-)
+
 
 
             
