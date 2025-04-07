@@ -130,7 +130,7 @@ if tool == "Unit Planner":
                 clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
                 lines.append("    • " + clean)
             elif stripped.endswith(":"):
-                lines.append(f"\n**{stripped}**\n")
+                lines.append(f"<b>{stripped}</b>")
             elif stripped:
                 lines.append(stripped)
 
@@ -140,7 +140,6 @@ if tool == "Unit Planner":
         st.markdown(
         f"""
         <div style="
-            background-color: #f2f2f2;
             color: #000000;
             padding: 15px;
             border-radius: 5px;
@@ -207,7 +206,7 @@ if tool == "Unit Planner":
             for wrapped in textwrap.wrap(line, width=90):
                 pdf.cell(0, 8, txt=wrapped, ln=True)
 
-        pdf_bytes = pdf.output(dest='S').encode('latin1')
+        pdf_bytes = pdf.output(dest='S').encode('utf-8')
         st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
 
 
