@@ -83,6 +83,10 @@ if tool != "Unit Planner":  # Reset only when the selected tool is not Unit Plan
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
+    # Reset session state when changing tools (this part was too aggressive before)
+    if "unit_plan_text" in st.session_state:
+        del st.session_state["unit_plan_text"]
+
     # Check if unit plan exists in session state
     if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
         # If the unit plan exists and has content, show it and provide the Word download button
