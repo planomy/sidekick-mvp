@@ -140,10 +140,10 @@ if tool == "Unit Planner":
 
             # Save to session so it doesn't reset
             if "unit_plan" not in st.session_state or not st.session_state["unit_plan"]:
-    st.warning("No unit plan found. Please generate the unit plan first.")
-    st.stop()
-else:
-    formatted = st.session_state["unit_plan"]
+                st.warning("No unit plan found. Please generate the unit plan first.")
+                st.stop()
+            else:
+                formatted = st.session_state["unit_plan"]
 
 
     # === IF PLAN EXISTS ===
