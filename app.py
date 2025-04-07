@@ -270,16 +270,18 @@ elif tool == "Worksheet Generator":
     st.header("📝 Worksheet Generator")
     # Teacher can type or paste a learning goal or lesson plan excerpt
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
-    # Option to choose number of questions
+    
+    # Option for number of questions and passage length
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
+    passage_length = st.slider("Desired word count for the information passage (0-200)", min_value=0, max_value=200, value=100, step=10)
     
     if st.button("Generate Worksheet"):
-        # Build the prompt for generating a worksheet
         worksheet_prompt = (
             f"Based on the following learning goal or lesson plan excerpt:\n\n"
             f"{learning_goal}\n\n"
             f"Generate a worksheet containing {num_questions} questions for students. "
-            "For each question, provide a sample answer for the teacher. "
+            f"The accompanying information passage should be approximately {passage_length} words. "
+            "List all the questions first, then at the bottom provide the corresponding answers for each question. "
             "Include a mix of multiple choice and short answer questions."
         )
         with st.spinner("Generating worksheet..."):
