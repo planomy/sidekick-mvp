@@ -16,7 +16,8 @@ if not client.api_key:
     st.stop()
 
 # --- SIDEBAR: TOOL SELECTION ---
-st.sidebar.title("PLANOMY - Where you're the ✨ Star ✨")
+st.sidebar.title("PLANNERME")
+st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
     ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner"]
