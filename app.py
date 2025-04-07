@@ -112,89 +112,104 @@ if tool == "Unit Planner":
                 ]
             )
 
+ # (Inside TOOL 0: UNIT PLANNER section)
+
+    if st.button("Generate Unit Plan"):
+        ...
+
         if response and response.choices:
             import re
+
+            # Step 1: Clean and store in session state so it's safe across reruns
             unit_plan_raw = response.choices[0].message.content
 
-            # --- Clean formatting ---
-            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\\1", unit_plan_raw)
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove bold
             unit_plan = re.sub(r"#+\s*", "", unit_plan)
             unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())
-            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)  # double space after headings
+            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)  # Double line after colons
 
-            bullet_lines = []
+            formatted_lines = []
             for line in unit_plan.splitlines():
                 stripped = line.strip()
-                if re.match(r'^\d+\.\s+|^-\s+', stripped):
-                    bullet_lines.append("    • " + re.sub(r'^\d+\.\s+|^-\s+', '', stripped))
-                elif stripped.endswith(":"):
-                    bullet_lines.append("\n" + stripped)
-                elif stripped:
-                    bullet_lines.append(stripped)
-            cleaned_plan = "\n".join(bullet_lines)
 
+                # Bullet points
+                if re.match(r'^(\d+\.\s+|-\s+)', stripped):
+                    clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
+                    formatted_lines.append("    • " + clean)
+
+                # Headings (ending in colon)
+                elif stripped.endswith(":"):
+                    formatted_lines.append("")  # blank line before
+                    formatted_lines.append(f"**{stripped}**")
+                    formatted_lines.append("")  # blank line after
+
+                # Regular line
+                elif stripped:
+                    formatted_lines.append(stripped)
+
+            cleaned_plan = "\n".join(formatted_lines).strip()
             st.session_state["unit_plan"] = cleaned_plan
 
-    # Show unit plan if already generated
-    if "unit_plan" in st.session_state:
-        st.text_area("Generated Unit Plan", st.session_state["unit_plan"], height=400)
+            # Step 2: Show on screen without rerun loss
+            st.markdown("### Generated Unit Plan")
+            st.markdown(cleaned_plan)
 
-        # --- Export Options ---
-        st.markdown("---")
-        st.subheader("📄 Export Options")
+            # --- EXPORT OPTIONS ---
+            st.markdown("---")
+            st.subheader("📄 Export Options")
 
-        export_text = st.session_state["unit_plan"]
+            if "unit_plan" in st.session_state:
+                export_text = st.session_state["unit_plan"]
 
-        # Word export
-        from docx import Document
-        from docx.shared import Pt
-        from io import BytesIO
+                # WORD EXPORT
+                from docx import Document
+                from docx.shared import Pt
+                from io import BytesIO
 
-        doc = Document()
-        style = doc.styles['Normal']
-        font = style.font
-        font.name = 'Calibri'
-        font.size = Pt(11)
+                doc = Document()
+                style = doc.styles['Normal']
+                font = style.font
+                font.name = 'Calibri'
+                font.size = Pt(11)
 
-        for line in export_text.split("\n"):
-            stripped = line.strip()
-            if stripped.startswith("\u2022") and not stripped.endswith(":"):
-                p = doc.add_paragraph(stripped)
-                p.paragraph_format.left_indent = Pt(18)
-                p.paragraph_format.space_after = Pt(0)
-            elif stripped.endswith(":"):
-                p = doc.add_paragraph(stripped)
-                p.paragraph_format.space_after = Pt(8)
-            elif stripped:
-                p = doc.add_paragraph(stripped)
-                p.paragraph_format.space_after = Pt(0)
+                for line in export_text.split("\n"):
+                    stripped = line.strip()
+                    if stripped.startswith("•") and not stripped.endswith(":"):
+                        p = doc.add_paragraph(stripped)
+                        p.paragraph_format.left_indent = Pt(18)
+                        p.paragraph_format.space_after = Pt(0)
+                    elif stripped.startswith("**") and stripped.endswith("**"):
+                        p = doc.add_paragraph(stripped.strip("*"))
+                        p.paragraph_format.space_after = Pt(10)
+                    elif stripped:
+                        p = doc.add_paragraph(stripped)
+                        p.paragraph_format.space_after = Pt(0)
 
-        word_buffer = BytesIO()
-        doc.save(word_buffer)
-        word_buffer.seek(0)
+                word_buffer = BytesIO()
+                doc.save(word_buffer)
+                word_buffer.seek(0)
 
-        st.download_button("📝 Download Word", word_buffer,
-                           file_name="unit_plan.docx",
-                           mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                st.download_button("📝 Download Word", word_buffer,
+                                   file_name="unit_plan.docx",
+                                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-        # PDF export
-        from fpdf import FPDF
-        import textwrap
+                # PDF EXPORT
+                from fpdf import FPDF
+                import textwrap
 
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=11)
-        pdf_text = export_text.replace("\u2022", "-")
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_auto_page_break(auto=True, margin=15)
+                pdf.set_font("Arial", size=11)
 
-        for line in pdf_text.split("\n"):
-            for wrapped in textwrap.wrap(line, width=90):
-                pdf.cell(0, 8, txt=wrapped, ln=True)
+                pdf_text = export_text.replace("•", "-")
 
-        pdf_bytes = pdf.output(dest='S').encode('latin1')
-        st.download_button("📌 Download PDF", data=pdf_bytes,
-                           file_name="unit_plan.pdf",
-                           mime="application/pdf")
+                for line in pdf_text.split("\n"):
+                    for wrapped in textwrap.wrap(line, width=90):
+                        pdf.cell(0, 8, txt=wrapped, ln=True)
+
+                pdf_bytes = pdf.output(dest='S').encode('latin1')
+                st.download_button("📌 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
 
 
 # ---------- TOOL 1: LESSON BUILDER ----------
