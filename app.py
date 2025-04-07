@@ -342,7 +342,7 @@ elif tool == "Self Care Tool":
             "Include some amusing or uplifting advice about what they can do today, "
             "and tell them something amazing about themselves."
         )
-        with st.spinner("Generating self care tip..."):
+        with st.spinner("Breathe in the zen..."):
             tip = chat_completion_request(
                 system_msg="You are a caring self care advisor who offers thoughtful, humorous, and uplifting self care tips.",
                 user_msg=self_care_prompt,
