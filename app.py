@@ -84,26 +84,16 @@ if tool != "Unit Planner":
 if tool == "Unit Planner":
     st.header("📘 Unit Planner")
 
-    # Use dynamic keys to avoid conflicts across tools
-    year_key = f"unit_year_{tool}"
-    subject_key = f"unit_subject_{tool}"
-    topic_key = f"unit_topic_{tool}"
-    weeks_key = f"unit_weeks_{tool}"
-    assessment_key = f"unit_assessment_{tool}"
-    hook_key = f"unit_hook_{tool}"
-    fast_finishers_key = f"unit_fast_finishers_{tool}"
-    cheat_sheet_key = f"unit_cheat_sheet_{tool}"
-
     # Input Fields for the Unit Planner (Only shown when Unit Planner is selected)
-    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key=year_key)
-    subject = st.text_input("Subject (e.g. HASS, English, Science)", key=subject_key)
-    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key=topic_key)
-    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key=weeks_key)
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key=f"unit_year_{tool}")
+    subject = st.text_input("Subject (e.g. HASS, English, Science)", key=f"unit_subject_{tool}")
+    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key=f"unit_topic_{tool}")
+    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key=f"unit_weeks_{tool}")
 
-    include_assessment = st.checkbox("Include Assessment Suggestions?", key=assessment_key)
-    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key=hook_key)
-    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key=fast_finishers_key)
-    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key=cheat_sheet_key)
+    include_assessment = st.checkbox("Include Assessment Suggestions?", key=f"unit_assessment_{tool}")
+    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key=f"unit_hook_{tool}")
+    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key=f"unit_fast_finishers_{tool}")
+    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key=f"unit_cheat_sheet_{tool}")
 
     if st.button("Generate Unit Plan", key="generate_unit_plan"):
         # Construct the prompt
@@ -209,6 +199,7 @@ if tool == "Unit Planner":
                            file_name="unit_plan.pdf",
                            mime="application/pdf",
                            key="download_pdf")
+
 
 
 
