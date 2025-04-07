@@ -232,25 +232,27 @@ def format_unit_plan_text(text):
 
     return "\n".join(formatted_lines)
 
+
 from fpdf import FPDF
 import textwrap
 from io import BytesIO
+import streamlit as st
 
 # Ensure unit_plan is not empty
-if 'unit_plan' in locals() and unit_plan:
-    # PDF generation setup
+if unit_plan:
+    # Initialize PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("Arial", size=11)
 
-    # Write text line by line to the PDF
+    # Write text line by line
     for line in unit_plan.split("\n"):
-        wrapped_lines = textwrap.wrap(line, width=90)
+        wrapped_lines = textwrap.wrap(line, width=90)  # Wrap text
         for wrapped_line in wrapped_lines:
             pdf.cell(0, 8, txt=wrapped_line, ln=True)
 
-    # Save PDF to a buffer
+    # Save PDF to a buffer instead of encoding it
     pdf_buffer = BytesIO()
     pdf.output(pdf_buffer)
     pdf_buffer.seek(0)
@@ -261,6 +263,7 @@ if 'unit_plan' in locals() and unit_plan:
                        mime="application/pdf")
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
+
 
 
 
