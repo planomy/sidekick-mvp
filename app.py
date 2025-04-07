@@ -234,12 +234,14 @@ def format_unit_plan_text(text):
 
 
 
-from fpdf import FPDF
-import textwrap
-from io import BytesIO
+# Before generating PDF, ensure that unit_plan is available
+if "unit_plan_text" in st.session_state:
+    unit_plan = st.session_state["unit_plan_text"]
+else:
+    unit_plan = ""
 
-# Ensure unit_plan is not empty
-if unit_plan:
+# Proceed only if unit_plan is not empty
+if unit_plan:  # Ensure unit_plan is not empty
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -259,7 +261,6 @@ if unit_plan:
     st.download_button("📎 Download PDF", data=pdf_buffer,
                        file_name="unit_plan.pdf",
                        mime="application/pdf")
-
 else:
     st.warning("⚠️ Unit plan is empty or failed to generate.")
 
