@@ -1,10 +1,8 @@
 import streamlit as st
 import openai
 import re
-import textwrap
 from io import BytesIO
 from docx import Document
-from docx.shared import Pt
 from fpdf import FPDF
 
 # This must be the first Streamlit call!
@@ -30,16 +28,14 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     A helper to call GPT-3.5-turbo with system & user messages.
     Make sure your environment has openai>=0.27.0.
     """
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_msg}
-        ],
+    response = openai.Completion.create(
+        model="gpt-3.5-turbo",  # Make sure you’re using the correct model
+        prompt=f"{system_msg}\n{user_msg}",
         max_tokens=max_tokens,
         temperature=temperature
     )
-    return response.choices[0].message.content.strip()
+    return response.choices[0].text.strip()
+
 
 # ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
