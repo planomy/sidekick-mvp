@@ -143,10 +143,18 @@ if tool == "Unit Planner":
 
         st.markdown(
             f"""
-            <div style='background-color:#ffffff; color:#000000; padding:15px;
-                        border-radius:5px; font-family:sans-serif;
-                        white-space:pre-wrap; line-height:1.6; font-size:15px;'>
-                {st.session_state["unit_plan_text"].replace("\n", "<br>")}
+            <div style='
+                background-color: #ffffff;
+                padding: 24px 30px;
+                border-radius: 6px;
+                font-family: "Segoe UI", sans-serif;
+                font-size: 16px;
+                line-height: 1.75;
+                color: #222;
+                white-space: pre-wrap;
+                text-align: left;
+            '>
+                {st.session_state["unit_plan_text"].replace("\n", "<br><br>")}
             </div>
             """,
             unsafe_allow_html=True
@@ -208,10 +216,15 @@ if tool == "Unit Planner":
                 pdf.cell(0, 8, line, ln=True)
                 pdf.set_font("Arial", style='', size=11)
             elif line.startswith("•"):
-                text = line.replace("•", "-")
-                for wrapped in textwrap.wrap(text, width=90):
-                    pdf.cell(10)
+                text = line.replace("•", "•")
+                for i, wrapped in enumerate(textwrap.wrap(text, width=90)):
+                    if i == 0:
+                        pdf.cell(8)  # indent
+                    else:
+                        pdf.cell(12)  # indent continuation lines more
                     pdf.cell(0, 8, wrapped, ln=True)
+
+                    
             elif line:
                 for wrapped in textwrap.wrap(line, width=90):
                     pdf.cell(0, 8, wrapped, ln=True)
