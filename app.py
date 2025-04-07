@@ -179,7 +179,7 @@ if tool == "Unit Planner":
         )
 
 
-        st.markdown("---")
+    st.markdown("---")
         st.subheader("📄 Export Options")
 
         # WORD EXPORT
