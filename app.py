@@ -297,25 +297,27 @@ if "unit_plan_text" in st.session_state and st.session_state["unit_plan_text"]:
 
 
     
+      # ---- FORMATTING CLEANUP ----
+unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
+unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
+unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
+unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
+
+bullet_lines = []
+for line in unit_plan.splitlines():  # This line must have the same indentation as the previous line
+    stripped = line.strip()
+    if re.match(r'^\d+\.\s+', stripped):  # Numbered or dash
+        clean = re.sub(r'^\d+\.\s+', '', stripped)
+        bullet_lines.append("• " + clean)
+    elif stripped.endswith(":"):
+        bullet_lines.append("")  # Add space BEFORE heading
+        bullet_lines.append(stripped)
+    elif stripped:
+        bullet_lines.append(stripped)
+
+
         
-        # ---- FORMATTING CLEANUP ----
-        unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
-        unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
-        unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
-        unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
-
-        bullet_lines = []
-        for line in unit_plan.splitlines():
-            stripped = line.strip()
-            if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
-                clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                bullet_lines.append("    • " + clean)
-            elif stripped.endswith(":"):
-                bullet_lines.append("")  # Add space BEFORE heading
-                bullet_lines.append(stripped)
-            elif stripped:
-                bullet_lines.append(stripped)
-
+      
         final_text = "\n".join(bullet_lines)
         st.session_state["unit_plan_text"] = final_text
 
