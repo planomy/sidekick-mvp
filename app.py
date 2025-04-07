@@ -81,13 +81,7 @@ if tool == "Unit Planner":
     include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
     include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
 
-    if st.button("Generate Unit Plan", key="generate_unit_plan"):
-        import openai, re, textwrap
-        from io import BytesIO
-        from docx import Document
-        from docx.shared import Pt
-        from fpdf import FPDF
-
+    if st.button("Generate Unit Plan"):
         prompt_parts = [
             f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
             f"The unit runs for approximately {weeks} weeks.",
@@ -107,6 +101,7 @@ if tool == "Unit Planner":
             prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
 
         full_prompt = " ".join(prompt_parts)
+
         client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
         with st.spinner("Planning your unit..."):
@@ -119,87 +114,99 @@ if tool == "Unit Planner":
             )
 
         if response and response.choices:
+            import re
             raw = response.choices[0].message.content
 
-            # Clean text
-            text = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)
-            text = re.sub(r"#+", "", text)
-            text = re.sub(r"\n{3,}", "\n\n", text.strip())
-            text = re.sub(r'(?<=:)\n', '\n\n', text)
+            unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", raw)
+            unit_plan = re.sub(r"#+", "", unit_plan)
+            unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())
+            unit_plan = re.sub(r'(:)\n', r'\1\n\n', unit_plan)
 
-            final_lines = []
-            for line in text.splitlines():
+            lines = []
+            for line in unit_plan.splitlines():
                 stripped = line.strip()
                 if re.match(r'^(\d+\.\s+|-\s+)', stripped):
                     clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                    final_lines.append("    • " + clean)
+                    lines.append("    • " + clean)
                 elif stripped.endswith(":"):
-                    final_lines.append("")
-                    final_lines.append(stripped)
-                    final_lines.append("")
+                    lines.append(f"\n{stripped}\n")
                 elif stripped:
-                    final_lines.append(stripped)
+                    lines.append(stripped)
 
-            cleaned = "\n".join(final_lines).strip()
-            st.session_state["unit_plan"] = cleaned
+            formatted = "\n".join(lines).strip()
+            st.session_state["unit_plan"] = formatted
 
-            # Streamlit display
-            st.markdown("### Generated Unit Plan")
-            st.text_area("📄 Unit Plan Output", cleaned, height=400)
+    # Display + export area (persists across reruns)
+    if "unit_plan" in st.session_state:
+        st.markdown("### Generated Unit Plan")
+        st.markdown(
+            f"""
+            <div style='
+                background-color: white;
+                color: black;
+                padding: 15px;
+                border-radius: 5px;
+                font-family: sans-serif;
+                white-space: pre-wrap;
+                line-height: 1.5;
+                font-size: 15px;
+            '>
+            {st.session_state["unit_plan"].replace("\n", "<br>")}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-            # --- EXPORT SECTION ---
-            st.markdown("---")
-            st.subheader("📄 Export Options")
+        st.markdown("---")
+        st.subheader("📄 Export Options")
 
-            export_text = st.session_state["unit_plan"]
+        from docx import Document
+        from docx.shared import Pt
+        from io import BytesIO
+        from fpdf import FPDF
+        import textwrap
 
-            # Word export
-            doc = Document()
-            style = doc.styles['Normal']
-            font = style.font
-            font.name = 'Calibri'
-            font.size = Pt(11)
+        export_text = st.session_state["unit_plan"]
 
-            for line in export_text.split("\n"):
-                s = line.strip()
-                if s.startswith("•") and not s.endswith(":"):
-                    p = doc.add_paragraph(s)
-                    p.paragraph_format.left_indent = Pt(18)
-                    p.paragraph_format.space_after = Pt(0)
-                elif s.endswith(":"):
-                    p = doc.add_paragraph(s)
-                    p.paragraph_format.space_after = Pt(8)
-                elif s:
-                    p = doc.add_paragraph(s)
-                    p.paragraph_format.space_after = Pt(0)
+        # --- WORD ---
+        doc = Document()
+        style = doc.styles['Normal']
+        font = style.font
+        font.name = 'Calibri'
+        font.size = Pt(11)
 
-            word_buffer = BytesIO()
-            doc.save(word_buffer)
-            word_buffer.seek(0)
+        for line in export_text.split("\n"):
+            s = line.strip()
+            if s.startswith("•") and not s.endswith(":"):
+                p = doc.add_paragraph(s)
+                p.paragraph_format.left_indent = Pt(18)
+                p.paragraph_format.space_after = Pt(0)
+            elif s.endswith(":"):
+                p = doc.add_paragraph(s)
+                p.paragraph_format.space_after = Pt(10)
+            elif s:
+                p = doc.add_paragraph(s)
+                p.paragraph_format.space_after = Pt(0)
 
-            st.download_button("📝 Download Word", word_buffer,
-                               file_name="unit_plan.docx",
-                               mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                               key="download_word")
+        word_buffer = BytesIO()
+        doc.save(word_buffer)
+        word_buffer.seek(0)
 
-            # PDF export
-            class SafePDF(FPDF):
-                def __init__(self):
-                    super().__init__()
-                    self.set_auto_page_break(auto=True, margin=15)
-                    self.set_font("Arial", size=11)
+        st.download_button("📝 Download Word", word_buffer, file_name="unit_plan.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-                def safe_text(self, text):
-                    return text.encode('latin-1', 'replace').decode('latin-1')
+        # --- PDF ---
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font("Arial", size=11)
+        pdf_safe = export_text.replace("•", "-")
 
-            pdf = SafePDF()
-            pdf.add_page()
-            for line in export_text.replace("•", "-").split("\n"):
-                for wrapped in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, txt=pdf.safe_text(wrapped), ln=True)
+        for line in pdf_safe.split("\n"):
+            for wrapped in textwrap.wrap(line, width=90):
+                pdf.cell(0, 8, txt=wrapped, ln=True)
 
-            pdf_bytes = pdf.output(dest='S').encode('latin-1')
-            st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf", key="download_pdf")
+        pdf_bytes = pdf.output(dest='S').encode('latin1', errors='ignore')
+        st.download_button("📎 Download PDF", data=pdf_bytes, file_name="unit_plan.pdf", mime="application/pdf")
 
 
 # ---------- TOOL 1: LESSON BUILDER ----------
