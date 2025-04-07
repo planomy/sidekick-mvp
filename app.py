@@ -96,89 +96,104 @@ if tool == "Unit Planner":
                            file_name="unit_plan.docx",
                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                            key="download_word")
+
+        # --- PDF Generation ---
+        # Create PDF instance
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+
+        # Set font for PDF
+        pdf.set_font("Arial", size=10)
+
+        # Write unit plan content to PDF
+        for line in st.session_state["unit_plan_text"].split("\n"):
+            pdf.cell(200, 10, txt=line, ln=True)
+
+        # Output the PDF to buffer
+        pdf_output = pdf.output(dest='S')
+        pdf_buffer = BytesIO()
+        pdf_buffer.write(pdf_output.encode('latin1'))
+        pdf_buffer.seek(0)
+
+        # Provide the download button for the PDF
+        st.download_button("📎 Download PDF", data=pdf_buffer,
+                           file_name="unit_plan.pdf",
+                           mime="application/pdf")
+
     else:
         # If the unit plan is empty or not generated, show warning
         st.warning("⚠️ Unit plan is empty or failed to generate. Please generate the unit plan first.")
 
 
-    
-    
-    
-    # Inputs
-    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
-    subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
-    topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
-    weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key="unit_weeks")
+# Input Fields for the Unit Planner
+year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"], key="unit_year")
+subject = st.text_input("Subject (e.g. HASS, English, Science)", key="unit_subject")
+topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)", key="unit_topic")
+weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5, key="unit_weeks")
 
-    include_assessment = st.checkbox("Include Assessment Suggestions?", key="unit_assessment")
-    include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key="unit_hook")
-    include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
-    include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
+include_assessment = st.checkbox("Include Assessment Suggestions?", key="unit_assessment")
+include_hook = st.checkbox("Include Hook Ideas for Lesson 1?", key="unit_hook")
+include_fast_finishers = st.checkbox("Include Fast Finisher Suggestions?", key="unit_fast_finishers")
+include_cheat_sheet = st.checkbox("Include Quick Content Cheat Sheet (for teacher)?", key="unit_cheat_sheet")
 
-    if st.button("Generate Unit Plan", key="generate_unit_plan"):
-        prompt_parts = [
-            f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
-            f"The unit runs for approximately {weeks} weeks.",
-            "Include the following sections:",
-            "1. A short Unit Overview (what it's about).",
-            "2. 3–5 clear Learning Intentions.",
-            "3. A list of lesson types or activity ideas that would suit this unit."
-        ]
-        if include_assessment:
-            prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
-        if include_hook:
-            prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
-        if include_fast_finishers:
-            prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
-        if include_cheat_sheet:
-            prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
+if st.button("Generate Unit Plan", key="generate_unit_plan"):
+    prompt_parts = [
+        f"Create a unit plan overview for a Year {year} {subject} unit on '{topic}'.",
+        f"The unit runs for approximately {weeks} weeks.",
+        "Include the following sections:",
+        "1. A short Unit Overview (what it's about).",
+        "2. 3–5 clear Learning Intentions.",
+        "3. A list of lesson types or activity ideas that would suit this unit."
+    ]
+    if include_assessment:
+        prompt_parts.append("5. Include 1–2 assessment ideas (format only, keep it brief).")
+    if include_hook:
+        prompt_parts.append("6. Suggest 2–3 engaging Hook Ideas for Lesson 1.")
+    if include_fast_finishers:
+        prompt_parts.append("7. Suggest Fast Finisher or Extension Task ideas.")
+    if include_cheat_sheet:
+        prompt_parts.append("8. Provide a Quick Content Cheat Sheet: 10 bullet-point facts a teacher should know to teach this unit.")
 
-        full_prompt = " ".join(prompt_parts)
+    full_prompt = " ".join(prompt_parts)
 
-        with st.spinner("Planning your unit..."):
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
-                    {"role": "user", "content": full_prompt}
-                ]
-            )
+    with st.spinner("Planning your unit..."):
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a practical and experienced curriculum-aligned teacher in Australia."},
+                {"role": "user", "content": full_prompt}
+            ]
+        )
 
-        import re
-        unit_plan_raw = response.choices[0].message.content
+    unit_plan_raw = response.choices[0].message.content
 
-        # ---- FORMATTING CLEANUP ----
-        unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
-        unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
-        unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
-        unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
+    # ---- FORMATTING CLEANUP ----
+    unit_plan = re.sub(r"\*\*(.*?)\*\*", r"\1", unit_plan_raw)  # Remove markdown bold
+    unit_plan = re.sub(r"#+\s*", "", unit_plan)  # Remove markdown headings
+    unit_plan = re.sub(r"\n{2,}", "\n", unit_plan.strip())  # Collapse excessive blank lines
+    unit_plan = re.sub(r"(:)\n", r"\1\n\n", unit_plan)  # Add spacing AFTER colons
 
-        bullet_lines = []
-        for line in unit_plan.splitlines():
-            stripped = line.strip()
-            if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
-                clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
-                bullet_lines.append("    • " + clean)
-            elif stripped.endswith(":"):
-                bullet_lines.append("")  # Add space BEFORE heading
-                bullet_lines.append(stripped)
-            elif stripped:
-                bullet_lines.append(stripped)
+    bullet_lines = []
+    for line in unit_plan.splitlines():
+        stripped = line.strip()
+        if re.match(r'^(\d+\.\s+|-\s+)', stripped):  # Numbered or dash
+            clean = re.sub(r'^(\d+\.\s+|-\s+)', '', stripped)
+            bullet_lines.append("    • " + clean)
+        elif stripped.endswith(":"):
+            bullet_lines.append("")  # Add space BEFORE heading
+            bullet_lines.append(stripped)
+        elif stripped:
+            bullet_lines.append(stripped)
 
-        final_text = "\n".join(bullet_lines)
-        st.session_state["unit_plan_text"] = final_text
+    final_text = "\n".join(bullet_lines)
+    st.session_state["unit_plan_text"] = final_text
 
-# === IF PLAN EXISTS ===
+# ---------- PDF Generation Check
 if "unit_plan_text" in st.session_state:
     st.markdown("### Generated Unit Plan")
 
-  # Convert plain text to HTML for Streamlit screen output
-    # Assuming you are inside the Unit Planner tool section
-
-if "unit_plan_text" in st.session_state:
-    st.markdown("### Generated Unit Plan")
-
-    # Define the convert_to_html function
+    # Convert plain text to HTML for Streamlit screen output
     def convert_to_html(text):
         lines = text.split("\n")
         html_lines = []
@@ -215,68 +230,6 @@ if "unit_plan_text" in st.session_state:
         unsafe_allow_html=True
     )
 
-    # Correct the indentation for this line:
-    st.markdown("---")  # This should be aligned with the rest of the code
-    st.subheader("📄 Export Options")
-
-# WORD EXPORT
-from docx import Document  # Ensure this is at the top of your file
-from docx.shared import Pt
-from io import BytesIO
-
-# Word export
-doc = Document()  # Create a new Document instance
-
-# Get the section and set the margins
-sections = doc.sections
-for section in sections:
-    section._sectPr.pgMar.top = Pt(40)  # Top margin
-    section._sectPr.pgMar.bottom = Pt(60)  # Bottom margin
-    section._sectPr.pgMar.left = Pt(40)  # Left margin
-    section._sectPr.pgMar.right = Pt(60)  # Right margin
-
-# Set font and add content
-style = doc.styles['Normal']
-font = style.font
-font.name = 'Calibri'
-font.size = Pt(10)
-
-# Check if unit_plan_text exists in session state before accessing it
-if "unit_plan_text" in st.session_state:
-    # Loop through the lines of the unit plan
-    for line in st.session_state["unit_plan_text"].split("\n"):
-        s = line.strip()
-
-        if s.startswith("•") and not s.endswith(":"):
-            p = doc.add_paragraph(s[1:].strip())  # Remove bullet symbol
-            p.paragraph_format.left_indent = Pt(18)
-            p.paragraph_format.space_after = Pt(0)
-            p.style.font.bold = False  # No bold for bullets
-
-        elif s.endswith(":"):
-            p = doc.add_paragraph(s)
-            p.paragraph_format.space_before = Pt(11)
-            p.paragraph_format.space_after = Pt(0)
-            p.style.font.bold = True  # Bold for headings
-
-        elif s:
-            p = doc.add_paragraph(s)
-            p.paragraph_format.space_after = Pt(0)
-            p.style.font.bold = False  # Normal text is not bold
-
-else:
-    st.warning("Unit plan text is not available. Please generate the unit plan first.")
-
-# Create Word buffer and save the document
-word_buffer = BytesIO()
-doc.save(word_buffer)
-word_buffer.seek(0)
-
-# Provide the download button for the Word file
-st.download_button("📝 Download Word", word_buffer,
-                   file_name="unit_plan.docx",
-                   mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                   key="download_word")
 
 # ---------- TOOL 1: LESSON BUILDER ----------
 if tool == "Lesson Builder":
@@ -329,7 +282,6 @@ if tool == "Lesson Builder":
                 ]
             )
 
-            import re
             formatted = response.choices[0].message.content
 
             formatted = formatted.replace("* ", "• ")
