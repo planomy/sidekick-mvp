@@ -190,9 +190,10 @@ elif tool == "Email Assistant":
 # ========== TOOL 4: UNIT GLOSSARY GENERATOR ==========
 elif tool == "Unit Glossary Generator":
     st.header("📘 Unit Glossary Generator")
+    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
     subject = st.text_input("Subject (e.g. Science, HASS)")
     topic = st.text_input("Topic or Unit Focus (e.g. Body Systems, Volcanoes)")
-    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+   
 
     if st.button("Generate Glossary"):
         glossary_prompt = (
