@@ -123,6 +123,7 @@ if tool == "Lesson Builder":
             text_box = slide.shapes.add_textbox(left, top, width, height)
             tf = text_box.text_frame
             tf.text = section  # Put the section text here
+            tf.word_wrap = True # Enable automatic wrapping
             
             # Format the text (if desired)
             for paragraph in tf.paragraphs:
