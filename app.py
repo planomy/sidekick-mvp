@@ -41,57 +41,23 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     return response.choices[0].message.content.strip()
 
 
-
-import re
-from youtube_transcript_api import YouTubeTranscriptApi
+# ========== Setting up Video Assistant ==========
 import streamlit as st
 
-# Function to extract the video ID from the YouTube URL
-def get_video_id(url):
-    video_id_match = re.search(r"(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]+)", url)
-    if video_id_match:
-        return video_id_match.group(1)
-    return None
+# Function to generate educational output based on selected options
+def generate_output(year_level, video_description, output_choices):
+    prompt = f"Year Level: {year_level}\nVideo Description: {video_description}\n\n"
 
-# Function to fetch transcript using YouTube Transcript API
-def get_video_transcript(url):
-    video_id = get_video_id(url)
-    if video_id:
-        try:
-            transcript = YouTubeTranscriptApi.get_transcript(video_id)
-            # Join all transcript text entries
-            transcript_text = " ".join([entry['text'] for entry in transcript])
-            return transcript_text
-        except Exception as e:
-            return f"Error fetching video transcript: {str(e)}"
-    else:
-        return "Invalid YouTube URL."
+    if "Summary" in output_choices:
+        prompt += "Provide a concise summary of the video."
+    if "Quiz Questions" in output_choices:
+        prompt += "\nGenerate 10 comprehension questions (including 2 inferential ones) with answers for a classroom quiz."
+    if "Discussion Prompts" in output_choices:
+        prompt += "\nGenerate discussion prompts to encourage critical thinking and engagement."
+    if "Key Vocabulary" in output_choices:
+        prompt += "\nExtract and explain 10 key vocabulary words from the description."
 
-# Function to generate educational content (summary, questions, etc.)
-def generate_output(video_url):
-    transcript = get_video_transcript(video_url)
-    if not transcript.startswith("Error"):
-        prompt = f"Video Transcript:\n{transcript}\n\nGenerate educational output based on the video transcript, including quiz questions, a summary, or discussion prompts."
-
-        # Use chat_completion_request function (assuming it's defined elsewhere in your code)
-        output = chat_completion_request(
-            system_msg="You are an expert educational content generator.",
-            user_msg=prompt,
-            max_tokens=600,
-            temperature=0.7
-        )
-        return output
-    else:
-        return transcript  # If there was an error fetching the transcript
-
-
-
-
-
-
-
-
-
+    return prompt
 
 
 # ========== TOOL 1: LESSON BUILDER ==========
@@ -450,17 +416,23 @@ elif tool == "Self Care Tool":
 
 # ========== VIDEO ASSISTANT ==========
 st.header("🎥 Video Assistant")
-st.write("Enter a YouTube URL to generate educational output based on its transcript.")
-video_url = st.text_input("YouTube URL:")
+st.write("Tell me about the video and what you’d like to generate.")
 
-output_option = st.selectbox("Choose what you want:", 
-                             ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
+# Dropdown for selecting year level
+year_level = st.selectbox("Select Year Level", ["7", "8", "9", "10", "11", "12"])
 
-if st.button("Generate Output") and video_url:
-    # Generate output based on the video transcript
-    result = generate_output(video_url)
+# Input field for video description
+video_description = st.text_area("Tell me what this video is about:")
+
+# Radio buttons for selecting educational output
+output_choices = st.multiselect("Select the outputs you want:",
+                                ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
+
+# Button to generate output
+if st.button("Generate Output") and video_description:
+    result = generate_output(year_level, video_description, output_choices)
     st.markdown("### Generated Output")
-    st.markdown(result, unsafe_allow_html=True)
+    st.write(result)
 
 
 
