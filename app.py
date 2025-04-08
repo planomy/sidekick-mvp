@@ -43,27 +43,47 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
 
 
 import re
-from pytube import YouTube
+from youtube_transcript_api import YouTubeTranscriptApi
 import streamlit as st
 
-# Function to extract video ID from YouTube URL
+# Function to extract the video ID from the YouTube URL
 def get_video_id(url):
     video_id_match = re.search(r"(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]+)", url)
     if video_id_match:
         return video_id_match.group(1)
     return None
 
-# Function to fetch video description
-def get_video_description(url):
+# Function to fetch transcript using YouTube Transcript API
+def get_video_transcript(url):
     video_id = get_video_id(url)
     if video_id:
         try:
-            yt = YouTube(url)
-            return yt.description
+            transcript = YouTubeTranscriptApi.get_transcript(video_id)
+            # Join all transcript text entries
+            transcript_text = " ".join([entry['text'] for entry in transcript])
+            return transcript_text
         except Exception as e:
-            return f"Error fetching video description: {str(e)}"
+            return f"Error fetching video transcript: {str(e)}"
     else:
         return "Invalid YouTube URL."
+
+# Function to generate educational content (summary, questions, etc.)
+def generate_output(video_url):
+    transcript = get_video_transcript(video_url)
+    if not transcript.startswith("Error"):
+        prompt = f"Video Transcript:\n{transcript}\n\nGenerate educational output based on the video transcript, including quiz questions, a summary, or discussion prompts."
+
+        # Use chat_completion_request function (assuming it's defined elsewhere in your code)
+        output = chat_completion_request(
+            system_msg="You are an expert educational content generator.",
+            user_msg=prompt,
+            max_tokens=600,
+            temperature=0.7
+        )
+        return output
+    else:
+        return transcript  # If there was an error fetching the transcript
+
 
 
 
@@ -428,43 +448,19 @@ elif tool == "Self Care Tool":
 
 
 
-# Streamlit code for user interface
+# ========== VIDEO ASSISTANT ==========
 st.header("🎥 Video Assistant")
-st.write("Enter a YouTube URL to generate educational output based on its description.")
+st.write("Enter a YouTube URL to generate educational output based on its transcript.")
 video_url = st.text_input("YouTube URL:")
 
 output_option = st.selectbox("Choose what you want:", 
                              ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
 
 if st.button("Generate Output") and video_url:
-    # Validate the YouTube URL
-    if not video_url.startswith("https://www.youtube.com/watch?v="):
-        st.error("Please enter a valid YouTube URL.")
-    else:
-        description = get_video_description(video_url)
-        if description.startswith("Error"):
-            st.error(description)
-        else:
-            # Generate output based on selected option
-            if output_option == "Summary":
-                prompt = f"Based on the following video description, provide a concise summary:\n\n{description}"
-            elif output_option == "Quiz Questions":
-                prompt = f"Based on the following video description, generate 10 comprehension questions (including 2 inferential ones) along with their answers for a classroom quiz:\n\n{description}"
-            elif output_option == "Discussion Prompts":
-                prompt = f"Based on the following video description, generate several discussion prompts that encourage critical thinking and engagement:\n\n{description}"
-            elif output_option == "Key Vocabulary":
-                prompt = f"Extract and explain 10 key vocabulary words from the following video description:\n\n{description}"
-            
-            # Use OpenAI to generate the requested output
-            with st.spinner("Generating output..."):
-                output = chat_completion_request(
-                    system_msg="You are an expert educational content generator.",
-                    user_msg=prompt,
-                    max_tokens=600,
-                    temperature=0.7
-                )
-            st.markdown("### Generated Output")
-            st.markdown(output, unsafe_allow_html=True)
+    # Generate output based on the video transcript
+    result = generate_output(video_url)
+    st.markdown("### Generated Output")
+    st.markdown(result, unsafe_allow_html=True)
 
 
 
