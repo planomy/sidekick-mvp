@@ -458,7 +458,7 @@ elif tool == "Video Quiz Generator":
     st.header("🎥 Video Quiz Generator")
     st.write("Enter a YouTube URL below and let the app generate a quiz based on its transcript.")
     video_url = st.text_input("YouTube URL:")
-    
+
     if st.button("Generate Quiz") and video_url:
         video_id = extract_video_id(video_url)
         if video_id:
