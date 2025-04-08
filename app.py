@@ -433,6 +433,28 @@ elif tool == "Self Care Tool":
         st.markdown(tip, unsafe_allow_html=True)
 
 
+# ========== VIDEO QUIZ GENERATOR ==========
+elif tool == "Video Quiz Generator":
+    st.header("🎥 Video Quiz Generator")
+    st.write("Enter a YouTube URL below and let the app generate a quiz based on its transcript.")
+    video_url = st.text_input("YouTube URL:")
+
+    if st.button("Generate Quiz") and video_url:
+        video_id = extract_video_id(video_url)
+        if video_id:
+            with st.spinner("Fetching transcript and generating quiz..."):
+                transcript = get_transcript(video_id)
+                if transcript.startswith("Error"):
+                    st.error(transcript)
+                else:
+                    questions = generate_questions(transcript)
+                    st.markdown("### Quiz Questions and Answers")
+                    st.markdown(questions, unsafe_allow_html=True)
+        else:
+            st.error("Invalid YouTube URL.")
+
+
+
  # Generate a unique Teacher Boost dynamically using ChatGPT (no pre-populated list)
 st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and a divider
 
@@ -454,24 +476,7 @@ if "teacher_boost" not in st.session_state:
 st.sidebar.markdown(f"**Teacher Boost:** _{st.session_state['teacher_boost']}_")
 
 
-elif tool == "Video Quiz Generator":
-    st.header("🎥 Video Quiz Generator")
-    st.write("Enter a YouTube URL below and let the app generate a quiz based on its transcript.")
-    video_url = st.text_input("YouTube URL:")
 
-    if st.button("Generate Quiz") and video_url:
-        video_id = extract_video_id(video_url)
-        if video_id:
-            with st.spinner("Fetching transcript and generating quiz..."):
-                transcript = get_transcript(video_id)
-                if transcript.startswith("Error"):
-                    st.error(transcript)
-                else:
-                    questions = generate_questions(transcript)
-                    st.markdown("### Quiz Questions and Answers")
-                    st.markdown(questions, unsafe_allow_html=True)
-        else:
-            st.error("Invalid YouTube URL.")
 
 
 
