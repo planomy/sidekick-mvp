@@ -40,7 +40,6 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     )
     return response.choices[0].message.content.strip()
 
-
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 
@@ -82,7 +81,30 @@ elif tool == "Video Assistant":
         # If there is an error fetching the description or transcript, show the error
         if description.startswith("Error"):
             st.error(description)
-        elif transcript.startswith("Error
+        elif transcript.startswith("Error"):
+            st.error(transcript)
+        else:
+            # If no error, use the transcript to generate output based on the selected option
+            if output_option == "Summary":
+                prompt = f"Based on the following transcript, provide a concise summary:\n\n{transcript}"
+            elif output_option == "Quiz Questions":
+                prompt = f"Based on the following transcript, generate 10 comprehension questions (including 2 inferential ones) along with their answers for a classroom quiz:\n\n{transcript}"
+            elif output_option == "Discussion Prompts":
+                prompt = f"Based on the following transcript, generate several discussion prompts that encourage critical thinking and engagement:\n\n{transcript}"
+            elif output_option == "Key Vocabulary":
+                prompt = f"Extract and explain 10 key vocabulary words from the following transcript:\n\n{transcript}"
+            
+            # Use the chat_completion_request function to get the output from OpenAI
+            with st.spinner("Generating output..."):
+                output = chat_completion_request(
+                    system_msg="You are an expert educational content generator.",
+                    user_msg=prompt,
+                    max_tokens=600,
+                    temperature=0.7
+                )
+            st.markdown("### Generated Output")
+            st.markdown(output, unsafe_allow_html=True)
+
 
 
 
