@@ -399,4 +399,4 @@ teacher_boosts = [
 ]
 
 boost = random.choice(teacher_boosts)
-st.sidebar.markdown(f"**Booyar ** _{boost}_")
+st.sidebar.markdown(f"**Booyar>** _{boost}_")
