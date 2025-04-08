@@ -396,18 +396,23 @@ elif tool == "Self Care Tool":
  # Generate a unique Teacher Boost dynamically using ChatGPT (no pre-populated list)
 st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and a divider
 
+# Check if a teacher boost has already been generated for this session
+if "teacher_boost" not in st.session_state:
+    with st.spinner(""):
+        boost_prompt = (
+            "Generate an uplifting teacher boost message that is either funny, sarcastic, "
+            "or a random quirky fact. Please ensure your answer is 40 tokens or less. "
+            "Don't use words like hell or other possible offensive terms."
+        )
+        st.session_state["teacher_boost"] = chat_completion_request(
+            system_msg="You are a creative teacher boost generator.",
+            user_msg=boost_prompt,
+            max_tokens=40,
+            temperature=0.9
+        )
 
-boost_prompt = (
-    "Generate an uplifting teacher boost message that is either funny, sarcastic, or a random quirky fact. "
-    "Please ensure your answer is 40 tokens or less. Don't use words like hell or other possible offensive terms."
-    )
-unique_boost = chat_completion_request(
-        system_msg="You are a creative teacher boost generator.",
-        user_msg=boost_prompt,
-        max_tokens=40,
-        temperature=0.9
-    )
-unique_boost = unique_boost.strip(' "\n')
-st.sidebar.markdown(f"_{unique_boost}_")
+st.sidebar.markdown(f"**Teacher Boost:** _{st.session_state['teacher_boost']}_")
+
+
 
 
