@@ -95,38 +95,41 @@ if tool == "Lesson Builder":
         # After displaying the lesson plan:
         st.subheader("Export Options")
         
-        # New: Download as PowerPoint Slides
+        # New: Download as PowerPoint Slides (Multiple Slides Version)
         from pptx import Presentation
         from pptx.util import Inches, Pt
         
         ppt_buffer = BytesIO()
         prs = Presentation()
         
-        # Create a title slide (you can adjust layout or add more slides if you wish)
-        slide_layout = prs.slide_layouts[5]  # Use a blank or title-only slide layout
-        slide = prs.slides.add_slide(slide_layout)
+        # Split the lesson plan text into chunks. For example, splitting by double newlines:
+        slide_sections = re.split(r'\n\s*\n', lesson_plan.strip())
         
-        # Optionally add a title if you want:
-        title_placeholder = slide.shapes.title
-        if title_placeholder:
-            title_placeholder.text = "Lesson Plan"
+        for i, section in enumerate(slide_sections, start=1):
+            # Select a blank slide layout (adjust as desired)
+            slide_layout = prs.slide_layouts[5]
+            slide = prs.slides.add_slide(slide_layout)
+            
+            # Optional: add a title for each slide
+            title_placeholder = slide.shapes.title
+            if title_placeholder:
+                title_placeholder.text = f"Slide {i}"
+            
+            # Add a text box containing the section text
+            left = Inches(1)
+            top = Inches(1.5)
+            width = Inches(8)
+            height = Inches(5)
+            text_box = slide.shapes.add_textbox(left, top, width, height)
+            tf = text_box.text_frame
+            tf.text = section  # Put the section text here
+            
+            # Format the text (if desired)
+            for paragraph in tf.paragraphs:
+                for run in paragraph.runs:
+                    run.font.size = Pt(18)
         
-        # Add a text box with the lesson plan content
-        left = Inches(1)
-        top = Inches(1.5)
-        width = Inches(8)
-        height = Inches(5)
-        
-        text_box = slide.shapes.add_textbox(left, top, width, height)
-        tf = text_box.text_frame
-        tf.text = lesson_plan  # Add the entire lesson plan text
-        
-        # Optionally, format the text in the text frame:
-        for paragraph in tf.paragraphs:
-            for run in paragraph.runs:
-                run.font.size = Pt(18)  # Adjust the font size as desired
-        
-        # Save presentation to buffer
+        # Save the presentation to the buffer and prepare for download
         prs.save(ppt_buffer)
         ppt_buffer.seek(0)
         
