@@ -399,7 +399,7 @@ elif tool == "Video Assistant":
     grade = st.selectbox("Grade Level", ["7", "8", "9", "10", "11", "12"])
     video_description = st.text_area("What is the video about? Provide a brief overview:")
     
-    if st.button("Generate Video Content"):
+    if st.button("Generate Content"):
         video_prompt = (
             f"For a Grade {grade} class, generate the following based on the video description:\n"
             f"1. A few discussion starter questions\n"
