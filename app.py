@@ -458,8 +458,13 @@ if st.button("Generate Output") and video_url:
             # Use OpenAI to generate the requested output
             with st.spinner("Generating output..."):
                 output = chat_completion_request(
-                    system_msg="You are an_
-
+                    system_msg="You are an expert educational content generator.",
+                    user_msg=prompt,
+                    max_tokens=600,
+                    temperature=0.7
+                )
+            st.markdown("### Generated Output")
+            st.markdown(output, unsafe_allow_html=True)
 
 
 
