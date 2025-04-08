@@ -42,22 +42,28 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
 
 
 # ========== Setting up Video Assistant ==========
+import openai
 import streamlit as st
 
-# Function to generate educational output based on selected options
-def generate_output(year_level, video_description, output_choices):
-    prompt = f"Year Level: {year_level}\nVideo Description: {video_description}\n\n"
+# OpenAI API key (make sure you have set your OpenAI API key in Streamlit secrets)
+openai.api_key = st.secrets.get("OPENAI_API_KEY")
 
-    if "Summary" in output_choices:
-        prompt += "Provide a concise summary of the video."
-    if "Quiz Questions" in output_choices:
-        prompt += "\nGenerate 10 comprehension questions (including 2 inferential ones) with answers for a classroom quiz."
-    if "Discussion Prompts" in output_choices:
-        prompt += "\nGenerate discussion prompts to encourage critical thinking and engagement."
-    if "Key Vocabulary" in output_choices:
-        prompt += "\nExtract and explain 10 key vocabulary words from the description."
+# Function to interact with OpenAI's GPT model to generate content
+def chat_completion_request(system_msg, user_msg, max_tokens=600, temperature=0.7):
+    """
+    A helper to call GPT-3.5-turbo with system & user messages using OpenAI.
+    """
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg}
+        ],
+        max_tokens=max_tokens,
+        temperature=temperature
+    )
+    return response.choices[0].message.content.strip()
 
-    return prompt
 
 
 # ========== TOOL 1: LESSON BUILDER ==========
@@ -428,11 +434,35 @@ video_description = st.text_area("Tell me what this video is about:")
 output_choices = st.multiselect("Select the outputs you want:",
                                 ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
 
+# Function to generate output content based on selected choices
+def generate_content(year_level, video_description, output_choices):
+    result = ""
+    system_msg = "You are an expert educational content generator."
+
+    if "Summary" in output_choices:
+        prompt = f"Provide a concise summary of the video:\n\n{video_description}"
+        result += f"**Summary:** {chat_completion_request(system_msg, prompt)}\n\n"
+
+    if "Quiz Questions" in output_choices:
+        prompt = f"Generate 10 comprehension questions (including 2 inferential ones) with answers for a classroom quiz:\n\n{video_description}"
+        result += f"**Quiz Questions:** {chat_completion_request(system_msg, prompt)}\n\n"
+
+    if "Discussion Prompts" in output_choices:
+        prompt = f"Generate discussion prompts to encourage critical thinking and engagement:\n\n{video_description}"
+        result += f"**Discussion Prompts:** {chat_completion_request(system_msg, prompt)}\n\n"
+
+    if "Key Vocabulary" in output_choices:
+        prompt = f"Extract and explain 10 key vocabulary words from the following description:\n\n{video_description}"
+        result += f"**Key Vocabulary:** {chat_completion_request(system_msg, prompt)}\n\n"
+
+    return result
+
 # Button to generate output
 if st.button("Generate Output") and video_description:
-    result = generate_output(year_level, video_description, output_choices)
+    generated_content = generate_content(year_level, video_description, output_choices)
     st.markdown("### Generated Output")
-    st.write(result)
+    st.write(generated_content)
+    
 
 
 
