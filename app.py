@@ -322,6 +322,9 @@ elif tool == "Unit Planner":
     # ========== TOOL 6: WORKSHEET GENERATOR ==========
 elif tool == "Worksheet Generator":
     st.header("📝 Worksheet Generator")
+    # New: Add Year Level input for the worksheet
+    year_level = st.selectbox("Select Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    
     # Teacher can type or paste a learning goal or lesson plan excerpt
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
     
@@ -331,7 +334,7 @@ elif tool == "Worksheet Generator":
     
     if st.button("Generate Worksheet"):
         worksheet_prompt = (
-            f"Based on the following learning goal or lesson plan excerpt:\n\n"
+            f"Based on the following learning goal or lesson plan excerpt for Year {year_level}:\n\n"
             f"{learning_goal}\n\n"
             f"Generate a worksheet containing {num_questions} questions for students. "
             f"The accompanying information passage should be approximately {passage_length} words. "
