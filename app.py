@@ -436,7 +436,7 @@ elif tool == "Self Care Tool":
 # ========== VIDEO QUIZ GENERATOR ==========
 elif tool == "Video Quiz Generator":
     st.header("🎥 Video Quiz Generator")
-    st.write("Enter a YouTube URL below and let the app generate a quiz based on its transcript.")
+    st.write("Enter a YouTube URL to generate a quiz based on its transcript.")
     video_url = st.text_input("YouTube URL:")
 
     if st.button("Generate Quiz") and video_url:
@@ -447,9 +447,9 @@ elif tool == "Video Quiz Generator":
                 if transcript.startswith("Error"):
                     st.error(transcript)
                 else:
-                    questions = generate_questions(transcript)
+                    quiz = generate_questions(transcript)
                     st.markdown("### Quiz Questions and Answers")
-                    st.markdown(questions, unsafe_allow_html=True)
+                    st.markdown(quiz, unsafe_allow_html=True)
         else:
             st.error("Invalid YouTube URL.")
 
