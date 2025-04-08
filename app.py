@@ -403,7 +403,7 @@ elif tool == "Video Assistant":
         video_prompt = (
             f"For a Grade {grade} class, generate the following based on the video description:\n"
             f"1. A few discussion starter questions\n"
-            f"2. A list of key vocabulary words they might encounter\n"
+            f"2. A list of key vocabulary words they might encounter along with a brief definition of each\n"
             f"3. Some thoughtful questions to promote deeper engagement\n\n"
             f"Video description: {video_description}"
         )
