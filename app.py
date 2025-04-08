@@ -56,44 +56,44 @@ if tool == "Lesson Builder":
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
     differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
 
-# After your input fields are defined
-col_empty1, col_button, col_empty2 = st.columns([3, 1, 3])
-with col_button:
-    if st.button("Generate Lesson Plan"):
-        prompt_parts = [
-            f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
-            f"Start each lesson with a clear Learning Goal aligned to a {goal_focus.lower()} outcome.",
-            "Structure each lesson with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket.",
-            f"The lesson should use {device_use.lower()}. Students should work in {grouping.lower()}.",
-            f"Use a {lesson_style.lower()} approach."
-        ]
-        if differentiation:
-            prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
-        if assessment != "No Assessment":
-            prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
-        if include_curriculum:
-            prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
-  
-        full_prompt = " ".join(prompt_parts)
-  
-        with st.spinner("Planning your lesson(s)..."):
-            lesson_plan = chat_completion_request(
-                system_msg="You are a practical, creative Australian teacher.",
-                user_msg=full_prompt,
-                max_tokens=1200
-            )
-            formatted_plan = lesson_plan.replace("* ", "• ")
-            formatted_plan = re.sub(r"^#+\s*(.+)$", r"<br><b>\1</b>", formatted_plan, flags=re.MULTILINE)
-            st.markdown(
-                f"""
-                <div style='background-color: #f9f9f9; padding: 20px; border-radius: 8px;
-                            font-family: sans-serif; font-size: 16px; color: #111;
-                            line-height: 1.6; white-space: pre-wrap;'>
-                    {formatted_plan.replace("\n", "<br>")}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    # After your input fields are defined
+    col_empty1, col_button, col_empty2 = st.columns([3, 1, 3])
+    with col_button:
+        if st.button("Generate Lesson Plan"):
+            prompt_parts = [
+                f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
+                f"Start each lesson with a clear Learning Goal aligned to a {goal_focus.lower()} outcome.",
+                "Structure each lesson with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket.",
+                f"The lesson should use {device_use.lower()}. Students should work in {grouping.lower()}.",
+                f"Use a {lesson_style.lower()} approach."
+            ]
+            if differentiation:
+                prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
+            if assessment != "No Assessment":
+                prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
+            if include_curriculum:
+                prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
+      
+            full_prompt = " ".join(prompt_parts)
+      
+            with st.spinner("Planning your lesson(s)..."):
+                lesson_plan = chat_completion_request(
+                    system_msg="You are a practical, creative Australian teacher.",
+                    user_msg=full_prompt,
+                    max_tokens=1200
+                )
+                formatted_plan = lesson_plan.replace("* ", "• ")
+                formatted_plan = re.sub(r"^#+\s*(.+)$", r"<br><b>\1</b>", formatted_plan, flags=re.MULTILINE)
+                st.markdown(
+                    f"""
+                    <div style='background-color: #f9f9f9; padding: 20px; border-radius: 8px;
+                                font-family: sans-serif; font-size: 16px; color: #111;
+                                line-height: 1.6; white-space: pre-wrap;'>
+                        {formatted_plan.replace("\n", "<br>")}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
 
         # After displaying the lesson plan:
