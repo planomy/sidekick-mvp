@@ -40,14 +40,12 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     )
     return response.choices[0].message.content.strip()
 
-from pytube import YouTube
 
-def get_video_description(url):
-    try:
-        yt = YouTube(url)
-        return yt.description
-    except Exception as e:
-        return f"Error fetching video description: {e}"
+from youtube_transcript_api import YouTubeTranscriptApi
+
+def get_transcript(video_id):
+    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    return transcript
 
 
 
@@ -417,10 +415,12 @@ elif tool == "Video Assistant":
     
     if st.button("Generate Output") and video_url:
         description = get_video_description(video_url)
+        
+        # If there's an error fetching the description, show an error message
         if description.startswith("Error"):
             st.error(description)
         else:
-            # Build your prompt based on the chosen output option
+            # Build the prompt based on the chosen output option
             if output_option == "Summary":
                 prompt = f"Based on the following video description, provide a concise summary:\n\n{description}"
             elif output_option == "Quiz Questions":
@@ -430,6 +430,7 @@ elif tool == "Video Assistant":
             elif output_option == "Key Vocabulary":
                 prompt = f"Extract and explain 10 key vocabulary words from the following video description:\n\n{description}"
             
+            # Use the chat_completion_request function to get the output from OpenAI
             with st.spinner("Generating output..."):
                 output = chat_completion_request(
                     system_msg="You are an expert educational content generator.",
@@ -439,6 +440,7 @@ elif tool == "Video Assistant":
                 )
             st.markdown("### Generated Output")
             st.markdown(output, unsafe_allow_html=True)
+
 
 
 
