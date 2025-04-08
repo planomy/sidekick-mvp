@@ -52,6 +52,7 @@ def get_video_id(url):
         return video_id_match.group(1)
     return None
 
+from pytube import YouTube
 def get_video_description(url):
     try:
         yt = YouTube(url)
