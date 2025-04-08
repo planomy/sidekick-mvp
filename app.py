@@ -23,10 +23,6 @@ tool = st.sidebar.radio(
     ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool"]
 )
 
-if st.button("Clear Session State"):
-    st.session_state.clear()
-    st.experimental_rerun()
-
 
 # ========== HELPER FUNCTION ==========
 def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0.7):
