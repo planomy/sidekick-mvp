@@ -92,50 +92,50 @@ if tool == "Lesson Builder":
                 unsafe_allow_html=True
             )
 
-    # After displaying the lesson plan:
-    st.subheader("Export Options")
-    
-    # New: Download as PowerPoint Slides
-    from pptx import Presentation
-    from pptx.util import Inches, Pt
-    
-    ppt_buffer = BytesIO()
-    prs = Presentation()
-    
-    # Create a title slide (you can adjust layout or add more slides if you wish)
-    slide_layout = prs.slide_layouts[5]  # Use a blank or title-only slide layout
-    slide = prs.slides.add_slide(slide_layout)
-    
-    # Optionally add a title if you want:
-    title_placeholder = slide.shapes.title
-    if title_placeholder:
-        title_placeholder.text = "Lesson Plan"
-    
-    # Add a text box with the lesson plan content
-    left = Inches(1)
-    top = Inches(1.5)
-    width = Inches(8)
-    height = Inches(5)
-    
-    text_box = slide.shapes.add_textbox(left, top, width, height)
-    tf = text_box.text_frame
-    tf.text = lesson_plan  # Add the entire lesson plan text
-    
-    # Optionally, format the text in the text frame:
-    for paragraph in tf.paragraphs:
-        for run in paragraph.runs:
-            run.font.size = Pt(18)  # Adjust the font size as desired
-    
-    # Save presentation to buffer
-    prs.save(ppt_buffer)
-    ppt_buffer.seek(0)
-    
-    st.download_button(
-        label="📊 Download PowerPoint",
-        data=ppt_buffer,
-        file_name="lesson_plan.pptx",
-        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    )
+        # After displaying the lesson plan:
+        st.subheader("Export Options")
+        
+        # New: Download as PowerPoint Slides
+        from pptx import Presentation
+        from pptx.util import Inches, Pt
+        
+        ppt_buffer = BytesIO()
+        prs = Presentation()
+        
+        # Create a title slide (you can adjust layout or add more slides if you wish)
+        slide_layout = prs.slide_layouts[5]  # Use a blank or title-only slide layout
+        slide = prs.slides.add_slide(slide_layout)
+        
+        # Optionally add a title if you want:
+        title_placeholder = slide.shapes.title
+        if title_placeholder:
+            title_placeholder.text = "Lesson Plan"
+        
+        # Add a text box with the lesson plan content
+        left = Inches(1)
+        top = Inches(1.5)
+        width = Inches(8)
+        height = Inches(5)
+        
+        text_box = slide.shapes.add_textbox(left, top, width, height)
+        tf = text_box.text_frame
+        tf.text = lesson_plan  # Add the entire lesson plan text
+        
+        # Optionally, format the text in the text frame:
+        for paragraph in tf.paragraphs:
+            for run in paragraph.runs:
+                run.font.size = Pt(18)  # Adjust the font size as desired
+        
+        # Save presentation to buffer
+        prs.save(ppt_buffer)
+        ppt_buffer.seek(0)
+        
+        st.download_button(
+            label="📊 Download PowerPoint",
+            data=ppt_buffer,
+            file_name="lesson_plan.pptx",
+            mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        )
 
 
 # ========== TOOL 2: FEEDBACK ASSISTANT ==========
