@@ -387,17 +387,32 @@ elif tool == "Self Care Tool":
         st.markdown(tip, unsafe_allow_html=True)
 
 
-# Teacher Boosts Section (displayed at the bottom of the tool kit)
-st.markdown("<br><br>", unsafe_allow_html=True)
-import random
+# Extra spacing before the boost block
+elif tool == "Teacher Boost":
+    st.header("💪 Teacher Boost")
+    import random
+    # Randomly select one of the three categories
+    boost_category = random.choice(["regular", "sarcastic", "crazy fact"])
+    
+    # Build a prompt based on the chosen category
+    if boost_category == "regular":
+        prompt = ("Generate an encouraging teacher boost message that is warm, uplifting, and sincere. "
+                  "Keep it concise and positive.")
+    elif boost_category == "sarcastic":
+        prompt = ("Generate a teacher boost message that is sarcastic and witty, yet reminds the teacher "
+                  "they're doing a great job. Make it short and snappy.")
+    elif boost_category == "crazy fact":
+        prompt = ("Generate a teacher boost message that includes an unbelievable but true fact about the world, "
+                  "along with an uplifting note. Keep it fun and quirky.")
+    
+    # Call the chat_completion_request to generate the boost message
+    boost_message = chat_completion_request(
+        system_msg="You are a creative and upbeat teacher boost generator.",
+        user_msg=prompt,
+        max_tokens=50,
+        temperature=0.9
+    )
+    
+    # Display the resulting boost
+    st.sidebar.markdown(f"**Teacher Boost ({boost_category.title()}):** _{boost_message}_")
 
-teacher_boosts = [
-    "You're crushing it—teach like it's your superpower!",
-    "Remember: You're shaping futures, one lesson at a time.",
-    "Yeah, right—another Monday, another miracle!",
-    "Take a moment: You're awesome. Seriously, your classroom adores you.",
-    "Quirky Fact: Your dedication could power a spaceship. Keep being stellar!"
-]
-
-boost = random.choice(teacher_boosts)
-st.sidebar.markdown(f"_{boost}_")
