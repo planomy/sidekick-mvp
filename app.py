@@ -43,17 +43,13 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
 
 # ========== Setting up Video Assistant ==========
 import openai
-import streamlit as st
-
-# OpenAI API key (make sure you have set your OpenAI API key in Streamlit secrets)
-openai.api_key = st.secrets.get("OPENAI_API_KEY")
 
 # Function to interact with OpenAI's GPT model to generate content
 def chat_completion_request(system_msg, user_msg, max_tokens=600, temperature=0.7):
     """
     A helper to call GPT-3.5-turbo with system & user messages using OpenAI.
     """
-    response = openai.ChatCompletion.create(
+    response = openai.Completion.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system_msg},
@@ -62,7 +58,8 @@ def chat_completion_request(system_msg, user_msg, max_tokens=600, temperature=0.
         max_tokens=max_tokens,
         temperature=temperature
     )
-    return response.choices[0].message.content.strip()
+    return response.choices[0].message['content'].strip()
+
 
 
 
