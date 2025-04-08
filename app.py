@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool", "Video Assistant"]
 )
 
 
@@ -392,6 +392,31 @@ elif tool == "Self Care Tool":
                 temperature=0.8
             )
         st.markdown(tip, unsafe_allow_html=True)
+
+# ========== Video Assistant ==========
+elif tool == "Video Assistant":
+    st.header("🎥 Video Assistant")
+    grade = st.selectbox("Grade Level", ["7", "8", "9", "10", "11", "12"])
+    video_description = st.text_area("What is the video about? Provide a brief overview:")
+    
+    if st.button("Generate Video Content"):
+        video_prompt = (
+            f"For a Grade {grade} class, generate the following based on the video description:\n"
+            f"1. A few discussion starter questions\n"
+            f"2. A list of key vocabulary words they might encounter\n"
+            f"3. Some thoughtful questions to promote deeper engagement\n\n"
+            f"Video description: {video_description}"
+        )
+        
+        with st.spinner("Generating video assistant content..."):
+            video_content = chat_completion_request(
+                system_msg="You are a creative educational content generator.",
+                user_msg=video_prompt,
+                max_tokens=500,
+                temperature=0.7
+            )
+            st.markdown(video_content, unsafe_allow_html=True)
+
     
 
 
