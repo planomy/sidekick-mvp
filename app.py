@@ -98,6 +98,9 @@ if tool == "Lesson Builder":
         # New: Download as PowerPoint Slides (Multiple Slides Version)
         from pptx import Presentation
         from pptx.util import Inches, Pt
+
+        # Clean the lesson_plan to remove asterisks (*) and hashes (#)
+        export_plan = re.sub(r'[\*\#]', '', lesson_plan)
         
         ppt_buffer = BytesIO()
         prs = Presentation()
