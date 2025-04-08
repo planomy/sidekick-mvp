@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool", "Video Assistant"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool"]
 )
 
 
@@ -39,25 +39,6 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
         temperature=temperature
     )
     return response.choices[0].message.content.strip()
-
-
-# ========== Setting up Video Assistant ==========
-try:
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_msg}
-        ],
-        max_tokens=max_tokens,
-        temperature=temperature
-    )
-    return response.choices[0].message.content.strip()
-except Exception as e:
-    st.error(f"An error occurred: {e}")
-
-
-
 
 
 # ========== TOOL 1: LESSON BUILDER ==========
@@ -411,51 +392,6 @@ elif tool == "Self Care Tool":
                 temperature=0.8
             )
         st.markdown(tip, unsafe_allow_html=True)
-
-
-
-# ========== VIDEO ASSISTANT ==========
-st.header("🎥 Video Assistant")
-st.write("Tell me about the video and what you’d like to generate.")
-
-# Dropdown for selecting year level
-year_level = st.selectbox("Select Year Level", ["7", "8", "9", "10", "11", "12"])
-
-# Input field for video description
-video_description = st.text_area("Tell me what this video is about:")
-
-# Radio buttons for selecting educational output
-output_choices = st.multiselect("Select the outputs you want:",
-                                ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
-
-# Function to generate output content based on selected choices
-def generate_content(year_level, video_description, output_choices):
-    result = ""
-    system_msg = "You are an expert educational content generator."
-
-    if "Summary" in output_choices:
-        prompt = f"Provide a concise summary of the video:\n\n{video_description}"
-        result += f"**Summary:** {chat_completion_request(system_msg, prompt)}\n\n"
-
-    if "Quiz Questions" in output_choices:
-        prompt = f"Generate 10 comprehension questions (including 2 inferential ones) with answers for a classroom quiz:\n\n{video_description}"
-        result += f"**Quiz Questions:** {chat_completion_request(system_msg, prompt)}\n\n"
-
-    if "Discussion Prompts" in output_choices:
-        prompt = f"Generate discussion prompts to encourage critical thinking and engagement:\n\n{video_description}"
-        result += f"**Discussion Prompts:** {chat_completion_request(system_msg, prompt)}\n\n"
-
-    if "Key Vocabulary" in output_choices:
-        prompt = f"Extract and explain 10 key vocabulary words from the following description:\n\n{video_description}"
-        result += f"**Key Vocabulary:** {chat_completion_request(system_msg, prompt)}\n\n"
-
-    return result
-
-# Button to generate output
-if st.button("Generate Output") and video_description:
-    generated_content = generate_content(year_level, video_description, output_choices)
-    st.markdown("### Generated Output")
-    st.write(generated_content)
     
 
 
