@@ -400,6 +400,6 @@ with st.spinner("Generating a unique teacher boost..."):
         max_tokens=60,
         temperature=0.9
     )
-st.sidebar.markdown(f"**_{unique_boost}_")
+st.sidebar.markdown(f"_{unique_boost}_")
 
 
