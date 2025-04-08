@@ -396,8 +396,9 @@ elif tool == "Self Care Tool":
 # ========== Video Assistant ==========
 elif tool == "Video Assistant":
     st.header("🎥 Video Assistant")
-    grade = st.radio("Grade Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    grade = st.number_input("Grade Level", min_value=1, max_value=12, step=1)
     video_description = st.text_area("What is the video about? Provide a brief overview:")
+
     
     if st.button("Generate Content"):
         video_prompt = (
