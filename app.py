@@ -388,6 +388,7 @@ elif tool == "Self Care Tool":
 
 
 # Teacher Boosts Section (displayed at the bottom of the tool kit)
+st.markdown("<br><br>", unsafe_allow_html=True)
 import random
 
 teacher_boosts = [
