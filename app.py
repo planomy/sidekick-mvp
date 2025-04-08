@@ -64,46 +64,7 @@ def get_transcript(video_url):
     else:
         return "Invalid YouTube URL."
 
-# Video Assistant Tool
-elif tool == "Video Assistant":
-    st.header("🎥 Video Assistant")
-    st.write("Enter a YouTube URL to generate educational output based on its description or transcript.")
-    video_url = st.text_input("YouTube URL:")
-    
-    # Add a select box for output options
-    output_option = st.selectbox("Choose what you want:", 
-                                 ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
-    
-    if st.button("Generate Output") and video_url:
-        description = get_video_description(video_url)  # Keep this for description-based output (if needed)
-        transcript = get_transcript(video_url)  # Get the transcript for the selected video URL
 
-        # If there is an error fetching the description or transcript, show the error
-        if description.startswith("Error"):
-            st.error(description)
-        elif transcript.startswith("Error"):
-            st.error(transcript)
-        else:
-            # If no error, use the transcript to generate output based on the selected option
-            if output_option == "Summary":
-                prompt = f"Based on the following transcript, provide a concise summary:\n\n{transcript}"
-            elif output_option == "Quiz Questions":
-                prompt = f"Based on the following transcript, generate 10 comprehension questions (including 2 inferential ones) along with their answers for a classroom quiz:\n\n{transcript}"
-            elif output_option == "Discussion Prompts":
-                prompt = f"Based on the following transcript, generate several discussion prompts that encourage critical thinking and engagement:\n\n{transcript}"
-            elif output_option == "Key Vocabulary":
-                prompt = f"Extract and explain 10 key vocabulary words from the following transcript:\n\n{transcript}"
-            
-            # Use the chat_completion_request function to get the output from OpenAI
-            with st.spinner("Generating output..."):
-                output = chat_completion_request(
-                    system_msg="You are an expert educational content generator.",
-                    user_msg=prompt,
-                    max_tokens=600,
-                    temperature=0.7
-                )
-            st.markdown("### Generated Output")
-            st.markdown(output, unsafe_allow_html=True)
 
 
 
@@ -463,7 +424,45 @@ elif tool == "Self Care Tool":
 
 
 # ========== VIDEO Assistant ==========
+elif tool == "Video Assistant":
+    st.header("🎥 Video Assistant")
+    st.write("Enter a YouTube URL to generate educational output based on its description or transcript.")
+    video_url = st.text_input("YouTube URL:")
+    
+    # Add a select box for output options
+    output_option = st.selectbox("Choose what you want:", 
+                                 ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
+    
+    if st.button("Generate Output") and video_url:
+        description = get_video_description(video_url)  # Keep this for description-based output (if needed)
+        transcript = get_transcript(video_url)  # Get the transcript for the selected video URL
 
+        # If there is an error fetching the description or transcript, show the error
+        if description.startswith("Error"):
+            st.error(description)
+        elif transcript.startswith("Error"):
+            st.error(transcript)
+        else:
+            # If no error, use the transcript to generate output based on the selected option
+            if output_option == "Summary":
+                prompt = f"Based on the following transcript, provide a concise summary:\n\n{transcript}"
+            elif output_option == "Quiz Questions":
+                prompt = f"Based on the following transcript, generate 10 comprehension questions (including 2 inferential ones) along with their answers for a classroom quiz:\n\n{transcript}"
+            elif output_option == "Discussion Prompts":
+                prompt = f"Based on the following transcript, generate several discussion prompts that encourage critical thinking and engagement:\n\n{transcript}"
+            elif output_option == "Key Vocabulary":
+                prompt = f"Extract and explain 10 key vocabulary words from the following transcript:\n\n{transcript}"
+            
+            # Use the chat_completion_request function to get the output from OpenAI
+            with st.spinner("Generating output..."):
+                output = chat_completion_request(
+                    system_msg="You are an expert educational content generator.",
+                    user_msg=prompt,
+                    max_tokens=600,
+                    temperature=0.7
+                )
+            st.markdown("### Generated Output")
+            st.markdown(output, unsafe_allow_html=True)
 
 
 
