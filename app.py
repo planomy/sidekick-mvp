@@ -57,8 +57,8 @@ if tool == "Lesson Builder":
     differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
 
     # After your input fields are defined
-col_empty1, col_button, col_empty2 = st.columns([3, 1, 3])
-with col_button:
+    col_empty1, col_button, col_empty2 = st.columns([3, 1, 3])
+    with col_button:
     if st.button("Generate Lesson Plan"):
         prompt_parts = [
             f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
