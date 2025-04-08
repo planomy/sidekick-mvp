@@ -392,12 +392,12 @@ st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and
 
 with st.spinner("Generating a unique teacher boost..."):
     boost_prompt = (
-        "Generate an uplifting teacher boost message that is either funny, sarcastic, or a random quirky fact"
+        "Generate an uplifting teacher boost message that is either funny, sarcastic, random quirky fact."
     )
     unique_boost = chat_completion_request(
         system_msg="You are a creative teacher boost generator.",
         user_msg=boost_prompt,
-        max_tokens=30,
+        max_tokens=3o
         temperature=0.9
     )
 st.sidebar.markdown(f"_{unique_boost}_")
