@@ -40,6 +40,8 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     )
     return response.choices[0].message.content.strip()
 
+
+
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 
@@ -50,6 +52,13 @@ def get_video_id(url):
         return video_id_match.group(1)
     return None
 
+def get_video_description(url):
+    try:
+        yt = YouTube(url)
+        return yt.description
+    except Exception as e:
+        return f"Error fetching video description: {str(e)}"
+        
 # Function to fetch the transcript using YouTubeTranscriptApi
 def get_transcript(video_url):
     video_id = get_video_id(video_url)
