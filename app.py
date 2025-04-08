@@ -67,7 +67,7 @@ Clearly label each question as Q1, Q2, ... and the answers as A1, A2, ...
 Transcript:
 {transcript_text}"""
     response = openai.ChatCompletion.create(
-        model="gpt-4",  # Change to gpt-3.5-turbo if that's what you prefer
+        model="gpt-3.5-turbo",  # Change to gpt-3.5-turbo if that's what you prefer
         messages=[
             {"role": "system", "content": "You are a helpful assistant that generates educational quiz questions."},
             {"role": "user", "content": prompt}
