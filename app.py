@@ -52,8 +52,8 @@ if tool == "Lesson Builder":
     include_curriculum = st.checkbox("Include V9 curriculum reference")
     device_use = st.selectbox("Device Use", ["Laptops", "iPads", "Both", "No Devices"])
     grouping = st.selectbox("Grouping Preference", ["Individual", "Pairs", "Small Groups", "Whole Class"])
-    differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
     lesson_style = st.selectbox("Lesson Style", ["Hands-On", "Discussion-Based", "Quiet/Reflective", "Creative"])
+    differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
 
     if st.button("Generate Lesson Plan"):
