@@ -49,7 +49,7 @@ def chat_completion_request(system_msg, user_msg, max_tokens=600, temperature=0.
     """
     A helper to call GPT-3.5-turbo with system & user messages using OpenAI.
     """
-    response = openai.Completion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system_msg},
