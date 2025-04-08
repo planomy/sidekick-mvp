@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool", "Video Quiz Generator"]
 )
 
 
@@ -39,6 +39,46 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
         temperature=temperature
     )
     return response.choices[0].message.content.strip()
+
+
+
+
+import re
+from youtube_transcript_api import YouTubeTranscriptApi
+
+# Function to extract the video ID from a YouTube URL
+def extract_video_id(url):
+    match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
+    return match.group(1) if match else None
+
+# Function to fetch the transcript text for a given video ID
+def get_transcript(video_id):
+    try:
+        transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+        return " ".join([entry["text"] for entry in transcript_list])
+    except Exception as e:
+        return f"Error fetching transcript: {e}"
+
+# Function to generate quiz questions (10 questions, including 2 inferential ones) based on the transcript
+def generate_questions(transcript_text):
+    prompt = f"""Based on the transcript below, write 10 comprehension questions, including 2 inferential questions.
+Clearly label each question as Q1, Q2, ... and the answers as A1, A2, ... 
+
+Transcript:
+{transcript_text}"""
+    response = openai.ChatCompletion.create(
+        model="gpt-4",  # Change to gpt-3.5-turbo if that's what you prefer
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that generates educational quiz questions."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=600
+    )
+    return response.choices[0].message.content.strip()
+
+
+
 
 # ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
@@ -412,6 +452,27 @@ if "teacher_boost" not in st.session_state:
         )
 
 st.sidebar.markdown(f"**Teacher Boost:** _{st.session_state['teacher_boost']}_")
+
+
+elif tool == "Video Quiz Generator":
+    st.header("🎥 Video Quiz Generator")
+    st.write("Enter a YouTube URL below and let the app generate a quiz based on its transcript.")
+    video_url = st.text_input("YouTube URL:")
+    
+    if st.button("Generate Quiz") and video_url:
+        video_id = extract_video_id(video_url)
+        if video_id:
+            with st.spinner("Fetching transcript and generating quiz..."):
+                transcript = get_transcript(video_id)
+                if transcript.startswith("Error"):
+                    st.error(transcript)
+                else:
+                    questions = generate_questions(transcript)
+                    st.markdown("### Quiz Questions and Answers")
+                    st.markdown(questions, unsafe_allow_html=True)
+        else:
+            st.error("Invalid YouTube URL.")
+
 
 
 
