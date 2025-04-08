@@ -388,7 +388,7 @@ elif tool == "Self Care Tool":
 
 
 # Extra spacing before the boost block
-elif tool == "Teacher Boost":
+    elif tool == "Teacher Boost":
     st.header("💪 Teacher Boost")
     import random
     # Randomly select one of the three categories
