@@ -397,7 +397,7 @@ with st.spinner("Generating a unique teacher boost..."):
     unique_boost = chat_completion_request(
         system_msg="You are a creative teacher boost generator.",
         user_msg=boost_prompt,
-        max_tokens=60,
+        max_tokens=30,
         temperature=0.9
     )
 st.sidebar.markdown(f"_{unique_boost}_")
