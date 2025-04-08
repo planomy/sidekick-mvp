@@ -387,32 +387,21 @@ elif tool == "Self Care Tool":
         st.markdown(tip, unsafe_allow_html=True)
 
 
-    # Extra spacing before the boost block
-    elif tool == "Teacher Boost":
-        st.header("💪 Teacher Boost")
-        import random
-        # Randomly select one of the three categories
-        boost_category = random.choice(["regular", "sarcastic", "crazy fact"])
-        
-        # Build a prompt based on the chosen category
-        if boost_category == "regular":
-            prompt = ("Generate an encouraging teacher boost message that is warm, uplifting, and sincere. "
-                      "Keep it concise and positive.")
-        elif boost_category == "sarcastic":
-            prompt = ("Generate a teacher boost message that is sarcastic and witty, yet reminds the teacher "
-                      "they're doing a great job. Make it short and snappy.")
-        elif boost_category == "crazy fact":
-            prompt = ("Generate a teacher boost message that includes an unbelievable but true fact about the world, "
-                      "along with an uplifting note. Keep it fun and quirky.")
-        
-        # Call the chat_completion_request to generate the boost message
-        boost_message = chat_completion_request(
-            system_msg="You are a creative and upbeat teacher boost generator.",
-            user_msg=prompt,
-            max_tokens=50,
-            temperature=0.9
-        )
-        
-        # Display the resulting boost
-        st.sidebar.markdown(f"**Teacher Boost ({boost_category.title()}):** _{boost_message}_")
+ # Generate a unique Teacher Boost dynamically using ChatGPT (no pre-populated list)
+st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and a divider
+
+with st.spinner("Generating a unique teacher boost..."):
+    boost_prompt = (
+        "Generate an uplifting teacher boost message that is funny, sarcastic, "
+        "and uniquely encouraging. It should remind the teacher how amazing they are, "
+        "using a mix of wit and genuine praise. Keep it concise and fresh."
+    )
+    unique_boost = chat_completion_request(
+        system_msg="You are a creative teacher boost generator.",
+        user_msg=boost_prompt,
+        max_tokens=60,
+        temperature=0.9
+    )
+st.sidebar.markdown(f"**Teacher Boost:** _{unique_boost}_")
+
 
