@@ -397,17 +397,17 @@ elif tool == "Self Care Tool":
 st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and a divider
 
 
-    boost_prompt = (
+boost_prompt = (
     "Generate an uplifting teacher boost message that is either funny, sarcastic, or a random quirky fact. "
     "Please ensure your answer is 40 tokens or less. Don't use words like hell or other possible offensive terms."
     )
-    unique_boost = chat_completion_request(
+unique_boost = chat_completion_request(
         system_msg="You are a creative teacher boost generator.",
         user_msg=boost_prompt,
         max_tokens=40,
         temperature=0.9
     )
-    unique_boost = unique_boost.strip(' "\n')
+unique_boost = unique_boost.strip(' "\n')
 st.sidebar.markdown(f"_{unique_boost}_")
 
 
