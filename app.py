@@ -20,7 +20,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool", "Video Quiz Generator"]
+    ["Lesson Builder", "Feedback Assistant", "Email Assistant", "Unit Glossary Generator", "Unit Planner", "Worksheet Generator", "Feeling Peckish", "Self Care Tool", "Video Assistant"]
 )
 
 
@@ -40,42 +40,14 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     )
     return response.choices[0].message.content.strip()
 
+from pytube import YouTube
 
-
-
-import re
-from youtube_transcript_api import YouTubeTranscriptApi
-
-# Function to extract the video ID from a YouTube URL
-def extract_video_id(url):
-    match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
-    return match.group(1) if match else None
-
-# Function to fetch the transcript text for a given video ID
-def get_transcript(video_id):
+def get_video_description(url):
     try:
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-        return " ".join([entry["text"] for entry in transcript_list])
+        yt = YouTube(url)
+        return yt.description
     except Exception as e:
-        return f"Error fetching transcript: {e}"
-
-# Function to generate quiz questions (10 questions, including 2 inferential ones) based on the transcript
-def generate_questions(transcript_text):
-    prompt = f"""Based on the transcript below, write 10 comprehension questions, including 2 inferential questions.
-Clearly label each question as Q1, Q2, ... and the answers as A1, A2, ... 
-
-Transcript:
-{transcript_text}"""
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # Change to gpt-3.5-turbo if that's what you prefer
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant that generates educational quiz questions."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=600
-    )
-    return response.choices[0].message.content.strip()
+        return f"Error fetching video description: {e}"
 
 
 
@@ -433,25 +405,41 @@ elif tool == "Self Care Tool":
         st.markdown(tip, unsafe_allow_html=True)
 
 
-# ========== VIDEO QUIZ GENERATOR ==========
-elif tool == "Video Quiz Generator":
-    st.header("🎥 Video Quiz Generator")
-    st.write("Enter a YouTube URL to generate a quiz based on its transcript.")
+# ========== VIDEO Assistant ==========
+elif tool == "Video Assistant":
+    st.header("🎥 Video Assistant")
+    st.write("Enter a YouTube URL to generate educational output based on its description. (We auto-fetch the description.)")
     video_url = st.text_input("YouTube URL:")
-
-    if st.button("Generate Quiz") and video_url:
-        video_id = extract_video_id(video_url)
-        if video_id:
-            with st.spinner("Fetching transcript and generating quiz..."):
-                transcript = get_transcript(video_id)
-                if transcript.startswith("Error"):
-                    st.error(transcript)
-                else:
-                    quiz = generate_questions(transcript)
-                    st.markdown("### Quiz Questions and Answers")
-                    st.markdown(quiz, unsafe_allow_html=True)
+    
+    # Add a select box for output options
+    output_option = st.selectbox("Choose what you want:", 
+                                 ["Summary", "Quiz Questions", "Discussion Prompts", "Key Vocabulary"])
+    
+    if st.button("Generate Output") and video_url:
+        description = get_video_description(video_url)
+        if description.startswith("Error"):
+            st.error(description)
         else:
-            st.error("Invalid YouTube URL.")
+            # Build your prompt based on the chosen output option
+            if output_option == "Summary":
+                prompt = f"Based on the following video description, provide a concise summary:\n\n{description}"
+            elif output_option == "Quiz Questions":
+                prompt = f"Based on the following video description, generate 10 comprehension questions (including 2 inferential ones) along with their answers for a classroom quiz:\n\n{description}"
+            elif output_option == "Discussion Prompts":
+                prompt = f"Based on the following video description, generate several discussion prompts that encourage critical thinking and engagement:\n\n{description}"
+            elif output_option == "Key Vocabulary":
+                prompt = f"Extract and explain 10 key vocabulary words from the following video description:\n\n{description}"
+            
+            with st.spinner("Generating output..."):
+                output = chat_completion_request(
+                    system_msg="You are an expert educational content generator.",
+                    user_msg=prompt,
+                    max_tokens=600,
+                    temperature=0.7
+                )
+            st.markdown("### Generated Output")
+            st.markdown(output, unsafe_allow_html=True)
+
 
 
 
