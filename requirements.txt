@@ -4,3 +4,4 @@ python-docx
 fpdf
 pyperclip
 python-pptx
+youtube_transcript_api
