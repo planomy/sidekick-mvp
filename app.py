@@ -93,11 +93,7 @@ if tool == "Lesson Builder":
             )
 
     # After displaying the lesson plan:
-    st.markdown("---")
     st.subheader("Export Options")
-    
-    # Download as Markdown (existing export button)
-    st.download_button("📋 Copy Markdown", lesson_plan, file_name="lesson_plan.md")
     
     # New: Download as PowerPoint Slides
     from pptx import Presentation
