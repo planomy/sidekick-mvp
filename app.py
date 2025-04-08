@@ -396,7 +396,7 @@ elif tool == "Self Care Tool":
  # Generate a unique Teacher Boost dynamically using ChatGPT (no pre-populated list)
 st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and a divider
 
-with st.spinner("Generating a unique teacher boost..."):
+
     boost_prompt = (
     "Generate an uplifting teacher boost message that is either funny, sarcastic, or a random quirky fact. "
     "Please ensure your answer is 40 tokens or less. Don't use words like hell or other possible offensive terms."
