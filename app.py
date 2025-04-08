@@ -44,7 +44,7 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
 # ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
-    year = st.selectbox("Year Level", ["7", "8", "9", "10", "11", "12"])
+    year = st.number_input("Grade Level", min_value=1, max_value=12, step=1)
     subject = st.text_input("Subject (e.g. English, Science)")
     topic = st.text_input("Lesson Topic or Focus")
     duration = st.slider("Lesson Duration (minutes)", 30, 120, 70, step=5)
