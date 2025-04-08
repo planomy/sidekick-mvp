@@ -387,16 +387,16 @@ elif tool == "Self Care Tool":
         st.markdown(tip, unsafe_allow_html=True)
 
 
-# Teacher Boosts Section (displayed at the bottom of the tool kit)
-import random
-
-teacher_boosts = [
-    "You're crushing it—teach like it's your superpower!",
-    "Remember: You're shaping futures, one lesson at a time.",
-    "Yeah, right—another Monday, another miracle!",
-    "Take a moment: You're awesome. Seriously, your classroom adores you.",
-    "Quirky Fact: Your dedication could power a spaceship. Keep being stellar!"
-]
-
-boost = random.choice(teacher_boosts)
-st.markdown(f"**Teacher Boost:** _{boost}_")
+        # Teacher Boosts Section (displayed at the bottom of the tool kit)
+        import random
+        
+        teacher_boosts = [
+            "You're crushing it—teach like it's your superpower!",
+            "Remember: You're shaping futures, one lesson at a time.",
+            "Yeah, right—another Monday, another miracle!",
+            "Take a moment: You're awesome. Seriously, your classroom adores you.",
+            "Quirky Fact: Your dedication could power a spaceship. Keep being stellar!"
+        ]
+        
+        boost = random.choice(teacher_boosts)
+        st.markdown(f"**Teacher Boost:** _{boost}_")
