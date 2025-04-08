@@ -73,9 +73,9 @@ with col_button:
             prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
         if include_curriculum:
             prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
-
+  
         full_prompt = " ".join(prompt_parts)
-
+  
         with st.spinner("Planning your lesson(s)..."):
             lesson_plan = chat_completion_request(
                 system_msg="You are a practical, creative Australian teacher.",
@@ -94,6 +94,7 @@ with col_button:
                 """,
                 unsafe_allow_html=True
             )
+
 
         # After displaying the lesson plan:
         st.subheader("Export Options")
