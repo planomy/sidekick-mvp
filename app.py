@@ -349,7 +349,7 @@ elif tool == "Worksheet Generator":
         # If cloze activity option is selected, adjust the prompt accordingly
         if cloze_activity:
             # Calculate the number of blanks as 10% of passage length (ensuring at least 1)
-            num_blanks = max(1, passage_length // 10)
+            num_blanks = (passage_length // 10)
             
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
