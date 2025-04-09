@@ -10,6 +10,7 @@ import random
 
 st.set_page_config(page_title="Super Teacher", layout="wide")
 
+st.error("DEBUG: App started")
 
 
 import random
