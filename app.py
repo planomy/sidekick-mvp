@@ -98,7 +98,7 @@ if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject (e.g. English, Science)")
-    topic = st.text_input("Lesson Topic or Focus")
+    topic = st.text_input("Lesson Topic")
     duration = st.slider("Lesson Duration (minutes)", 30, 120, 70, step=5)
     lesson_count = st.number_input("Number of Lessons", min_value=1, value=1, step=1)
     goal_focus = st.selectbox("Lesson Focus", ["Skills-Based", "Knowledge-Based", "Critical Thinking", "Creative Thinking"])
