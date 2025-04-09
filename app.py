@@ -332,39 +332,44 @@ elif tool == "Worksheet Generator":
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
     passage_length = st.slider("Desired word count for the information passage (0-200)", min_value=0, max_value=200, value=100, step=10)
     
-    # New option: Toggle cloze activity
-    cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
+  # New option: Toggle cloze activity
+cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
 
-    if st.button("Generate Worksheet"):
-        # Base prompt for standard worksheet
-        worksheet_prompt = (
-            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-            f"{learning_goal}\n\n"
-            f"Generate a worksheet containing {num_questions} questions for students. "
-            f"The accompanying information passage should be approximately {passage_length} words. "
-            "List all the questions first, then at the bottom provide the corresponding answers for each question. "
-            "Include a mix of multiple choice and short answer questions."
-        )
-        
-        # If cloze activity option is selected, adjust the prompt accordingly
+if st.button("Generate Worksheet"):
+    # Base prompt for standard worksheet
+    worksheet_prompt = (
+        f"Based on the following learning goal or paste a lesson plan excerpt for Year {year}:\n\n"
+        f"{learning_goal}\n\n"
+        f"Generate a worksheet containing {num_questions} questions for students. "
+        f"The accompanying information passage should be approximately {passage_length} words. "
+        "List all the questions first, then at the bottom provide the corresponding answers for each question. "
+        "Include a mix of multiple choice and short answer questions."
+    )
+    
+    # If cloze activity option is selected, adjust the prompt accordingly
     if cloze_activity:
+        # Calculate the number of blanks as 10% of passage length (ensuring at least 1)
+        num_blanks = max(1, passage_length // 10)
+        
         worksheet_prompt = (
             f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
             f"{learning_goal}\n\n"
             f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words. "
-            "Randomly remove exactly ({passage_length}/10) of significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
-            "After the paragraph, provide an answer key listing the missing words in random order. LIST THE WORDS IN RANDOM ORDER."
-            "After the list of words, generate {num_questions} for students to answer based on the information passage."
+            f"Randomly remove exactly {num_blanks} significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
+            "After the paragraph, provide an answer key listing the missing words in random order. "
+            f"After the answer key, generate {num_questions} questions for students to answer based on the information in the passage."
         )
-
         
-        with st.spinner("Generating worksheet..."):
-            worksheet = chat_completion_request(
-                system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
-                user_msg=worksheet_prompt,
-                max_tokens=1000
-            )
-            st.markdown(worksheet, unsafe_allow_html=True)
+    with st.spinner("Generating worksheet..."):
+        worksheet = chat_completion_request(
+            system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
+            user_msg=worksheet_prompt,
+            max_tokens=1000
+        )
+        st.markdown(worksheet, unsafe_allow_html=True)
+
+
+            
             
             # ---- Export Options for Worksheet ----
             st.subheader("Export Options")
