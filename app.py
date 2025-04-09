@@ -81,7 +81,7 @@ def display_output_block(text):
         {}
     </div>
     """
-    safe_text = text.replace("\n", "<br>").replace("**", "<b>").replace("__", "<i>")
+    safe_text = text.replace("\n", "<br>") # .replace("**", "<b>").replace("__", "<i>")
     st.markdown(html_template.format(safe_text), unsafe_allow_html=True)
 
 
