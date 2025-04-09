@@ -566,19 +566,19 @@ elif tool == "Test Creator":
 
     
     st.number_input("Number of True/False Questions", min_value=0, max_value=50, value=3, step=1)
-num_tf = st.session_state.get("Number of True/False Questions", 3)
-
-st.number_input("Number of Multiple Choice Questions", min_value=0, max_value=50, value=3, step=1)
-num_mcq = st.session_state.get("Number of Multiple Choice Questions", 3)
-
-st.number_input("Number of Short Answer Questions", min_value=0, max_value=50, value=4, step=1)
-num_sa = st.session_state.get("Number of Short Answer Questions", 4)
-
-st.number_input("Number of Extended Response Questions", min_value=0, max_value=10, value=0, step=1)
-num_er = st.session_state.get("Number of Extended Response Questions", 0)
-
-# Total for prompt
-total_qs = num_tf + num_mcq + num_sa + num_er
+    num_tf = st.session_state.get("Number of True/False Questions", 3)
+    
+    st.number_input("Number of Multiple Choice Questions", min_value=0, max_value=50, value=3, step=1)
+    num_mcq = st.session_state.get("Number of Multiple Choice Questions", 3)
+    
+    st.number_input("Number of Short Answer Questions", min_value=0, max_value=50, value=4, step=1)
+    num_sa = st.session_state.get("Number of Short Answer Questions", 4)
+    
+    st.number_input("Number of Extended Response Questions", min_value=0, max_value=10, value=0, step=1)
+    num_er = st.session_state.get("Number of Extended Response Questions", 0)
+    
+    # Total for prompt
+    total_qs = num_tf + num_mcq + num_sa + num_er
 
 
 
