@@ -387,51 +387,51 @@ elif tool == "Worksheet Generator":
                 passage = worksheet.strip()
                 questions = ""
 
-            tokens = word_tokenize(passage)
-            tagged = pos_tag(tokens)
-            
-            # Choose significant words (nouns + verbs only)
-            candidates = [word for word, pos in tagged if pos.startswith('NN') or pos.startswith('VB')]
-            candidates = list(set(candidates))
-            
-            if len(candidates) < num_blanks:
-                num_blanks = len(candidates)
-            
-            # Choose target words (lowercased for matching)
-            tokens_lower = [word.lower() for word in tokens]
-            selected_lower = random.sample([w.lower() for w in candidates], num_blanks)
-            
-            # Build a map of word → blank number
-            blank_map = {}
-            for i, word in enumerate(tokens_lower):
-                if word in selected_lower and word not in blank_map:
-                    blank_map[word] = len(blank_map) + 1
-            
-            # Replace tokens
-            cloze_tokens = []
-            for word in tokens:
-                word_lower = word.lower()
-                if word_lower in blank_map:
-                    blank_number = blank_map[word_lower]
-                    cloze_tokens.append(f"_____({blank_number})")
-                else:
-                    cloze_tokens.append(word)
-            
-            # Build final passage
-            cloze_passage = ' '.join(cloze_tokens)
-            cloze_passage = cloze_passage.replace(" ,", ",").replace(" .", ".").replace(" ’", "’")
-            
-            # Randomise and display answer key
-            answer_key = list(blank_map.keys())
-            random.shuffle(answer_key)
-            answer_key_display = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_key)])
-            
-            # Build full output
-            worksheet = (
-                f"Worksheet:\n\n{cloze_passage}\n\n"
-                f"Answer Key:\n\n{answer_key_display}\n\n"
-                f"Short Answer Questions:\n\n{questions}"
-            )
+        tokens = word_tokenize(passage)
+        tagged = pos_tag(tokens)
+        
+        # Choose significant words (nouns + verbs only)
+        candidates = [word for word, pos in tagged if pos.startswith('NN') or pos.startswith('VB')]
+        candidates = list(set(candidates))
+        
+        if len(candidates) < num_blanks:
+            num_blanks = len(candidates)
+        
+        # Choose target words (lowercased for matching)
+        tokens_lower = [word.lower() for word in tokens]
+        selected_lower = random.sample([w.lower() for w in candidates], num_blanks)
+        
+        # Build a map of word → blank number
+        blank_map = {}
+        for i, word in enumerate(tokens_lower):
+            if word in selected_lower and word not in blank_map:
+                blank_map[word] = len(blank_map) + 1
+        
+        # Replace tokens
+        cloze_tokens = []
+        for word in tokens:
+            word_lower = word.lower()
+            if word_lower in blank_map:
+                blank_number = blank_map[word_lower]
+                cloze_tokens.append(f"_____({blank_number})")
+            else:
+                cloze_tokens.append(word)
+        
+        # Build final passage
+        cloze_passage = ' '.join(cloze_tokens)
+        cloze_passage = cloze_passage.replace(" ,", ",").replace(" .", ".").replace(" ’", "’")
+        
+        # Randomise and display answer key
+        answer_key = list(blank_map.keys())
+        random.shuffle(answer_key)
+        answer_key_display = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_key)])
+        
+        # Build full output
+        worksheet = (
+            f"Worksheet:\n\n{cloze_passage}\n\n"
+            f"Answer Key:\n\n{answer_key_display}\n\n"
+            f"Short Answer Questions:\n\n{questions}"
+        )
 
 
         # --- Display output + your existing Word export ---
