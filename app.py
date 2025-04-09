@@ -66,8 +66,6 @@ if tool == "Lesson Builder":
             f"Use a {lesson_style.lower()} approach."
         ]
       
-
-        ]
         if differentiation:
             prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
         if assessment != "No Assessment":
