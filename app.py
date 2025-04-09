@@ -460,8 +460,21 @@ elif tool == "Worksheet Generator":
         # ---- Export Options ----
         st.subheader("Export Options")
         st.write("Don't forget to delete the answers :)")
+        
+
+        # New: Checkbox to decide if answers should be included in the exported Word doc
+        include_answers_export = st.checkbox("Include answers in the exported Word doc?")
+
         export_worksheet = re.sub(r'[\*\#]', '', worksheet)
 
+        if not include_answers_export:
+    # If the user doesn't want the answers, remove the answers section.
+    # Adjust this regex if your answer section marker is different.
+            parts = re.split(r'\n\s*\*\*Short Answer Answers:\*\*\n', export_worksheet)
+            if parts:
+                export_worksheet = parts[0]  # Keep content before the answers section
+
+        
 
         word_buffer = BytesIO()
         doc = Document()
