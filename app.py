@@ -379,7 +379,7 @@ elif tool == "Worksheet Generator":
                 f"{learning_goal}\n\n"
                 f"Write an information passage of about {passage_length} words. "
                 f"Then generate {num_questions} short answer questions for students based on the passage. "
-                f"Do not remove any words or create blanks. Do not list answers."
+                f"Do not remove any words or create blanks. After the questions, include an 'Answer Key:' section with the correct answers."
             )
         
             with st.spinner("Generating cloze worksheet..."):
