@@ -562,13 +562,26 @@ elif tool == "Test Creator":
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject", placeholder="e.g. English, Science, HASS")
     topic = st.text_input("Topic", placeholder="e.g. Fractions, Ancient Rome, Persuasive Texts")
-    num_questions = st.slider("Number of questions", min_value=5, max_value=25, value=10, step=1)
 
-    question_types = st.multiselect(
-        "Question Types to Include - Remove what you don't want",
-        ["Multiple Choice", "Short Answer", "True/False"],
-        default=["Multiple Choice", "Short Answer", "True/False"]
-    )
+
+    
+    st.number_input("Number of True/False Questions", min_value=0, max_value=50, value=3, step=1)
+num_tf = st.session_state.get("Number of True/False Questions", 3)
+
+st.number_input("Number of Multiple Choice Questions", min_value=0, max_value=50, value=3, step=1)
+num_mcq = st.session_state.get("Number of Multiple Choice Questions", 3)
+
+st.number_input("Number of Short Answer Questions", min_value=0, max_value=50, value=4, step=1)
+num_sa = st.session_state.get("Number of Short Answer Questions", 4)
+
+st.number_input("Number of Extended Response Questions", min_value=0, max_value=10, value=0, step=1)
+num_er = st.session_state.get("Number of Extended Response Questions", 0)
+
+# Total for prompt
+total_qs = num_tf + num_mcq + num_sa + num_er
+
+
+
 
     mix_difficulty = st.checkbox("Mix difficulty levels?", value=True)
     include_instructions = st.checkbox("Include instructions at the top?", value=True)
@@ -586,18 +599,21 @@ elif tool == "Test Creator":
         if include_answers:
             test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
 
-        test_prompt += (
-    f"Create a test with {num_questions} total questions, grouped by type:\n"
-    f"- 30% True or False\n"
-    f"- 30% Multiple Choice\n"
-    f"- 40% Short Answer\n\n"
-    "Start with all the True/False questions, then the Multiple Choice, then Short Answer at the end.\n"
-    "Include this line at the top: 'Student Name:___________________'\n"
-    "Include this line before the short answer section: 'Short Answer responses require 3-5 sentences.'\n"
-    "End the test with the phrase: 'End of Test'\n"
-    "Ensure the test is suitable for printing or copying into a Word doc. "
-    "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
-        )
+        test_prompt = (
+    f"Create a test with the following structure for Year {year} students on the topic '{topic}' in {subject}:\n"
+    f"- {num_tf} True/False questions\n"
+    f"- {num_mcq} Multiple Choice questions\n"
+    f"- {num_sa} Short Answer questions (3–5 sentence responses)\n"
+    f"- {num_er} Extended Response questions (at least 10 sentences)\n\n"
+    "Group the questions by type, in the order listed above. Number the questions sequentially. "
+    "Add the line 'Student Name:___________________' at the top.\n"
+    "Add 'Short Answer responses require 3-5 sentences.' above the short answer section.\n"
+    "Add 'Extended Response answers require a well-developed paragraph of at least 10 sentences.' above that section if applicable.\n"
+    "Use clean formatting with no markdown symbols like asterisks or hashes. "
+    "Leave space for students to respond.\n"
+    "End the test with the phrase: 'End of Test'."
+)
+
 
 
         with st.spinner("Generating test..."):
