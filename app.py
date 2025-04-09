@@ -76,28 +76,18 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
 import re
 
 def display_output_block(text):
-    cleaned_text = re.sub(r'[\*\#]', '', text.strip())  # Strip asterisks and hashes
-    lines = cleaned_text.splitlines()
-    formatted = "<br>".join(line.strip() for line in lines)
-
+    cleaned_text = text.strip().replace("*", "").replace("#", "")
     st.markdown(
         f"""
-        <div style="
-            background-color: white;
-            color: black;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: sans-serif;
-            font-size: 16px;
-            line-height: 1.6;
-            text-indent: 0;
-            margin-left: 0;
-            white-space: pre-wrap;">
-            {formatted}
+        <div style='background-color: white; color: black; padding: 20px; 
+                    border-radius: 8px; font-family: sans-serif; 
+                    font-size: 16px; line-height: 1.6; white-space: pre-wrap; margin-left: 0;'>
+            {cleaned_text.replace('\n', '<br>')}
         </div>
         """,
         unsafe_allow_html=True
     )
+
 
 
 
