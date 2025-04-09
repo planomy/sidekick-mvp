@@ -457,13 +457,14 @@ elif tool == "Worksheet Generator":
                 st.markdown(worksheet, unsafe_allow_html=True)
 
 
-                # ---- Export Options ----
+               
+        # ---- Export Options ----
         st.subheader("Export Options")
         st.write("Don't forget to delete the answers :)")
         
-        # Make sure the worksheet has been generated and stored in session_state
+        # Use the stored worksheet content if available; otherwise, prompt to generate a worksheet
         if "worksheet_content" in st.session_state:
-            # Checkbox with a unique key so its state persists across re-runs
+            # Checkbox with a unique key so its state persists across re-runs.
             include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True, key="export_include_answers")
         
             # Use the stored worksheet content
@@ -473,7 +474,7 @@ elif tool == "Worksheet Generator":
                 # Since the asterisks are removed, we target "Short Answer Answers:" as the marker.
                 parts = re.split(r'\n\s*Short Answer Answers:\n', export_worksheet)
                 if parts:
-                    export_worksheet = parts[0]  # Keep content before the answers section
+                    export_worksheet = parts[0]  # Keep only the part before the answers section
         
             word_buffer = BytesIO()
             doc = Document()
@@ -494,6 +495,7 @@ elif tool == "Worksheet Generator":
             )
         else:
             st.info("Please generate a worksheet first.")
+      
 
 
 
