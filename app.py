@@ -349,7 +349,7 @@ elif tool == "Worksheet Generator":
 
 
 
-   if st.button("Generate Worksheet"):
+    if st.button("Generate Worksheet"):
     if cloze_activity:
         # Step 1: Ask GPT for plain passage + questions (no blanks)
         worksheet_prompt = (
