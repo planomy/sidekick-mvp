@@ -213,7 +213,9 @@ elif tool == "Feedback Assistant":
                 user_msg=feedback_prompt,
                 max_tokens=800
             )
-            st.markdown(feedback, unsafe_allow_html=True)
+           
+            display_output_block(feedback)
+
 
 # ========== TOOL 3: EMAIL ASSISTANT ==========
 elif tool == "Email Assistant":
