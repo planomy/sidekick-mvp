@@ -598,29 +598,30 @@ elif tool == "Test Creator":
         if include_answers:
             test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
 
+        
         test_prompt = (
-    f"Create a test with the following structure for Year {year} students on the topic '{topic}' in {subject}:\n"
-    f"- {num_tf} True/False questions\n"
-    f"- {num_mcq} Multiple Choice questions\n"
-    f"- {num_sa} Short Answer questions (3–5 sentence responses)\n"
-    f"- {num_er} Extended Response questions (at least 10 sentences)\n\n"
-    "IMPORTANT: You must include ALL of these sections, even if the number of questions is low.\n"
-    "Group the questions by type, in the order listed above. Number the questions sequentially (do not reset numbering).\n"
-)
-
-# Add section instructions
-if num_sa > 0:
-    test_prompt += "Before the short answer section, include this line: 'Short Answer responses require 3–5 sentences.'\n"
-if num_er > 0:
-    test_prompt += "Before the extended response section, include this line: 'Extended Response answers require a well-developed paragraph of at least 10 sentences.'\n"
-
-# Final formatting instructions
-test_prompt += (
-    "Add 'Student Name:___________________' at the very top.\n"
-    "Use clean formatting suitable for copying into Word. Avoid markdown symbols like asterisks or hashes.\n"
-    "Leave space after each question for student responses.\n"
-    "End the test with the phrase: 'End of Test'."
-)
+            f"Create a test with the following structure for Year {year} students on the topic '{topic}' in {subject}:\n"
+            f"- {num_tf} True/False questions\n"
+            f"- {num_mcq} Multiple Choice questions\n"
+            f"- {num_sa} Short Answer questions (3–5 sentence responses)\n"
+            f"- {num_er} Extended Response questions (at least 10 sentences)\n\n"
+            "IMPORTANT: You must include ALL of these sections, even if the number of questions is low.\n"
+            "Group the questions by type, in the order listed above. Number the questions sequentially (do not reset numbering).\n"
+        )
+        
+        # Add section instructions
+        if num_sa > 0:
+            test_prompt += "Before the short answer section, include this line: 'Short Answer responses require 3–5 sentences.'\n"
+        if num_er > 0:
+            test_prompt += "Before the extended response section, include this line: 'Extended Response answers require a well-developed paragraph of at least 10 sentences.'\n"
+        
+        # Final formatting instructions
+        test_prompt += (
+            "Add 'Student Name:___________________' at the very top.\n"
+            "Use clean formatting suitable for copying into Word. Avoid markdown symbols like asterisks or hashes.\n"
+            "Leave space after each question for student responses.\n"
+            "End the test with the phrase: 'End of Test'."
+        )
 
 
 
