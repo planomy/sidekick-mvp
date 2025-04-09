@@ -323,57 +323,58 @@ elif tool == "Unit Planner":
 
 
 
-    # ========== TOOL 6: WORKSHEET GENERATOR ==========
+   # ========== TOOL 6: WORKSHEET GENERATOR ==========
 elif tool == "Worksheet Generator":
     st.header("📝 Worksheet Generator")
+
     # Input fields
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
-    passage_length = st.slider("Desired word count for the information passage (0-200)", min_value=0, max_value=200, value=100, step=10)
-    
-      # New option: Toggle cloze activity
+    passage_length = st.slider("Desired word count for the information passage (50-200)", min_value=50, max_value=200, value=100, step=10)
+
+    # New option: Toggle cloze activity
     cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
-    
+
+    # New: Slider for number of blanks if cloze is selected
+    if cloze_activity:
+        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=5)
+
     if st.button("Generate Worksheet"):
         # Base prompt for standard worksheet
         worksheet_prompt = (
-            f"Based on the following learning goal or paste a lesson plan excerpt for Year {year}:\n\n"
+            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
             f"{learning_goal}\n\n"
-            f"Generate a worksheet containing {num_questions} questions for students. "
+            f"Generate a worksheet containing {num_questions} short answer questions for students. "
             f"The accompanying information passage should be approximately {passage_length} words. "
-            "List all the questions first, then at the bottom provide the corresponding answers for each question. "
-            "Include only short answer questions."
+            f"List all the questions first, then at the bottom provide the corresponding answers."
         )
-        
-        # If cloze activity option is selected, adjust the prompt accordingly
-        if cloze_activity:
-            # Calculate the number of blanks as 10% of passage length (ensuring at least 1)
-            num_blanks = (passage_length // 10)
-            
-            worksheet_prompt = (
-    f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-    f"{learning_goal}\n\n"
-    f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words.\n\n"
-    f"Randomly remove exactly {num_blanks} significant words from different parts of the passage. "
-    f"Make sure the blanks are spread throughout the entire passage, not just in the first few sentences. "
-    f"Replace each removed word with a blank marked as '_____(n)'. "
-    f"Double-check that the total number of blanks is exactly {num_blanks}, no more and no less.\n\n"
-    f"After the passage, provide an answer key listing the missing words in **random order**. "
-    f"Mix up the order of the answer words so students can't easily guess where each blank goes. "
-    f"Do **not** list them in the order they were removed from the passage. "
-    f"If necessary, shuffle the answer key before listing.\n\n"
-    f"Then, generate {num_questions} questions for students to answer based on the information in the passage."
-)
 
-            
+        # If cloze activity is selected, adjust the prompt
+        if cloze_activity:
+            worksheet_prompt = (
+                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+                f"{learning_goal}\n\n"
+                f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words.\n\n"
+                f"Remove exactly {num_blanks} significant words from different parts of the passage—not just the first few sentences. "
+                f"Replace each removed word with a blank marked '_____(n)'. "
+                f"Ensure that there are exactly {num_blanks} blanks.\n\n"
+                f"After the passage, provide an answer key listing the missing words in random order (not the order they appeared in). "
+                f"Mix up the order of the answers so students cannot easily match blanks to words. "
+                f"If necessary, shuffle the answer key before listing.\n\n"
+                f"Then, generate {num_questions} short answer questions for students to answer based on the information in the passage."
+            )
+
+        # Generate with temperature for better randomness
         with st.spinner("Generating worksheet..."):
             worksheet = chat_completion_request(
                 system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
                 user_msg=worksheet_prompt,
-                max_tokens=1000
+                max_tokens=1000,
+                temperature=0.7  # ✅ Set for creative variation like randomised answers
             )
             st.markdown(worksheet, unsafe_allow_html=True)
+
 
 
             
