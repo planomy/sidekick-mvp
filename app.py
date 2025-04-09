@@ -22,7 +22,8 @@ def create_cloze(passage: str, num_blanks: int = 5):
         num_blanks = len(candidates)
 
     selected = random.sample(candidates, num_blanks)
-    answer_map = {word: f"_____({i+1})" for i, word in enumerate(selected)}
+    answer_map = {word: "_____" for word in selected}
+
 
     def replacer(match):
         word = match.group(0)
