@@ -374,7 +374,7 @@ elif tool == "Worksheet Generator":
         # Base prompt
         if cloze_activity:
         # Step 1: Generate base passage and questions from GPT
-        worksheet_prompt = (
+            worksheet_prompt = (
             f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
             f"{learning_goal}\n\n"
             f"Write an information passage of about {passage_length} words. "
