@@ -566,7 +566,7 @@ if "teacher_boost" not in st.session_state:
         boost_prompt = (
             "Generate an uplifting teacher boost message that is either funny, sarcastic, "
             "or a random quirky fact. Please ensure your answer is 40 tokens or less. "
-            "Don't use words like hell or other possible offensive terms."
+            "Don't use words like hell or other possible offensive terms. You must not use hell or other offensive words."
         )
         st.session_state["teacher_boost"] = chat_completion_request(
             system_msg="You are a creative teacher boost generator.",
