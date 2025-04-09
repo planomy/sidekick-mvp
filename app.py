@@ -347,95 +347,93 @@ elif tool == "Worksheet Generator":
     if cloze_activity:
         num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=5)
 
-
-
     if st.button("Generate Worksheet"):
-    if cloze_activity:
-        # Step 1: Ask GPT for plain passage + questions (no blanks)
-        worksheet_prompt = (
-            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-            f"{learning_goal}\n\n"
-            f"Write an information passage of about {passage_length} words. "
-            f"Then generate {num_questions} short answer questions for students based on the passage. "
-            f"Do not remove any words or create blanks. Do not list answers."
-        )
-    else:
-        # Standard worksheet prompt
-        worksheet_prompt = (
-            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-            f"{learning_goal}\n\n"
-            f"Generate a worksheet containing {num_questions} short answer questions for students. "
-            f"The accompanying information passage should be approximately {passage_length} words. "
-            f"List all the questions first, then at the bottom provide the corresponding answers."
-        )
-
-    with st.spinner("Generating worksheet..."):
-        worksheet = chat_completion_request(
-            system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
-            user_msg=worksheet_prompt,
-            max_tokens=1000,
-            temperature=0.7
-        )
-
-        # ----- If cloze activity is selected, apply post-processing -----
         if cloze_activity:
-            if "1." in worksheet:
-                split_index = worksheet.find("1.")
-                passage = worksheet[:split_index].strip()
-                questions = worksheet[split_index:].strip()
-            else:
-                passage = worksheet.strip()
-                questions = ""
+            # Step 1: Ask GPT for plain passage + questions (no blanks)
+            worksheet_prompt = (
+                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+                f"{learning_goal}\n\n"
+                f"Write an information passage of about {passage_length} words. "
+                f"Then generate {num_questions} short answer questions for students based on the passage. "
+                f"Do not remove any words or create blanks. Do not list answers."
+            )
+        else:
+            # Standard worksheet prompt
+            worksheet_prompt = (
+                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+                f"{learning_goal}\n\n"
+                f"Generate a worksheet containing {num_questions} short answer questions for students. "
+                f"The accompanying information passage should be approximately {passage_length} words. "
+                f"List all the questions first, then at the bottom provide the corresponding answers."
+            )
 
-        tokens = word_tokenize(passage)
-        tagged = pos_tag(tokens)
-        
-        # Choose significant words (nouns + verbs only)
-        candidates = [word for word, pos in tagged if pos.startswith('NN') or pos.startswith('VB')]
-        candidates = list(set(candidates))
-        
-        if len(candidates) < num_blanks:
-            num_blanks = len(candidates)
-        
-        # Choose target words (lowercased for matching)
-        tokens_lower = [word.lower() for word in tokens]
-        selected_lower = random.sample([w.lower() for w in candidates], num_blanks)
-        
-        # Build a map of word → blank number
-        blank_map = {}
-        for i, word in enumerate(tokens_lower):
-            if word in selected_lower and word not in blank_map:
-                blank_map[word] = len(blank_map) + 1
-        
-        # Replace tokens
-        cloze_tokens = []
-        for word in tokens:
-            word_lower = word.lower()
-            if word_lower in blank_map:
-                blank_number = blank_map[word_lower]
-                cloze_tokens.append(f"_____({blank_number})")
-            else:
-                cloze_tokens.append(word)
-        
-        # Build final passage
-        cloze_passage = ' '.join(cloze_tokens)
-        cloze_passage = cloze_passage.replace(" ,", ",").replace(" .", ".").replace(" ’", "’")
-        
-        # Randomise and display answer key
-        answer_key = list(blank_map.keys())
-        random.shuffle(answer_key)
-        answer_key_display = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_key)])
-        
-        # Build full output
-        worksheet = (
-            f"Worksheet:\n\n{cloze_passage}\n\n"
-            f"Answer Key:\n\n{answer_key_display}\n\n"
-            f"Short Answer Questions:\n\n{questions}"
-        )
+        with st.spinner("Generating worksheet..."):
+            worksheet = chat_completion_request(
+                system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
+                user_msg=worksheet_prompt,
+                max_tokens=1000,
+                temperature=0.7
+            )
 
+            # ----- If cloze activity is selected, apply post-processing -----
+            if cloze_activity:
+                if "1." in worksheet:
+                    split_index = worksheet.find("1.")
+                    passage = worksheet[:split_index].strip()
+                    questions = worksheet[split_index:].strip()
+                else:
+                    passage = worksheet.strip()
+                    questions = ""
 
-        # --- Display output + your existing Word export ---
-        st.markdown(worksheet, unsafe_allow_html=True)
+                tokens = word_tokenize(passage)
+                tagged = pos_tag(tokens)
+
+                # Choose significant words (nouns + verbs only)
+                candidates = [word for word, pos in tagged if pos.startswith('NN') or pos.startswith('VB')]
+                candidates = list(set(candidates))
+
+                if len(candidates) < num_blanks:
+                    num_blanks = len(candidates)
+
+                # Choose target words (lowercased for matching)
+                tokens_lower = [word.lower() for word in tokens]
+                selected_lower = random.sample([w.lower() for w in candidates], num_blanks)
+
+                # Build a map of word → blank number
+                blank_map = {}
+                for i, word in enumerate(tokens_lower):
+                    if word in selected_lower and word not in blank_map:
+                        blank_map[word] = len(blank_map) + 1
+
+                # Replace tokens
+                cloze_tokens = []
+                for word in tokens:
+                    word_lower = word.lower()
+                    if word_lower in blank_map:
+                        blank_number = blank_map[word_lower]
+                        cloze_tokens.append(f"_____({blank_number})")
+                    else:
+                        cloze_tokens.append(word)
+
+                # Build final passage
+                cloze_passage = ' '.join(cloze_tokens)
+                cloze_passage = cloze_passage.replace(" ,", ",").replace(" .", ".").replace(" ’", "’")
+
+                # Randomise and display answer key
+                answer_key = list(blank_map.keys())
+                random.shuffle(answer_key)
+                answer_key_display = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_key)])
+
+                # Build full output
+                worksheet = (
+                    f"Worksheet:\n\n{cloze_passage}\n\n"
+                    f"Answer Key:\n\n{answer_key_display}\n\n"
+                    f"Short Answer Questions:\n\n{questions}"
+                )
+
+            # Display the worksheet (export code below remains unchanged)
+            st.markdown(worksheet, unsafe_allow_html=True)
+
 
 
 
