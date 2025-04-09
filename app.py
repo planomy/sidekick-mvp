@@ -417,7 +417,8 @@ elif tool == "Worksheet Generator":
         
             # Create cloze version of passage
             cloze_body, answer_list = create_cloze(body_only, num_blanks=num_blanks)
-            cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
+            cloze_passage = f"{header_1}\n\n{cloze_body}".strip()
+
         
             # Try to split out GPT answer section
             if "Answer Key:" in questions:
