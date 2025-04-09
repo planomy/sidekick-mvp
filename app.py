@@ -604,12 +604,21 @@ elif tool == "Test Creator":
     f"- {num_mcq} Multiple Choice questions\n"
     f"- {num_sa} Short Answer questions (3–5 sentence responses)\n"
     f"- {num_er} Extended Response questions (at least 10 sentences)\n\n"
-    "Group the questions by type, in the order listed above. Number the questions sequentially. "
-    "Add the line 'Student Name:___________________' at the top.\n"
-    "Add 'Short Answer responses require 3-5 sentences.' above the short answer section.\n"
-    "Add 'Extended Response answers require a well-developed paragraph of at least 10 sentences.' above that section if applicable.\n"
-    "Use clean formatting with no markdown symbols like asterisks or hashes. "
-    "Leave space for students to respond.\n"
+    "IMPORTANT: You must include ALL of these sections, even if the number of questions is low.\n"
+    "Group the questions by type, in the order listed above. Number the questions sequentially (do not reset numbering).\n"
+)
+
+# Add section instructions
+if num_sa > 0:
+    test_prompt += "Before the short answer section, include this line: 'Short Answer responses require 3–5 sentences.'\n"
+if num_er > 0:
+    test_prompt += "Before the extended response section, include this line: 'Extended Response answers require a well-developed paragraph of at least 10 sentences.'\n"
+
+# Final formatting instructions
+test_prompt += (
+    "Add 'Student Name:___________________' at the very top.\n"
+    "Use clean formatting suitable for copying into Word. Avoid markdown symbols like asterisks or hashes.\n"
+    "Leave space after each question for student responses.\n"
     "End the test with the phrase: 'End of Test'."
 )
 
