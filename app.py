@@ -243,7 +243,8 @@ elif tool == "Email Assistant":
                 user_msg=email_prompt,
                 max_tokens=800
             )
-            st.markdown(email_content)
+            
+            display_output_block)email_content)
 
 # ========== TOOL 4: UNIT GLOSSARY GENERATOR ==========
 elif tool == "Unit Glossary Generator":
