@@ -244,7 +244,7 @@ elif tool == "Email Assistant":
                 max_tokens=800
             )
             
-            display_output_block)email_content)
+            display_output_block(email_content)
 
 # ========== TOOL 4: UNIT GLOSSARY GENERATOR ==========
 elif tool == "Unit Glossary Generator":
