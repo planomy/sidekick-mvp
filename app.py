@@ -47,7 +47,7 @@ if tool == "Lesson Builder":
     subject = st.text_input("Subject (e.g. English, Science)")
     topic = st.text_input("Lesson Topic or Focus")
     duration = st.slider("Lesson Duration (minutes)", 30, 120, 70, step=5)
-    lesson_count = st.text_input("Number of Lessons")
+    lesson_count = st.number_input("Number of Lessons", min_value=1, value=1, step=1)
     goal_focus = st.selectbox("Learning Goal Focus", ["Skills-Based", "Knowledge-Based", "Critical Thinking", "Creative Thinking"])
     include_curriculum = st.checkbox("Include V9 curriculum reference")
     device_use = st.multiselect("Student Resource", ["Laptop/Tablet", "Textbook", "Worksheet", "No Devices"])
