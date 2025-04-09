@@ -5,4 +5,4 @@ fpdf
 pyperclip
 python-pptx
 pytube>=12.0.0
-nltk
+nltk>=3.9
