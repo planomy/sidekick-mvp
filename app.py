@@ -74,15 +74,17 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     return response.choices[0].message.content.strip()
 
 def display_output_block(text):
-    html_template = """
-    <div style='background-color: white; color: black; padding: 20px; 
-                border-radius: 8px; font-family: sans-serif; 
-                font-size: 16px; line-height: 1.6; white-space: pre-wrap;'>
-        {}
-    </div>
-    """
-    safe_text = text.replace("\n", "<br>") # .replace("**", "<b>").replace("__", "<i>")
-    st.markdown(html_template.format(safe_text), unsafe_allow_html=True)
+    cleaned_text = re.sub(r'[\*\#]', '', text)  # remove * and #
+    st.markdown(
+        f"""
+        <div style='background-color: white; color: black; padding: 20px; 
+                    border-radius: 8px; font-family: sans-serif; 
+                    font-size: 16px; line-height: 1.6; white-space: pre-wrap;'>
+            {cleaned_text.replace('\n', '<br>')}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 
