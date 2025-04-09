@@ -353,7 +353,7 @@ elif tool == "Worksheet Generator":
             f"{learning_goal}\n\n"
             f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words. "
             "Randomly remove a good proportion of significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
-            "After the paragraph, provide an answer key listing the missing words in random order. "
+            "After the paragraph, provide an answer key listing the missing words in random order. LIST THE WORDS IN RANDOM ORDER."
             "After the list of words, generate {num_questions} for students to answer based on the information passage."
         )
 
