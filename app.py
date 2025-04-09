@@ -590,6 +590,7 @@ elif tool == "Test Creator":
             "Group questions by type. True False first. Followed by Multiple Choice. Followed by short answer."
             "Ensure the test is suitable for printing or copying into a Word doc. "
             "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
+            "Add 'Student Name:___________________' at the top. Add 'End of Test' at the bottom."
         )
 
         with st.spinner("Generating test..."):
