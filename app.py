@@ -193,7 +193,7 @@ elif tool == "Email Assistant":
 # ========== TOOL 4: UNIT GLOSSARY GENERATOR ==========
 elif tool == "Unit Glossary Generator":
     st.header("📘 Unit Glossary Generator")
-    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject (e.g. Science, HASS)")
     topic = st.text_input("Topic or Unit Focus (e.g. Body Systems, Volcanoes)")
    
@@ -219,7 +219,7 @@ elif tool == "Unit Glossary Generator":
 # ========== TOOL 5: UNIT PLANNER ==========
 elif tool == "Unit Planner":
     st.header("📘 Unit Planner")
-    year = st.selectbox("Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject (e.g. HASS, English, Science)")
     topic = st.text_input("Unit Topic or Focus (e.g. Ancient Egypt, Persuasive Writing)")
     weeks = st.slider("Estimated Duration (Weeks)", 1, 10, 5)
@@ -327,7 +327,7 @@ elif tool == "Unit Planner":
 elif tool == "Worksheet Generator":
     st.header("📝 Worksheet Generator")
     # New: Add Year Level input for the worksheet
-    year_level = st.selectbox("Select Year Level", ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"])
+    year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     
     # Teacher can type or paste a learning goal or lesson plan excerpt
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
@@ -396,7 +396,7 @@ elif tool == "Self Care Tool":
 # ========== Video Assistant ==========
 elif tool == "Video Assistant":
     st.header("🎥 Video Assistant")
-    grade = st.number_input("Grade Level", min_value=1, max_value=12, step=1)
+    grade = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     video_description = st.text_area("What is the video about? Provide a brief overview:")
 
     
