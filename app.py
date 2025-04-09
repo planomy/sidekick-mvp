@@ -314,16 +314,26 @@ elif tool == "Unit Planner":
         # Remove all asterisks and hashes for exports
         export_plan = re.sub(r'[\*\#]', '', unit_plan)
 
-        # PDF Export (default export)
+      # PDF Export (default export)
         pdf_buffer = BytesIO()
         pdf = FPDF()
+        
+        # Option 2: Register a Unicode font (make sure the TTF file is in your working directory)
+        pdf.add_font('DejaVu', '', 'DejaVuSans.ttf', uni=True)
+        pdf.set_font("DejaVu", size=11)
+        
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=11)
+        
+        # Write the unit plan text into the PDF
         for line in unit_plan.split("\n"):
             for wrapped_line in textwrap.wrap(line, width=90):
                 pdf.cell(0, 8, txt=wrapped_line, ln=True)
-        pdf_output = pdf.output(dest='S').encode('latin1')
+        
+        # Output PDF content
+        # With the Unicode font registered, we should be able to output without encoding issues.
+        pdf_output = pdf.output(dest='S').encode('latin1', errors='replace')
+        
         pdf_buffer.write(pdf_output)
         pdf_buffer.seek(0)
         st.download_button(
@@ -333,6 +343,7 @@ elif tool == "Unit Planner":
             mime="application/pdf",
             key="pdf_download_btn"
         )
+
 
          # ========== WORD EXPORT ==========
         word_buffer = BytesIO()
