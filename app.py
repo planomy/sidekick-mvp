@@ -458,38 +458,43 @@ elif tool == "Worksheet Generator":
 
 
                 # ---- Export Options ----
-        st.subheader("Export Options")
-        st.write("Don't forget to delete the answers :)")
-        
-        # Add the checkbox above the export button so its state persists.
-        include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True)
-        
-        # Remove asterisks and hashtags from the worksheet text
-        export_worksheet = re.sub(r'[\*\#]', '', worksheet)
-        
-        if not include_answers_export:
-            # Split on the header "Short Answer Answers:" since the asterisks have been removed
-            parts = re.split(r'\n\s*Short Answer Answers:\n', export_worksheet)
-            if parts:
-                export_worksheet = parts[0]  # Keep only the part before the answers section
-        
-        word_buffer = BytesIO()
-        doc = Document()
-        doc.add_paragraph(export_worksheet)
-        try:
-            protection = doc.settings.element.xpath('//w:documentProtection')
-            if protection:
-                protection[0].getparent().remove(protection[0])
-        except Exception:
-            pass
-        doc.save(word_buffer)
-        word_buffer.seek(0)
-        st.download_button(
-            label="📝 Download Word",
-            data=word_buffer,
-            file_name="worksheet.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+st.subheader("Export Options")
+st.write("Don't forget to delete the answers :)")
+
+# Make sure the worksheet has been generated and stored in session_state
+if "worksheet_content" in st.session_state:
+    # Checkbox with a unique key so its state persists across re-runs
+    include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True, key="export_include_answers")
+
+    # Use the stored worksheet content
+    export_worksheet = re.sub(r'[\*\#]', '', st.session_state["worksheet_content"])
+
+    if not include_answers_export:
+        # Since the asterisks are removed, we target "Short Answer Answers:" as the marker.
+        parts = re.split(r'\n\s*Short Answer Answers:\n', export_worksheet)
+        if parts:
+            export_worksheet = parts[0]  # Keep content before the answers section
+
+    word_buffer = BytesIO()
+    doc = Document()
+    doc.add_paragraph(export_worksheet)
+    try:
+        protection = doc.settings.element.xpath('//w:documentProtection')
+        if protection:
+            protection[0].getparent().remove(protection[0])
+    except Exception:
+        pass
+    doc.save(word_buffer)
+    word_buffer.seek(0)
+    st.download_button(
+        label="📝 Download Word",
+        data=word_buffer,
+        file_name="worksheet.docx",
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+else:
+    st.info("Please generate a worksheet first.")
+
 
 
 
