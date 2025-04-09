@@ -338,7 +338,7 @@ elif tool == "Worksheet Generator":
     
     if st.button("Generate Worksheet"):
         worksheet_prompt = (
-            f"Based on the following learning goal or lesson plan excerpt for Year {year_level}:\n\n"
+            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
             f"{learning_goal}\n\n"
             f"Generate a worksheet containing {num_questions} questions for students. "
             f"The accompanying information passage should be approximately {passage_length} words. "
