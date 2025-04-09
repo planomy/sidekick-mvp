@@ -460,26 +460,25 @@ elif tool == "Worksheet Generator":
                
         
  # ---- Export Options ----
+        # ---- Export Options ----
         st.subheader("Export Options")
         st.write("Don't forget to delete the answers :)")
         
-        # New checkbox to decide if answers are included in the exported Word doc.
-        # (The default is checked so answers are included in the Word doc by default)
-        include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True, key="export_include_answers")
-        
-        # Check if the generated worksheet is stored in session_state
         if "worksheet_content" in st.session_state and st.session_state["worksheet_content"]:
-            # Remove asterisks and hashtags from the worksheet content
+            # Checkbox to let the user choose if answers should be included in the export.
+            include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True, key="export_include_answers")
+            
+            # Remove asterisks and hashtags from the stored worksheet content.
             export_worksheet = re.sub(r'[\*\#]', '', st.session_state["worksheet_content"])
             
             if not include_answers_export:
-                # Remove the answers section from the export.
-                # Assuming your answers section is marked by "Short Answer Answers:" (without asterisks after re.sub)
-                parts = re.split(r'\n\s*Short Answer Answers:\n', export_worksheet)
-                if parts:
+                # Remove the answers section from the exported text.
+                # This code splits the text at the first occurrence of "Short Answer Answers:" (which should be present if answers are included)
+                parts = re.split(r'\n\s*Short Answer Answers:\s*\n', export_worksheet, maxsplit=1)
+                if len(parts) > 1:
                     export_worksheet = parts[0]
             
-            # Create the Word document export
+            # Build the Word document from the modified export_worksheet string.
             word_buffer = BytesIO()
             doc = Document()
             doc.add_paragraph(export_worksheet)
@@ -500,7 +499,7 @@ elif tool == "Worksheet Generator":
             )
         else:
             st.info("Please generate a worksheet first.")
-       
+
       
 
 
