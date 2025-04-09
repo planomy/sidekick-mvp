@@ -14,43 +14,36 @@ st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
 st.markdown("""
     <style>
-        /* MAIN BACKGROUND */
+        /* DARK THEME UI */
         .stApp {
             background-color: #2e2e2e;
         }
 
-        /* SIDEBAR BACKGROUND */
         section[data-testid="stSidebar"] {
             background-color: #424242;
         }
 
-        /* WIDGET TEXT COLOR */
-        .stTextInput label, .stSlider label, .stSelectbox label, .stCheckbox label {
-            color: white;
-        }
-
-        /* HEADING TEXT */
+        .stTextInput label,
+        .stSlider label,
+        .stSelectbox label,
+        .stCheckbox label,
         h1, h2, h3, h4 {
             color: white;
         }
 
-        /* GENERAL TEXT */
-        .stMarkdown, .stMarkdown p, .stMarkdown span {
-            color: white !important;
-        }
-
-        /* OUTPUT CONTAINER (e.g. worksheet) */
-        .output-block {
-            background-color: #ffffff;
-            color: #000000;
+        /* FORCE WHITE BACKGROUND + BLACK TEXT FOR OUTPUT ONLY */
+        .output-box {
+            background-color: white;
+            color: black;
             padding: 20px;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
             font-family: sans-serif;
+            font-size: 16px;
             line-height: 1.6;
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 import random
