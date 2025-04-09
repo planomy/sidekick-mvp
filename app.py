@@ -423,10 +423,15 @@ elif tool == "Worksheet Generator":
             
             # Rebuild final passage
             cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
-
-
-
+            
+            worksheet = (
+                f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
+                f"**Answer Key:**\n\n" + "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)]) + "\n\n"
+                f"**Short Answer Questions:**\n\n{questions}"
+            )
+            
             st.markdown(worksheet, unsafe_allow_html=True)
+
 
         else:
             # Regular worksheet
