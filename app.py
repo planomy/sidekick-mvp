@@ -40,7 +40,6 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     )
     return response.choices[0].message.content.strip()
 
-
 # ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
     st.header("📝 Lesson Builder")
@@ -51,20 +50,23 @@ if tool == "Lesson Builder":
     lesson_count = st.text_input("Number of Lessons")
     goal_focus = st.selectbox("Learning Goal Focus", ["Skills-Based", "Knowledge-Based", "Critical Thinking", "Creative Thinking"])
     include_curriculum = st.checkbox("Include V9 curriculum reference")
-    device_use = st.selectbox("Student Resource", ["Laptops/Tablets", "Printed Material", "Both", "No Devices"])
+    device_use = st.multiselect("Student Resource", ["Laptop/Tablet", "Printed Material", "Textbook", "Worksheet", "No Devices"])
     grouping = st.selectbox("Grouping Preference", ["Individual", "Pairs", "Small Groups", "Whole Class"])
     lesson_style = st.selectbox("Lesson Style", ["Hands-On", "Discussion-Based", "Quiet/Reflective", "Creative"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
     differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
 
-   # After your input fields are defined
+    # After your input fields are defined
     if st.button("Generate Lesson Plan"):
         prompt_parts = [
             f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
             f"Start each lesson with a clear Learning Goal aligned to a {goal_focus.lower()} outcome.",
             "Structure each lesson with: Hook, Learning Intentions, Warm-up, Main Task, Exit Ticket.",
-            f"The lesson should use {device_use.lower()}. Students should work in {grouping.lower()}.",
+            f"The lesson should use {', '.join(device_use).lower()}. Students should work in {grouping.lower()}.",
             f"Use a {lesson_style.lower()} approach."
+        ]
+      
+
         ]
         if differentiation:
             prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
