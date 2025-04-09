@@ -270,7 +270,8 @@ elif tool == "Unit Glossary Generator":
                 user_msg=glossary_prompt,
                 max_tokens=700
             )
-            st.markdown(glossary)
+            
+            display_output_block(glossary)
 
 # ========== TOOL 5: UNIT PLANNER ==========
 elif tool == "Unit Planner":
@@ -328,7 +329,7 @@ elif tool == "Unit Planner":
     if st.session_state["unit_plan"]:
         unit_plan = st.session_state["unit_plan"]
         st.subheader("Your Generated Unit Plan")
-        st.markdown(unit_plan)
+        display_output_block(unit_plan)
         st.markdown("---")
         st.subheader("📄 Export Options")
 
@@ -436,7 +437,7 @@ elif tool == "Worksheet Generator":
             if answers_only:
                 worksheet += f"\n\n**Short Answer Answers:**\n\n{answers_only}"
         
-            st.markdown(worksheet, unsafe_allow_html=True)
+            display_output_block(worksheet)
             
 
 
@@ -457,7 +458,7 @@ elif tool == "Worksheet Generator":
                     max_tokens=1000,
                     temperature=0.7
                 )
-                st.markdown(worksheet, unsafe_allow_html=True)
+                display_output_block(worksheet)
 
 
         # ---- Export Options ----
@@ -505,7 +506,7 @@ elif tool == "Feeling Peckish":
                 max_tokens=800,
                 temperature=0.7
             )
-        st.markdown(recipe, unsafe_allow_html=True)
+        display_output_block(recipe)
 
 # ========== SELF CARE ==========
 elif tool == "Self Care Tool":
@@ -525,7 +526,7 @@ elif tool == "Self Care Tool":
                 max_tokens=300,
                 temperature=0.8
             )
-        st.markdown(tip, unsafe_allow_html=True)
+        display_output_block(tip)
 
 # ========== Video Assistant ==========
 elif tool == "Video Assistant":
@@ -550,7 +551,7 @@ elif tool == "Video Assistant":
                 max_tokens=500,
                 temperature=0.7
             )
-            st.markdown(video_content, unsafe_allow_html=True)
+            display_output_block(video_content)
 
     
 
