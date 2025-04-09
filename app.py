@@ -590,7 +590,6 @@ elif tool == "Test Creator":
     if st.button("Generate Test"):
         test_prompt = (
             f"Create a {total_qs}-question test for Year {year} students on the topic '{topic}' in the subject '{subject}'.\n\n"
-            f"Question Types to include: {', '.join(question_types)}.\n"
         )
         if mix_difficulty:
             test_prompt += "Mix easy, medium, and hard questions.\n"
