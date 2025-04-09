@@ -76,8 +76,7 @@ def create_cloze(passage: str, num_blanks: int = 5):
 
 
 
-# This must be the very first Streamlit call!
-st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
+
 
 # Initialize the client using the older pattern
 client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
