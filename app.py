@@ -43,6 +43,7 @@ def create_cloze(passage: str, num_blanks: int = 5):
 
 
 # Initialize the client using the older pattern
+import os
 client = openai.OpenAI(api_key=st.secrets.get("OPENAI_API_KEY"))
 if not client.api_key:
     st.warning("Please enter your OpenAI API key in the Streamlit secrets.")
