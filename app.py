@@ -359,25 +359,7 @@ elif tool == "Worksheet Generator":
             # Clean the worksheet output to remove asterisks and hashes (if any)
             export_worksheet = re.sub(r'[\*\#]', '', worksheet)
             
-            # --- PDF Export ---
-            pdf_buffer = BytesIO()
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_auto_page_break(auto=True, margin=15)
-            pdf.set_font("Arial", size=11)
-            for line in export_worksheet.split("\n"):
-                for wrapped_line in textwrap.wrap(line, width=90):
-                    pdf.cell(0, 8, txt=wrapped_line, ln=True)
-            pdf_output = pdf.output(dest='S').encode('latin1')
-            pdf_buffer.write(pdf_output)
-            pdf_buffer.seek(0)
-            st.download_button(
-                label="📎 Download PDF",
-                data=pdf_buffer,
-                file_name="worksheet.pdf",
-                mime="application/pdf"
-            )
-            
+    
             # --- WORD Export ---
             word_buffer = BytesIO()
             doc = Document()
