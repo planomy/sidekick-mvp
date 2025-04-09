@@ -339,7 +339,7 @@ elif tool == "Worksheet Generator":
     # Toggle cloze activity
     cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
     if cloze_activity:
-        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=5)
+        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
 
     if st.button("Generate Worksheet"):
         # Base prompt
@@ -347,7 +347,7 @@ elif tool == "Worksheet Generator":
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
-                f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words.\n\n"
+                f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of {passage_length} words.\n\n"
                 f"Remove exactly {num_blanks} significant words from different parts of the passage—not just the first few sentences. "
                 f"Replace each removed word with a blank marked '_____(n)'. "
                 f"Ensure that there are exactly {num_blanks} blanks.\n\n"
