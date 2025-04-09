@@ -12,40 +12,6 @@ st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
 
 
-st.markdown("""
-    <style>
-        /* DARK THEME UI */
-        .stApp {
-            background-color: #2e2e2e;
-        }
-
-        section[data-testid="stSidebar"] {
-            background-color: #424242;
-        }
-
-        .stTextInput label,
-        .stSlider label,
-        .stSelectbox label,
-        .stCheckbox label,
-        h1, h2, h3, h4 {
-            color: white;
-        }
-
-        /* FORCE WHITE BACKGROUND + BLACK TEXT FOR OUTPUT ONLY */
-        .output-box {
-            background-color: white;
-            color: black;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: sans-serif;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-
-
 import random
 import re
 
@@ -73,9 +39,6 @@ def create_cloze(passage: str, num_blanks: int = 5):
     cloze_passage = pattern.sub(replacer, passage)
     random.shuffle(selected)
     return cloze_passage, selected
-
-
-
 
 
 
