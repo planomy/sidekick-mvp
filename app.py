@@ -457,6 +457,13 @@ elif tool == "Worksheet Generator":
         
             if answers_only:
                 worksheet += f"\n\n**Short Answer Answers:**\n\n{answers_only}"
+            # Remove any occurrence of the "Short Answer Questions:" header from the entire worksheet
+            worksheet = re.sub(
+                r"(?im)^\s*short\s*answer\s*questions\s*[:\-]*\s*\n?", 
+                "", 
+                worksheet
+            ).strip()
+
         
             display_output_block(worksheet)
             
