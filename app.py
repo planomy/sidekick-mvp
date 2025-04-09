@@ -442,7 +442,7 @@ elif tool == "Worksheet Generator":
             worksheet = (
                 f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
                 f"**Answer Key (Blanks):**\n\n{cloze_answers}\n\n"
-                f"**Short Answer Questions:**\n\n{questions_only}"
+                f"{questions_only}"
             )
         
             if answers_only:
