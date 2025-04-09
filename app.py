@@ -457,25 +457,22 @@ elif tool == "Worksheet Generator":
                 st.markdown(worksheet, unsafe_allow_html=True)
 
 
-        # ---- Export Options ----
+                # ---- Export Options ----
         st.subheader("Export Options")
         st.write("Don't forget to delete the answers :)")
         
-
-        # New: Checkbox to decide if answers should be included in the exported Word doc
-        include_answers_export = st.checkbox("Include answers in the exported Word doc?")
-
-        export_worksheet = re.sub(r'[\*\#]', '', worksheet)
-
-        if not include_answers_export:
-    # If the user doesn't want the answers, remove the answers section.
-    # Adjust this regex if your answer section marker is different.
-            parts = re.split(r'\n\s*\*\*Short Answer Answers:\*\*\n', export_worksheet)
-            if parts:
-                export_worksheet = parts[0]  # Keep content before the answers section
-
+        # Add the checkbox above the export button so its state persists.
+        include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True)
         
-
+        # Remove asterisks and hashtags from the worksheet text
+        export_worksheet = re.sub(r'[\*\#]', '', worksheet)
+        
+        if not include_answers_export:
+            # Split on the header "Short Answer Answers:" since the asterisks have been removed
+            parts = re.split(r'\n\s*Short Answer Answers:\n', export_worksheet)
+            if parts:
+                export_worksheet = parts[0]  # Keep only the part before the answers section
+        
         word_buffer = BytesIO()
         doc = Document()
         doc.add_paragraph(export_worksheet)
@@ -493,6 +490,7 @@ elif tool == "Worksheet Generator":
             file_name="worksheet.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
+
 
 
 
