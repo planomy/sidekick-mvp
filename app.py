@@ -9,6 +9,35 @@ from fpdf import FPDF
 import random
 
 
+import random
+import re
+
+def create_cloze(passage: str, num_blanks: int = 5):
+    stopwords = {"the", "a", "an", "and", "or", "in", "on", "of", "to", "for", "with", "from", "at", "by", "as", "that"}
+    
+    words = re.findall(r'\b\w+\b', passage)
+    candidates = [w for w in set(words) if w.lower() not in stopwords and len(w) > 3]
+
+    if len(candidates) < num_blanks:
+        num_blanks = len(candidates)
+
+    selected = random.sample(candidates, num_blanks)
+    answer_map = {word: f"_____({i+1})" for i, word in enumerate(selected)}
+
+    def replacer(match):
+        word = match.group(0)
+        if word in answer_map:
+            replacement = answer_map.pop(word)
+            return replacement
+        return word
+
+    pattern = re.compile(r'\b(' + '|'.join(re.escape(w) for w in selected) + r')\b')
+    cloze_passage = pattern.sub(replacer, passage)
+    random.shuffle(selected)
+    return cloze_passage, selected
+
+
+
 
 # This must be the very first Streamlit call!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
@@ -343,19 +372,44 @@ elif tool == "Worksheet Generator":
 
     if st.button("Generate Worksheet"):
         # Base prompt
-        if cloze_activity:
-            worksheet_prompt = (
-                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-                f"{learning_goal}\n\n"
-                f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of {passage_length} words.\n\n"
-                f"Remove exactly {num_blanks} significant words from different parts of the passage—not just the first few sentences. "
-                f"Replace each removed word with a blank marked '_____(n)'. "
-                f"Ensure that there are exactly {num_blanks} blanks.\n\n"
-                f"After the passage, provide an answer key listing the missing words in random order (not the order they appeared in). "
-                f"Mix up the order of the answers so students cannot easily match blanks to words. "
-                f"If necessary, shuffle the answer key before listing.\n\n"
-                f"Then, generate {num_questions} short answer questions for students to answer based on the information in the passage."
+          if cloze_activity:
+        # Step 1: Generate base passage and questions from GPT
+        worksheet_prompt = (
+            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+            f"{learning_goal}\n\n"
+            f"Write an information passage of about {passage_length} words. "
+            f"Then generate {num_questions} short answer questions for students based on the passage. "
+            f"Do not remove any words or create blanks. Do not list answers."
+        )
+
+        with st.spinner("Generating cloze worksheet..."):
+            response = chat_completion_request(
+                system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
+                user_msg=worksheet_prompt,
+                max_tokens=1000,
+                temperature=0.7
             )
+
+        if "1." in response:
+            split_index = response.find("1.")
+            passage = response[:split_index].strip()
+            questions = response[split_index:].strip()
+        else:
+            passage = response.strip()
+            questions = ""
+
+        # Locally blank out significant words
+        cloze_passage, answer_list = create_cloze(passage, num_blanks=num_blanks)
+        answer_key_display = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)])
+
+        worksheet = (
+            f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
+            f"**Answer Key:**\n\n{answer_key_display}\n\n"
+            f"**Short Answer Questions:**\n\n{questions}"
+        )
+
+        st.markdown(worksheet, unsafe_allow_html=True)
+
         else:
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
