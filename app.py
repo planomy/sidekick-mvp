@@ -424,12 +424,26 @@ elif tool == "Worksheet Generator":
             # Rebuild final passage
             cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
             
-            worksheet = (
-                f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
-                f"**Answer Key:**\n\n" + "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)]) + "\n\n"
-                f"**Short Answer Questions:**\n\n{questions}"
-            )
-            
+            # Try to split out the answer section (if GPT included it after the questions)
+        if "Answer Key:" in questions:
+            question_part, answer_part = questions.split("Answer Key:", 1)
+            questions_only = question_part.strip()
+            answers_only = answer_part.strip()
+        else:
+            questions_only = questions
+            answers_only = ""
+        
+        # Final worksheet with answers shown at the bottom
+        worksheet = (
+            f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
+            f"**Answer Key (Blanks):**\n\n" + "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)]) + "\n\n"
+            f"**Short Answer Questions:**\n\n{questions_only}"
+        )
+        
+        if answers_only:
+            worksheet += f"\n\n**Short Answer Answers:**\n\n{answers_only}"
+        
+                    
             st.markdown(worksheet, unsafe_allow_html=True)
 
 
