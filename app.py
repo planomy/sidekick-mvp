@@ -353,7 +353,7 @@ elif tool == "Worksheet Generator":
 
     # New: Slider for number of blanks if cloze is selected
     if cloze_activity:
-        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=5)
+        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
 
     if st.button("Generate Worksheet"):
         if cloze_activity:
