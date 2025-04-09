@@ -372,59 +372,46 @@ elif tool == "Worksheet Generator":
         num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
 
     if st.button("Generate Worksheet"):
-        if cloze_activity:
-            # Step 1: Generate base passage and questions from GPT
-            worksheet_prompt = (
-                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-                f"{learning_goal}\n\n"
-                f"Write an information passage of about {passage_length} words. "
-                f"Then generate {num_questions} short answer questions for students based on the passage. "
-                f"Do not remove any words or create blanks. Do not list answers."
+    if cloze_activity:
+        # Step 1: Generate base passage and questions from GPT
+        worksheet_prompt = (
+            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+            f"{learning_goal}\n\n"
+            f"Write an information passage of about {passage_length} words. "
+            f"Then generate {num_questions} short answer questions for students based on the passage. "
+            f"Do not remove any words or create blanks. Do not list answers."
+        )
+    
+        with st.spinner("Generating cloze worksheet..."):
+            response = chat_completion_request(
+                system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
+                user_msg=worksheet_prompt,
+                max_tokens=1000,
+                temperature=0.7
             )
-
-            with st.spinner("Generating cloze worksheet..."):
-                response = chat_completion_request(
-                    system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
-                    user_msg=worksheet_prompt,
-                    max_tokens=1000,
-                    temperature=0.7
-                )
-
-            if "1." in response:
-                split_index = response.find("1.")
-                passage = response[:split_index].strip()
-                questions = response[split_index:].strip()
-            else:
-                passage = response.strip()
-                questions = ""
-
-            # Locally blank out significant words from body only
-            safe_header_1 = "Information Passage:"
-            safe_header_2 = "Short Answer Questions:"
-            
-            # Find and extract only the body (to protect headings)
-            body_start = passage.find(safe_header_1)
-            body_end = passage.find(safe_header_2)
-            
-            if body_start != -1:
-                body_start += len(safe_header_1)
-            else:
-                body_start = 0
-            
-            if body_end == -1:
-                body_end = len(passage)
-            
-            header_1 = safe_header_1 if safe_header_1 in passage else ""
-            header_2 = safe_header_2 if safe_header_2 in passage else ""
-            
-            body_only = passage[body_start:body_end].strip()
-            
-            cloze_body, answer_list = create_cloze(body_only, num_blanks=num_blanks)
-            
-            # Rebuild final passage
-            cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
-            
-            # Try to split out the answer section (if GPT included it after the questions)
+    
+        if "1." in response:
+            split_index = response.find("1.")
+            passage = response[:split_index].strip()
+            questions = response[split_index:].strip()
+        else:
+            passage = response.strip()
+            questions = ""
+    
+        # Extract body only from the passage
+        header_1 = "Information Passage:"
+        header_2 = "Short Answer Questions:"
+        body_start = passage.find(header_1) + len(header_1)
+        body_end = passage.find(header_2)
+        if body_end == -1:
+            body_end = len(passage)
+        body_only = passage[body_start:body_end].strip()
+    
+        # Create cloze version of passage
+        cloze_body, answer_list = create_cloze(body_only, num_blanks=num_blanks)
+        cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
+    
+        # Try to split out GPT answer section
         if "Answer Key:" in questions:
             question_part, answer_part = questions.split("Answer Key:", 1)
             questions_only = question_part.strip()
@@ -432,22 +419,22 @@ elif tool == "Worksheet Generator":
         else:
             questions_only = questions
             answers_only = ""
-        
-        # Final worksheet with cloze passage, cloze answers, and questions
+    
+        # Build cloze answer list
         cloze_answers = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)])
-        
+    
+        # Build final worksheet
         worksheet = (
             f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
             f"**Answer Key (Blanks):**\n\n{cloze_answers}\n\n"
             f"**Short Answer Questions:**\n\n{questions_only}"
         )
-        
+    
         if answers_only:
             worksheet += f"\n\n**Short Answer Answers:**\n\n{answers_only}"
-
+    
+        st.markdown(worksheet, unsafe_allow_html=True)
         
-                    
-            st.markdown(worksheet, unsafe_allow_html=True)
 
 
         else:
