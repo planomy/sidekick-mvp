@@ -51,7 +51,7 @@ if tool == "Lesson Builder":
     lesson_count = st.text_input("Number of Lessons")
     goal_focus = st.selectbox("Learning Goal Focus", ["Skills-Based", "Knowledge-Based", "Critical Thinking", "Creative Thinking"])
     include_curriculum = st.checkbox("Include V9 curriculum reference")
-    device_use = st.selectbox("Device Use", ["Laptops", "iPads", "Both", "No Devices"])
+    device_use = st.selectbox("Device Use", ["Laptops/Tablets", "Printed Material", "Both", "No Devices"])
     grouping = st.selectbox("Grouping Preference", ["Individual", "Pairs", "Small Groups", "Whole Class"])
     lesson_style = st.selectbox("Lesson Style", ["Hands-On", "Discussion-Based", "Quiet/Reflective", "Creative"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
