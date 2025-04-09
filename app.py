@@ -347,14 +347,17 @@ elif tool == "Worksheet Generator":
         )
         
         # If cloze activity option is selected, adjust the prompt accordingly
-        if cloze_activity:
-            worksheet_prompt = (
-                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-                f"{learning_goal}\n\n"
-                f"Generate a cloze (fill-in-the-blank) worksheet containing {num_questions} exercises for students. "
-                f"In the accompanying passage (which should be approximately {passage_length} words), remove key words and replace them with blanks. "
-                "List all the blanks with the corresponding correct words at the end as an answer key."
-            )
+    if cloze_activity:
+        worksheet_prompt = (
+f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+f"{learning_goal}\n\n"
+f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about 100 words. "
+"Randomly remove exactly {num_questions} significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
+"Then, at the end of the worksheet, provide an answer key listing the correct words. "
+"Scramble the order of the answers in the key so they do not correspond sequentially with the blanks. "
+"Do not include any additional commentary—only the passage and the scrambled answer key."
+)
+
         
         with st.spinner("Generating worksheet..."):
             worksheet = chat_completion_request(
