@@ -458,7 +458,13 @@ elif tool == "Worksheet Generator":
 
 
         # Ask teacher whether to include answers in the Word export
-        include_answers_in_word = st.checkbox("Include answers in Word export?", value=False)
+    
+        if "include_answers_in_word" not in st.session_state:
+            st.session_state.include_answers_in_word = False
+
+        include_answers_in_word = st.checkbox("Include answers in Word export?", value=st.session_state.include_answers_in_word)
+        st.session_state.include_answers_in_word = include_answers_in_word
+
 
         # ---- Export Options ----
         st.subheader("Export Options")
