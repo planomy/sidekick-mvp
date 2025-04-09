@@ -423,11 +423,15 @@ elif tool == "Worksheet Generator":
             # Try to split out GPT answer section
             if "Answer Key:" in questions:
                 question_part, answer_part = questions.split("Answer Key:", 1)
-                questions_only = re.sub(r"(?i)\bshort answer questions:\b", "", question_part).strip()
-
-
-
+            
+                # Strip rogue headings from both parts
+                question_part = re.sub(r"(?i)^short answer questions:\s*\n*", "", question_part.strip(), flags=re.MULTILINE)
+                answer_part = re.sub(r"(?i)^short answer questions:\s*\n*", "", answer_part.strip(), flags=re.MULTILINE)
+            
+                questions_only = question_part.strip()
                 answers_only = answer_part.strip()
+
+                
             else:
                 questions_only = questions
                 answers_only = ""
