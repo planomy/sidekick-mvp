@@ -6,6 +6,13 @@ from io import BytesIO
 from docx import Document
 from fpdf import FPDF
 
+import random
+import nltk
+from nltk import word_tokenize, pos_tag
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+
 # This must be the very first Streamlit call!
 st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
 
@@ -340,8 +347,20 @@ elif tool == "Worksheet Generator":
     if cloze_activity:
         num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=5)
 
-    if st.button("Generate Worksheet"):
-        # Base prompt for standard worksheet
+
+
+   if st.button("Generate Worksheet"):
+    if cloze_activity:
+        # Step 1: Ask GPT for plain passage + questions (no blanks)
+        worksheet_prompt = (
+            f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+            f"{learning_goal}\n\n"
+            f"Write an information passage of about {passage_length} words. "
+            f"Then generate {num_questions} short answer questions for students based on the passage. "
+            f"Do not remove any words or create blanks. Do not list answers."
+        )
+    else:
+        # Standard worksheet prompt
         worksheet_prompt = (
             f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
             f"{learning_goal}\n\n"
@@ -350,30 +369,61 @@ elif tool == "Worksheet Generator":
             f"List all the questions first, then at the bottom provide the corresponding answers."
         )
 
-        # If cloze activity is selected, adjust the prompt
+    with st.spinner("Generating worksheet..."):
+        worksheet = chat_completion_request(
+            system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
+            user_msg=worksheet_prompt,
+            max_tokens=1000,
+            temperature=0.7
+        )
+
+        # ----- If cloze activity is selected, apply post-processing -----
         if cloze_activity:
-            worksheet_prompt = (
-                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
-                f"{learning_goal}\n\n"
-                f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words.\n\n"
-                f"Remove exactly {num_blanks} significant words from different parts of the passage—not just the first few sentences. "
-                f"Replace each removed word with a blank marked '_____(n)'. "
-                f"Ensure that there are exactly {num_blanks} blanks.\n\n"
-                f"After the passage, provide an answer key listing the missing words in random order (not the order they appeared in). "
-                f"Mix up the order of the answers so students cannot easily match blanks to words. "
-                f"If necessary, shuffle the answer key before listing.\n\n"
-                f"Then, generate {num_questions} short answer questions for students to answer based on the information in the passage."
+            if "1." in worksheet:
+                split_index = worksheet.find("1.")
+                passage = worksheet[:split_index].strip()
+                questions = worksheet[split_index:].strip()
+            else:
+                passage = worksheet.strip()
+                questions = ""
+
+            tokens = word_tokenize(passage)
+            tagged = pos_tag(tokens)
+
+            # Choose significant words (nouns + verbs only)
+            candidates = [word for word, pos in tagged if pos.startswith('NN') or pos.startswith('VB')]
+            candidates = list(set(candidates))
+
+            if len(candidates) < num_blanks:
+                num_blanks = len(candidates)
+
+            selected = random.sample(candidates, num_blanks)
+            answer_key = selected.copy()
+            random.shuffle(answer_key)
+
+            # Replace in passage
+            cloze_tokens = []
+            counter = 1
+            for word in tokens:
+                if word in selected:
+                    cloze_tokens.append(f"_____({counter})")
+                    selected.remove(word)
+                    counter += 1
+                else:
+                    cloze_tokens.append(word)
+
+            cloze_passage = ' '.join(cloze_tokens)
+            cloze_passage = cloze_passage.replace(" ,", ",").replace(" .", ".").replace(" ’", "’")
+
+            worksheet = (
+                f"Worksheet:\n\n{cloze_passage}\n\n"
+                f"Answer Key:\n\n" +
+                "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_key)]) +
+                f"\n\nShort Answer Questions:\n\n{questions}"
             )
 
-        # Generate with temperature for better randomness
-        with st.spinner("Generating worksheet..."):
-            worksheet = chat_completion_request(
-                system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
-                user_msg=worksheet_prompt,
-                max_tokens=1000,
-                temperature=0.7  # ✅ Set for creative variation like randomised answers
-            )
-            st.markdown(worksheet, unsafe_allow_html=True)
+        # --- Display output + your existing Word export ---
+        st.markdown(worksheet, unsafe_allow_html=True)
 
 
 
