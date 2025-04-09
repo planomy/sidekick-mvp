@@ -355,6 +355,7 @@ elif tool == "Worksheet Generator":
 
   # ---- Export Options for Worksheet ----
             st.subheader("Export Options")
+            st.write("Don't forget to delete the answers :)")
             
             # Clean the worksheet output to remove asterisks and hashes (if any)
             export_worksheet = re.sub(r'[\*\#]', '', worksheet)
