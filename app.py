@@ -10,8 +10,6 @@ import random
 
 st.set_page_config(page_title="Super Teacher", layout="wide")
 
-st.error("DEBUG: App started")
-
 
 import random
 import re
@@ -399,8 +397,6 @@ elif tool == "Worksheet Generator":
                     temperature=0.7
                 )
                 
-            # Debug: check the full GPT response
-            st.write("DEBUG: Full GPT response:", response)
             
     
             if "1." in response:
@@ -411,9 +407,6 @@ elif tool == "Worksheet Generator":
                 passage = response.strip()
                 questions = ""
 
-            # Debug: check the extracted passage and questions
-            st.write("DEBUG: Extracted Passage:", passage)
-            st.write("DEBUG: Extracted Questions:", questions)
         
             # Extract body only from the passage
             header_1 = "Information Passage:"
@@ -428,17 +421,11 @@ elif tool == "Worksheet Generator":
             cloze_body, answer_list = create_cloze(body_only, num_blanks=num_blanks)
             cloze_passage = f"{header_1}\n\n{cloze_body}".strip()
 
-            # Debug: check cloze passage after creation
-            st.write("DEBUG: Cloze Passage:", cloze_passage)
-        
         
            # Try to split out GPT answer section
             if "Answer Key:" in questions:
                 question_part, answer_part = questions.split("Answer Key:", 1)
 
-                # Debug: check before cleaning question_part and answer_part
-                st.write("DEBUG: Question Part BEFORE cleanup:", question_part)
-                st.write("DEBUG: Answer Part BEFORE cleanup:", answer_part)
                 
                 # Remove rogue headings from both sections
               
@@ -453,10 +440,6 @@ elif tool == "Worksheet Generator":
                     "",
                     answer_part
                 ).strip()
-
-                # Debug: check after cleaning question_part and answer_part
-                st.write("DEBUG: Question Part AFTER cleanup:", question_part)
-                st.write("DEBUG: Answer Part AFTER cleanup:", answer_part)
         
 
             
@@ -485,9 +468,6 @@ elif tool == "Worksheet Generator":
                 "", 
                 worksheet
             ).strip()
-
-                # Debug: check the final worksheet content
-            st.write("DEBUG: Final worksheet:", worksheet)
 
         
             display_output_block(worksheet)
@@ -538,9 +518,6 @@ elif tool == "Worksheet Generator":
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
       
-
-
-
 
 
 # ========== PECKISH ==========
