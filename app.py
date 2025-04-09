@@ -369,7 +369,7 @@ elif tool == "Worksheet Generator":
     # Toggle cloze activity
     cloze_activity = st.checkbox("Make the passage a cloze activity (fill-in-the-blank worksheet)")
     if cloze_activity:
-        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
+        num_blanks = st.slider("Number of words to remove", min_value=5, max_value=20, value=10, step=1)
 
     if st.button("Generate Worksheet"):
         if cloze_activity:
