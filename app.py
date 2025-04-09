@@ -7,19 +7,6 @@ from docx import Document
 from fpdf import FPDF
 
 import random
-import nltk
-nltk.data.path.append("nltk_data")  # Use local nltk_data folder
-
-from nltk import word_tokenize, pos_tag
-
-nltk.download("punkt", download_dir="nltk_data")
-nltk.download("averaged_perceptron_tagger", download_dir="nltk_data")
-
-
-try:
-    nltk.data.find("taggers/averaged_perceptron_tagger")
-except LookupError:
-    nltk.download("averaged_perceptron_tagger")
 
 
 
