@@ -53,7 +53,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator", "Email Assistant", "Video Assistant", "Feedback Assistant", "Self Care Tool", "Feeling Peckish", "Breaking News Headlines"]
+    ["Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator", "Email Assistant", "Video Assistant", "Feedback Assistant", "Self Care Tool", "Feeling Peckish"]
 )
 
 
@@ -552,31 +552,7 @@ elif tool == "Video Assistant":
                 temperature=0.7
             )
             display_output_block(video_content)
-
-
-elif tool == "Breaking News Headlines":
-    st.header("📰 Breaking World News Headlines")
-
-    news_prompt = (
-        "List the 5 most important breaking world news headlines today. "
-        "Give just the headline and a 1-sentence summary. Do not include links. "
-        "Use a clear and engaging style suitable for educators."
-    )
-
-    if st.button("Get Headlines"):
-        with st.spinner("Fetching the latest global news..."):
-            headlines = chat_completion_request(
-                system_msg="You are a news assistant for a teacher dashboard.",
-                user_msg=news_prompt,
-                max_tokens=400,
-                temperature=0.6
-            )
-        st.markdown(headlines)
-
-
     
-
-
 
  # Generate a unique Teacher Boost dynamically using ChatGPT (no pre-populated list)
 st.sidebar.markdown("<br><hr><br>", unsafe_allow_html=True)  # extra spacing and a divider
