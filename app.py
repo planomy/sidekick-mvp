@@ -9,8 +9,16 @@ from fpdf import FPDF
 import random
 import nltk
 from nltk import word_tokenize, pos_tag
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt")
+
+try:
+    nltk.data.find("taggers/averaged_perceptron_tagger")
+except LookupError:
+    nltk.download("averaged_perceptron_tagger")
+
 
 
 # This must be the very first Streamlit call!
