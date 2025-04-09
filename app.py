@@ -371,7 +371,7 @@ elif tool == "Worksheet Generator":
     if cloze_activity:
         num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
 
-    if st.button("Generate Worksheet"):
+if st.button("Generate Worksheet"):
     if cloze_activity:
         # Step 1: Generate base passage and questions from GPT
         worksheet_prompt = (
