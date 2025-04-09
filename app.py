@@ -459,7 +459,7 @@ elif tool == "Worksheet Generator":
 
         # ---- Export Options ----
         st.subheader("Export Options")
-        st.write("Don't forget to delete the answers :)")
+        st.write("Do you think your students will notice the answers at the bottom? :)")
         export_worksheet = re.sub(r'[\*\#]', '', worksheet)
 
 
