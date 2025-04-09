@@ -575,7 +575,7 @@ if "teacher_boost" not in st.session_state:
             temperature=0.9
         )
 
-st.sidebar.markdown(f"**Teacher Boost:** _{st.session_state['teacher_boost']}_")
+st.sidebar.markdown(f"_{st.session_state['teacher_boost']}_")
 
 
 
