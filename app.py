@@ -565,10 +565,10 @@ elif tool == "Test Creator":
 
 
     
-    num_tf = st.number_input("Number of True/False Questions", min_value=0, max_value=20, value=3, step=1)
-    num_mcq = st.number_input("Number of Multiple Choice Questions", min_value=0, max_value=20, value=3, step=1)
-    num_sa = st.number_input("Number of Short Answer Questions", min_value=0, max_value=5, value=4, step=1)
-    num_er = st.number_input("Number of Extended Response Questions", min_value=0, max_value=2, value=0, step=1)
+    num_tf = st.number_input("Number of True/False Questions (Max 20)", min_value=0, max_value=20, value=3, step=1)
+    num_mcq = st.number_input("Number of Multiple Choice Questions (Max 20)", min_value=0, max_value=20, value=3, step=1)
+    num_sa = st.number_input("Number of Short Response Questions (Max 5)", min_value=0, max_value=5, value=4, step=1)
+    num_er = st.number_input("Number of Extended Response Questions (Max 2)", min_value=0, max_value=2, value=0, step=1)
 
     
     # Total for prompt
