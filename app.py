@@ -138,12 +138,13 @@ if tool == "Lesson Builder":
             )
             formatted_plan = lesson_plan.replace("* ", "• ")
             formatted_plan = re.sub(r"^#+\s*(.+)$", r"<br><b>\1</b>", formatted_plan, flags=re.MULTILINE)
+            html_plan = formatted_plan.replace("\n", "<br>")
             st.markdown(
                 f"""
                 <div style='background-color: #f9f9f9; padding: 20px; border-radius: 8px;
                             font-family: sans-serif; font-size: 16px; color: #111;
                             line-height: 1.6; white-space: pre-wrap;'>
-                    {formatted_plan.replace("\n", "<br>")}
+                    {html_plan}
                 </div>
                 """,
                 unsafe_allow_html=True
