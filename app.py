@@ -339,8 +339,7 @@ elif tool == "Unit Planner":
         )
 
 
-
-  # ========== TOOL 6: WORKSHEET GENERATOR ==========
+# ========== TOOL 6: WORKSHEET GENERATOR ==========
 elif tool == "Worksheet Generator":
     st.header("📝 Worksheet Generator")
 
@@ -350,21 +349,25 @@ elif tool == "Worksheet Generator":
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
     passage_length = st.slider("Desired word count for the information passage (50-200)", min_value=50, max_value=200, value=100, step=10)
 
-    # New option: Toggle cloze activity
+    # Toggle cloze activity
     cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
-
-    # New: Slider for number of blanks if cloze is selected
     if cloze_activity:
-        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
+        num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=5)
 
     if st.button("Generate Worksheet"):
+        # Base prompt
         if cloze_activity:
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
-                f"Write an information passage of about {passage_length} words. "
-                f"Then generate {num_questions} short answer questions for students based on the passage. "
-                f"Do not remove any words or create blanks. Do not list answers."
+                f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words.\n\n"
+                f"Remove exactly {num_blanks} significant words from different parts of the passage—not just the first few sentences. "
+                f"Replace each removed word with a blank marked '_____(n)'. "
+                f"Ensure that there are exactly {num_blanks} blanks.\n\n"
+                f"After the passage, provide an answer key listing the missing words in random order (not the order they appeared in). "
+                f"Mix up the order of the answers so students cannot easily match blanks to words. "
+                f"If necessary, shuffle the answer key before listing.\n\n"
+                f"Then, generate {num_questions} short answer questions for students to answer based on the information in the passage."
             )
         else:
             worksheet_prompt = (
@@ -380,101 +383,32 @@ elif tool == "Worksheet Generator":
                 system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
                 user_msg=worksheet_prompt,
                 max_tokens=1000,
-                temperature=0.7
+                temperature=0.7  # Help randomise the answer key a bit more
             )
-
-            if cloze_activity:
-                if "1." in worksheet:
-                    split_index = worksheet.find("1.")
-                    passage = worksheet[:split_index].strip()
-                    questions = worksheet[split_index:].strip()
-                else:
-                    passage = worksheet.strip()
-                    questions = ""
-
-                tokens = word_tokenize(passage)
-                tagged = pos_tag(tokens)
-
-                # Choose significant words (nouns + verbs only)
-                candidates = [word for word, pos in tagged if pos.startswith('NN') or pos.startswith('VB')]
-                candidates = list(set(candidates))
-
-                if len(candidates) < num_blanks:
-                    num_blanks = len(candidates)
-
-                # Choose target words (lowercased for matching)
-                tokens_lower = [word.lower() for word in tokens]
-                selected_lower = random.sample([w.lower() for w in candidates], num_blanks)
-
-                # Build map of word → blank number
-                blank_map = {}
-                for i, word in enumerate(tokens_lower):
-                    if word in selected_lower and word not in blank_map:
-                        blank_map[word] = len(blank_map) + 1
-
-                # Replace tokens with bold blanks
-                cloze_tokens = []
-                for word in tokens:
-                    word_lower = word.lower()
-                    if word_lower in blank_map:
-                        blank_number = blank_map[word_lower]
-                        cloze_tokens.append(f"**_____({blank_number})**")
-                    else:
-                        cloze_tokens.append(word)
-
-                # Rebuild passage and tidy punctuation spacing
-                cloze_passage = ' '.join(cloze_tokens)
-                cloze_passage = cloze_passage.replace(" ,", ",").replace(" .", ".").replace(" ’", "’")
-
-                # Randomise and build answer key
-                answer_key = list(blank_map.keys())
-                random.shuffle(answer_key)
-                answer_key_display = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_key)])
-
-                # Final formatted worksheet text
-                worksheet = (
-                    f"**Cloze Worksheet:**\n\n"
-                    f"{cloze_passage}\n\n"
-                    f"**Answer Key (random order):**\n\n{answer_key_display}\n\n"
-                    f"**Short Answer Questions:**\n\n{questions}"
-                )
-
-            # Show output
             st.markdown(worksheet, unsafe_allow_html=True)
 
+        # ---- Export Options ----
+        st.subheader("Export Options")
+        st.write("Don't forget to delete the answers :)")
+        export_worksheet = re.sub(r'[\*\#]', '', worksheet)
 
-
-
-
-            
-            
-            # ---- Export Options for Worksheet ----
-            st.subheader("Export Options")
-            st.write("Don't forget to delete the answers :)")
-            
-            # Clean the worksheet output for export
-            export_worksheet = re.sub(r'[\*\#]', '', worksheet)
-            
-            
-            # --- WORD Export ---
-            word_buffer = BytesIO()
-            doc = Document()
-            doc.add_paragraph(export_worksheet)
-            try:
-                protection = doc.settings.element.xpath('//w:documentProtection')
-                if protection:
-                    protection[0].getparent().remove(protection[0])
-            except Exception:
-                pass
-            doc.save(word_buffer)
-            word_buffer.seek(0)
-            st.download_button(
-                label="📝 Download Word",
-                data=word_buffer,
-                file_name="worksheet.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            )
-
+        word_buffer = BytesIO()
+        doc = Document()
+        doc.add_paragraph(export_worksheet)
+        try:
+            protection = doc.settings.element.xpath('//w:documentProtection')
+            if protection:
+                protection[0].getparent().remove(protection[0])
+        except Exception:
+            pass
+        doc.save(word_buffer)
+        word_buffer.seek(0)
+        st.download_button(
+            label="📝 Download Word",
+            data=word_buffer,
+            file_name="worksheet.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
 
 
 
