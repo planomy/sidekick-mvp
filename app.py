@@ -1,3 +1,38 @@
+st.markdown("""
+    <style>
+        /* Sidebar background */
+        [data-testid="stSidebar"] {
+            background-color: #cfcfcf;
+        }
+
+        /* Main background */
+        .main {
+            background-color: #f4f4f4;
+            color: #000000;
+        }
+
+        /* Button styling */
+        .stButton > button {
+            background-color: #5f9ea0;
+            color: white;
+            border-radius: 5px;
+        }
+
+        /* Headings */
+        h1, h2, h3 {
+            color: #333333;
+        }
+
+        /* Markdown text */
+        .markdown-text-container {
+            font-family: 'Helvetica Neue', sans-serif;
+            font-size: 16px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+
 import streamlit as st
 import openai
 import re
