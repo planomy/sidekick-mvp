@@ -372,7 +372,7 @@ elif tool == "Worksheet Generator":
 
     if st.button("Generate Worksheet"):
         # Base prompt
-          if cloze_activity:
+        if cloze_activity:
         # Step 1: Generate base passage and questions from GPT
         worksheet_prompt = (
             f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
