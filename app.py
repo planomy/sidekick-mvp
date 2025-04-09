@@ -587,7 +587,10 @@ elif tool == "Test Creator":
             test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
 
         test_prompt += (
-            "Group questions by type. True False first. Followed by Multiple Choice. Followed by short answer. Instruct students that short answer responses require 3-5 sentences."
+            "Group questions by type. 3 True False questions first."
+            "Followed by 3 Multiple Choice questions." 
+            "Followed by 4 short answer questions."
+            "Add 'Short Answer responses require 3-5 sentences.'"
             "Ensure the test is suitable for printing or copying into a Word doc. "
             "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
             "Add 'Student Name:___________________' at the top. Add 'End of Test' at the bottom."
