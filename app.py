@@ -53,7 +53,7 @@ st.sidebar.title("PLANNERME")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
-    ["Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator", "Email Assistant", "Video Assistant", "Feedback Assistant", "Self Care Tool", "Feeling Peckish"]
+    ["Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator", "Test Creator", "Email Assistant", "Video Assistant", "Feedback Assistant", "Self Care Tool", "Feeling Peckish"]
 )
 
 
@@ -552,6 +552,80 @@ elif tool == "Video Assistant":
                 temperature=0.7
             )
             display_output_block(video_content)
+
+
+# ========== TOOL 11: TEST CREATOR ==========
+elif tool == "Test Creator":
+    st.header("🧪 Test Creator")
+
+    # Input fields
+    year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
+    subject = st.selectbox("Subject", ["English", "Maths", "Science", "HASS", "History", "Geography", "Civics", "General Knowledge", "Custom"])
+    topic = st.text_input("Topic", placeholder="e.g. Fractions, Ancient Rome, Persuasive Texts")
+    num_questions = st.slider("Number of questions", min_value=5, max_value=25, value=10, step=1)
+
+    question_types = st.multiselect(
+        "Question Types to Include",
+        ["Multiple Choice", "Short Answer", "True/False", "Cloze", "Matching"],
+        default=["Multiple Choice", "Short Answer"]
+    )
+
+    mix_difficulty = st.checkbox("Mix difficulty levels?", value=True)
+    include_instructions = st.checkbox("Include instructions at the top?", value=True)
+    include_answers = st.checkbox("Generate an answer sheet?", value=True)
+
+    if st.button("Generate Test"):
+        test_prompt = (
+            f"Create a {num_questions}-question test for Year {year} students on the topic '{topic}' in the subject '{subject}'.\n\n"
+            f"Question Types to include: {', '.join(question_types)}.\n"
+        )
+        if mix_difficulty:
+            test_prompt += "Mix easy, medium, and hard questions.\n"
+        if include_instructions:
+            test_prompt += "Include clear test instructions at the top.\n"
+        if include_answers:
+            test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
+
+        test_prompt += (
+            "Ensure the test is suitable for printing or copying into a Word doc. "
+            "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
+        )
+
+        with st.spinner("Generating test..."):
+            test_output = chat_completion_request(
+                system_msg="You are an expert teacher creating clear, printable classroom tests.",
+                user_msg=test_prompt,
+                max_tokens=1200,
+                temperature=0.7
+            )
+
+            display_output_block(test_output)
+
+        # ---- Export Options ----
+        st.subheader("Export Options")
+        st.write("Ready to share or print your test? Download it below:")
+
+        export_test = re.sub(r'[\*\#]', '', test_output)
+
+        word_buffer = BytesIO()
+        doc = Document()
+        doc.add_paragraph(export_test)
+        try:
+            protection = doc.settings.element.xpath('//w:documentProtection')
+            if protection:
+                protection[0].getparent().remove(protection[0])
+        except Exception:
+            pass
+        doc.save(word_buffer)
+        word_buffer.seek(0)
+        st.download_button(
+            label="📥 Download Word",
+            data=word_buffer,
+            file_name="test.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+
+
     
 
  # Generate a unique Teacher Boost dynamically using ChatGPT (no pre-populated list)
