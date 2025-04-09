@@ -326,17 +326,17 @@ elif tool == "Unit Planner":
     # ========== TOOL 6: WORKSHEET GENERATOR ==========
 elif tool == "Worksheet Generator":
     st.header("📝 Worksheet Generator")
-    # New: Add Year Level input for the worksheet
+    # Input fields
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
-    
-    # Teacher can type or paste a learning goal or lesson plan excerpt
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
-    
-    # Option for number of questions and passage length
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
     passage_length = st.slider("Desired word count for the information passage (0-200)", min_value=0, max_value=200, value=100, step=10)
     
+    # New option: Toggle cloze activity
+    cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
+
     if st.button("Generate Worksheet"):
+        # Base prompt for standard worksheet
         worksheet_prompt = (
             f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
             f"{learning_goal}\n\n"
@@ -345,6 +345,17 @@ elif tool == "Worksheet Generator":
             "List all the questions first, then at the bottom provide the corresponding answers for each question. "
             "Include a mix of multiple choice and short answer questions."
         )
+        
+        # If cloze activity option is selected, adjust the prompt accordingly
+        if cloze_activity:
+            worksheet_prompt = (
+                f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
+                f"{learning_goal}\n\n"
+                f"Generate a cloze (fill-in-the-blank) worksheet containing {num_questions} exercises for students. "
+                f"In the accompanying passage (which should be approximately {passage_length} words), remove key words and replace them with blanks. "
+                "List all the blanks with the corresponding correct words at the end as an answer key."
+            )
+        
         with st.spinner("Generating worksheet..."):
             worksheet = chat_completion_request(
                 system_msg="You are a creative teacher assistant who specializes in generating educational worksheets.",
@@ -352,20 +363,19 @@ elif tool == "Worksheet Generator":
                 max_tokens=1000
             )
             st.markdown(worksheet, unsafe_allow_html=True)
-
-  # ---- Export Options for Worksheet ----
+            
+            # ---- Export Options for Worksheet ----
             st.subheader("Export Options")
             st.write("Don't forget to delete the answers :)")
             
-            # Clean the worksheet output to remove asterisks and hashes (if any)
+            # Clean the worksheet output for export
             export_worksheet = re.sub(r'[\*\#]', '', worksheet)
             
-    
+            
             # --- WORD Export ---
             word_buffer = BytesIO()
             doc = Document()
             doc.add_paragraph(export_worksheet)
-            # Remove document protection if it exists to avoid a locked/read-only file
             try:
                 protection = doc.settings.element.xpath('//w:documentProtection')
                 if protection:
@@ -380,6 +390,7 @@ elif tool == "Worksheet Generator":
                 file_name="worksheet.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )
+
 
 
 
