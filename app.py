@@ -587,6 +587,7 @@ elif tool == "Test Creator":
             test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
 
         test_prompt += (
+            "Group questions by type. True False first. Followed by Multiple Choice. Followed by short answer."
             "Ensure the test is suitable for printing or copying into a Word doc. "
             "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
         )
@@ -603,7 +604,7 @@ elif tool == "Test Creator":
 
         # ---- Export Options ----
         st.subheader("Export Options")
-        st.write("Do you think students studied for this? :)")
+        st.write("How many students studied? ;)")
 
         export_test = re.sub(r'[\*\#]', '', test_output)
 
