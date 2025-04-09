@@ -554,19 +554,19 @@ elif tool == "Video Assistant":
             display_output_block(video_content)
 
 
-# ========== TOOL 11: TEST CREATOR ==========
+# ========== TOOL 7: TEST CREATOR ==========
 elif tool == "Test Creator":
     st.header("🧪 Test Creator")
 
     # Input fields
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
-    subject = st.selectbox("Subject", ["English", "Maths", "Science", "HASS", "History", "Geography", "Civics", "General Knowledge", "Custom"])
+    subject = st.text_input("Subject", placeholder="e.g. English, Science, HASS")
     topic = st.text_input("Topic", placeholder="e.g. Fractions, Ancient Rome, Persuasive Texts")
     num_questions = st.slider("Number of questions", min_value=5, max_value=25, value=10, step=1)
 
     question_types = st.multiselect(
         "Question Types to Include",
-        ["Multiple Choice", "Short Answer", "True/False", "Cloze", "Matching"],
+        ["Multiple Choice", "Short Answer", "True/False"],
         default=["Multiple Choice", "Short Answer"]
     )
 
@@ -624,6 +624,8 @@ elif tool == "Test Creator":
             file_name="test.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
+
+
 
 
     
