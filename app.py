@@ -420,21 +420,20 @@ elif tool == "Worksheet Generator":
             cloze_passage = f"{header_1}\n\n{cloze_body}".strip()
 
         
-            # Try to split out GPT answer section
+           # Try to split out GPT answer section
             if "Answer Key:" in questions:
                 question_part, answer_part = questions.split("Answer Key:", 1)
             
-                # Strip rogue headings from both parts
-                question_part = re.sub(r"(?i)^short answer questions:\s*\n*", "", question_part.strip(), flags=re.MULTILINE)
-                answer_part = re.sub(r"(?i)^short answer questions:\s*\n*", "", answer_part.strip(), flags=re.MULTILINE)
+                # Remove rogue headings from both sections
+                question_part = re.sub(r"(?i)^.*short answer questions:.*$", "", question_part, flags=re.MULTILINE).strip()
+                answer_part = re.sub(r"(?i)^.*short answer questions:.*$", "", answer_part, flags=re.MULTILINE).strip()
             
-                questions_only = question_part.strip()
-                answers_only = answer_part.strip()
-
-                
+                questions_only = question_part
+                answers_only = answer_part
             else:
                 questions_only = questions
                 answers_only = ""
+
         
             # Build cloze answer list
             cloze_answers = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)])
