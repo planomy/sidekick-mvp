@@ -433,15 +433,18 @@ elif tool == "Worksheet Generator":
             questions_only = questions
             answers_only = ""
         
-        # Final worksheet with answers shown at the bottom
+        # Final worksheet with cloze passage, cloze answers, and questions
+        cloze_answers = "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)])
+        
         worksheet = (
             f"**Cloze Passage:**\n\n{cloze_passage}\n\n"
-            f"**Answer Key (Blanks):**\n\n" + "\n".join([f"{i+1}. {word}" for i, word in enumerate(answer_list)]) + "\n\n"
+            f"**Answer Key (Blanks):**\n\n{cloze_answers}\n\n"
             f"**Short Answer Questions:**\n\n{questions_only}"
         )
         
         if answers_only:
             worksheet += f"\n\n**Short Answer Answers:**\n\n{answers_only}"
+
         
                     
             st.markdown(worksheet, unsafe_allow_html=True)
