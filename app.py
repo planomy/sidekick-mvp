@@ -425,8 +425,18 @@ elif tool == "Worksheet Generator":
                 question_part, answer_part = questions.split("Answer Key:", 1)
             
                 # Remove rogue headings from both sections
-                question_part = re.sub(r"(?i)^.*short answer questions:.*$", "", question_part, flags=re.MULTILINE).strip()
-                answer_part = re.sub(r"(?i)^.*short answer questions:.*$", "", answer_part, flags=re.MULTILINE).strip()
+                question_part = re.sub(
+                    r"(?im)^\s*short\s*answer\s*questions\s*[:\-]*\s*\n?", 
+                    "", 
+                    question_part
+                ).strip()
+                
+                answer_part = re.sub(
+                    r"(?im)^\s*short\s*answer\s*questions\s*[:\-]*\s*\n?", 
+                    "", 
+                    answer_part
+                ).strip()
+
             
                 questions_only = question_part
                 answers_only = answer_part
