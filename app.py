@@ -457,10 +457,18 @@ elif tool == "Worksheet Generator":
                 st.markdown(worksheet, unsafe_allow_html=True)
 
 
+        # Ask teacher whether to include answers in the Word export
+        include_answers_in_word = st.checkbox("Include answers in Word export?", value=False)
+
         # ---- Export Options ----
         st.subheader("Export Options")
         st.write("Don't forget to delete the answers :)")
-        export_worksheet = re.sub(r'[\*\#]', '', worksheet)
+        if not include_answers_in_word:
+            # Remove "Answer Key" and anything below it
+            export_worksheet = re.sub(r'\*\*Answer Key.*', '', worksheet, flags=re.DOTALL)
+            export_worksheet = re.sub(r'\*\*Short Answer Answers.*', '', export_worksheet, flags=re.DOTALL)
+        else:
+            export_worksheet = re.sub(r'[\*\#]', '', worksheet)
 
         word_buffer = BytesIO()
         doc = Document()
