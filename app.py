@@ -77,16 +77,18 @@ import re
 
 def display_output_block(text):
     cleaned_text = text.strip().replace("*", "").replace("#", "")
+    html_text = cleaned_text.replace("\n", "<br>")  # Move this out of the f-string
     st.markdown(
         f"""
         <div style='background-color: white; color: black; padding: 20px; 
                     border-radius: 8px; font-family: sans-serif; 
                     font-size: 16px; line-height: 1.6; white-space: pre-wrap; margin-left: 0;'>
-            {cleaned_text.replace('\n', '<br>')}
+            {html_text}
         </div>
         """,
         unsafe_allow_html=True
     )
+
 
 
 
