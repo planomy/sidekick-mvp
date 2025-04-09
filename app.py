@@ -455,27 +455,31 @@ elif tool == "Worksheet Generator":
                     temperature=0.7
                 )
                 st.markdown(worksheet, unsafe_allow_html=True)
-
+                st.session_state["worksheet_content"] = worksheet
 
                
-        # ---- Export Options ----
+        
+ # ---- Export Options ----
         st.subheader("Export Options")
         st.write("Don't forget to delete the answers :)")
         
-        # Use the stored worksheet content if available; otherwise, prompt to generate a worksheet
-        if "worksheet_content" in st.session_state:
-            # Checkbox with a unique key so its state persists across re-runs.
-            include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True, key="export_include_answers")
+        # New checkbox to decide if answers are included in the exported Word doc.
+        # (The default is checked so answers are included in the Word doc by default)
+        include_answers_export = st.checkbox("Include answers in exported Word doc?", value=True, key="export_include_answers")
         
-            # Use the stored worksheet content
+        # Check if the generated worksheet is stored in session_state
+        if "worksheet_content" in st.session_state and st.session_state["worksheet_content"]:
+            # Remove asterisks and hashtags from the worksheet content
             export_worksheet = re.sub(r'[\*\#]', '', st.session_state["worksheet_content"])
-        
+            
             if not include_answers_export:
-                # Since the asterisks are removed, we target "Short Answer Answers:" as the marker.
+                # Remove the answers section from the export.
+                # Assuming your answers section is marked by "Short Answer Answers:" (without asterisks after re.sub)
                 parts = re.split(r'\n\s*Short Answer Answers:\n', export_worksheet)
                 if parts:
-                    export_worksheet = parts[0]  # Keep only the part before the answers section
-        
+                    export_worksheet = parts[0]
+            
+            # Create the Word document export
             word_buffer = BytesIO()
             doc = Document()
             doc.add_paragraph(export_worksheet)
@@ -487,6 +491,7 @@ elif tool == "Worksheet Generator":
                 pass
             doc.save(word_buffer)
             word_buffer.seek(0)
+            
             st.download_button(
                 label="📝 Download Word",
                 data=word_buffer,
@@ -495,6 +500,7 @@ elif tool == "Worksheet Generator":
             )
         else:
             st.info("Please generate a worksheet first.")
+       
       
 
 
