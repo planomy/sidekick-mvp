@@ -49,7 +49,7 @@ if not client.api_key:
     st.stop()
 
 # --- SIDEBAR: TOOL SELECTION ---
-st.sidebar.title("PLANNERME")
+st.sidebar.title("SIDEKICK")
 st.sidebar.title("Where you're the ✨ Star ✨")
 tool = st.sidebar.radio(
     "Choose a tool:",
