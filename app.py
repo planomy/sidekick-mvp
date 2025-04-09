@@ -424,7 +424,8 @@ elif tool == "Worksheet Generator":
             if "Answer Key:" in questions:
                 question_part, answer_part = questions.split("Answer Key:", 1)
                 questions_only = question_part.strip()
-                questions_only = re.sub(r"(?i)^short answer questions:\s*", "", questions_only).strip()
+                questions_only = re.sub(r"(?i)short answer questions:\s*", "", questions_only).strip()
+
                 answers_only = answer_part.strip()
             else:
                 questions_only = questions
