@@ -587,14 +587,18 @@ elif tool == "Test Creator":
             test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
 
         test_prompt += (
-            "Group questions by type. 3 True False questions first."
-            "Followed by 3 Multiple Choice questions." 
-            "Followed by 4 short answer questions."
-            "Add 'Short Answer responses require 3-5 sentences.'"
-            "Ensure the test is suitable for printing or copying into a Word doc. "
-            "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
-            "Add 'Student Name:___________________' at the top. Add 'End of Test' at the bottom."
+    f"Create a test with {num_questions} total questions, grouped by type:\n"
+    f"- 30% True or False\n"
+    f"- 30% Multiple Choice\n"
+    f"- 40% Short Answer\n\n"
+    "Start with all the True/False questions, then the Multiple Choice, then Short Answer at the end.\n"
+    "Include this line at the top: 'Student Name:___________________'\n"
+    "Include this line before the short answer section: 'Short Answer responses require 3-5 sentences.'\n"
+    "End the test with the phrase: 'End of Test'\n"
+    "Ensure the test is suitable for printing or copying into a Word doc. "
+    "Avoid markdown formatting like asterisks or hashes. Use clear spacing and numbering."
         )
+
 
         with st.spinner("Generating test..."):
             test_output = chat_completion_request(
