@@ -358,6 +358,7 @@ elif tool == "Worksheet Generator":
                 f"Randomly remove exactly {num_blanks} significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
                 f"Double-check that the total number of blanks is exactly {num_blanks}, no more or less."
                 f"After the paragraph, provide an answer key listing the missing words in random order. Mix up the order of the answer words so students can't easily guess where each blank goes."
+                f"Do not list them in the order they were removed from the passage."
                 f"After the answer key, generate {num_questions} questions for students to answer based on the information in the passage."
             )
             
