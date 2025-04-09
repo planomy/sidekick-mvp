@@ -1,3 +1,13 @@
+import streamlit as st
+import openai
+import re
+import textwrap
+from io import BytesIO
+from docx import Document
+from fpdf import FPDF
+
+import random
+
 st.markdown("""
     <style>
         /* Sidebar background */
@@ -30,19 +40,6 @@ st.markdown("""
         }
     </style>
     """, unsafe_allow_html=True)
-
-
-
-import streamlit as st
-import openai
-import re
-import textwrap
-from io import BytesIO
-from docx import Document
-from fpdf import FPDF
-
-import random
-
 
 import random
 import re
