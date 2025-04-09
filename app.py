@@ -351,11 +351,10 @@ elif tool == "Worksheet Generator":
         worksheet_prompt = (
 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
 f"{learning_goal}\n\n"
-f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about 100 words. "
-"Randomly remove exactly {num_questions} significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
-"Then, at the end of the worksheet, provide an answer key listing the correct words. "
-"Scramble the order of the answers in the key so they do not correspond sequentially with the blanks. "
-"Do not include any additional commentary—only the passage and the scrambled answer key."
+f"Generate a cohesive cloze (fill-in-the-blank) worksheet with a passage of about {passage_length} words. "
+"Randomly remove a good proportion of significant words from different parts of the passage—make sure the blanks are spread throughout the entire passage, not just in the first few sentences—and replace each removed word with a blank marked as '_____(n)'. "
+"Then, at the end of the worksheet, provide an answer key listing the correct words though in random order. "
+"Do not include any additional commentary — only the passage and the scrambled answer key."
 )
 
         
