@@ -367,7 +367,7 @@ elif tool == "Worksheet Generator":
     passage_length = st.slider("Desired word count for the information passage (50-200)", min_value=50, max_value=200, value=100, step=10)
 
     # Toggle cloze activity
-    cloze_activity = st.checkbox("Make this a cloze activity (fill-in-the-blank worksheet)")
+    cloze_activity = st.checkbox("Make the passage a cloze activity (fill-in-the-blank worksheet)")
     if cloze_activity:
         num_blanks = st.slider("Number of blanks to remove", min_value=5, max_value=20, value=10, step=1)
 
