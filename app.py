@@ -399,30 +399,30 @@ elif tool == "Worksheet Generator":
                 questions = ""
 
             # Locally blank out significant words from body only
-safe_header_1 = "Information Passage:"
-safe_header_2 = "Short Answer Questions:"
-
-# Find and extract only the body (to protect headings)
-body_start = passage.find(safe_header_1)
-body_end = passage.find(safe_header_2)
-
-if body_start != -1:
-    body_start += len(safe_header_1)
-else:
-    body_start = 0
-
-if body_end == -1:
-    body_end = len(passage)
-
-header_1 = safe_header_1 if safe_header_1 in passage else ""
-header_2 = safe_header_2 if safe_header_2 in passage else ""
-
-body_only = passage[body_start:body_end].strip()
-
-cloze_body, answer_list = create_cloze(body_only, num_blanks=num_blanks)
-
-# Rebuild final passage
-cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
+            safe_header_1 = "Information Passage:"
+            safe_header_2 = "Short Answer Questions:"
+            
+            # Find and extract only the body (to protect headings)
+            body_start = passage.find(safe_header_1)
+            body_end = passage.find(safe_header_2)
+            
+            if body_start != -1:
+                body_start += len(safe_header_1)
+            else:
+                body_start = 0
+            
+            if body_end == -1:
+                body_end = len(passage)
+            
+            header_1 = safe_header_1 if safe_header_1 in passage else ""
+            header_2 = safe_header_2 if safe_header_2 in passage else ""
+            
+            body_only = passage[body_start:body_end].strip()
+            
+            cloze_body, answer_list = create_cloze(body_only, num_blanks=num_blanks)
+            
+            # Rebuild final passage
+            cloze_passage = f"{header_1}\n\n{cloze_body}\n\n{header_2}".strip()
 
 
 
