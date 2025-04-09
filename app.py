@@ -8,7 +8,7 @@ from fpdf import FPDF
 
 import random
 
-st.set_page_config(page_title="Plannerme Teacher Super Aid", layout="wide")
+st.set_page_config(page_title="Super Teacher", layout="wide")
 
 
 
