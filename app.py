@@ -565,9 +565,9 @@ elif tool == "Test Creator":
     num_questions = st.slider("Number of questions", min_value=5, max_value=25, value=10, step=1)
 
     question_types = st.multiselect(
-        "Question Types to Include",
+        "Question Types to Include - Remove what you don't want",
         ["Multiple Choice", "Short Answer", "True/False"],
-        default=["Multiple Choice", "Short Answer"]
+        default=["Multiple Choice", "Short Answer", "True/False"]
     )
 
     mix_difficulty = st.checkbox("Mix difficulty levels?", value=True)
@@ -603,7 +603,7 @@ elif tool == "Test Creator":
 
         # ---- Export Options ----
         st.subheader("Export Options")
-        st.write("Ready to share or print your test? Download it below:")
+        st.write("Do you think students studied for this? :)")
 
         export_test = re.sub(r'[\*\#]', '', test_output)
 
