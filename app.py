@@ -14,6 +14,11 @@ st.set_page_config(page_title="Super Teacher", layout="wide")
 import random
 import re
 
+  # New: Download as PowerPoint Slides (Multiple Slides Version)
+        from pptx import Presentation
+        from pptx.util import Inches, Pt
+
+
 def create_cloze(passage: str, num_blanks: int = 5):
     stopwords = {
     'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're",
@@ -212,10 +217,6 @@ if tool == "Lesson Builder":
         # After displaying the lesson plan:
         st.subheader("Export Options")
         
-        # New: Download as PowerPoint Slides (Multiple Slides Version)
-        from pptx import Presentation
-        from pptx.util import Inches, Pt
-
         # Clean the lesson_plan to remove asterisks (*) and hashes (#)
         export_plan = re.sub(r'[\*\#]', '', lesson_plan)
         
