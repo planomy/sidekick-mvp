@@ -619,6 +619,7 @@ def eald_worksheet():
             "- Write a 120–150 word paragraph about the topic.\n"
             "- Make sure the vocabulary suits the grade and english level inputed.\n"
             "- You must remove 6 key words from the passage to create blanks like this '____________'"
+            "- Check to make sure you have removed 6 key words and replaced them with lines like this '____________'"
             "- List the removed words (in random order) below the passage.\n"
             "- Do not include these instructions or labels; only output the completed worksheet text."
             "- After the passage, write 8 open-ended comprehension questions.\n"
