@@ -630,7 +630,7 @@ def eald_worksheet():
             "- Underneath, provide the correct meaning with a translation into {language}.\n\n"
             "4. Mini Wordfind:\n"
             "- Create a 6x6 or 8x8 letter grid (a matrix of letters).\n"
-            "- Hide 6–8 of the vocabulary words in the grid.\n"
+            "- Hide 6–8 of the vocabulary words in the grid, going either up, down, or left.\n"
             "- Include an instruction: 'Find these words: [list].'\n\n"
             "5. General Knowledge Questions:\n"
             "- Write 5 simple, topic-related general knowledge questions.\n"
