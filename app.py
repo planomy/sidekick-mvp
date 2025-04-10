@@ -131,7 +131,7 @@ if tool == "Lesson Builder":
     lesson_style = st.selectbox("Lesson Style", ["Quiet/Reflective", "Discussion-Based", "Hands on", "Creative"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
     differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
-    generate_materials = st.checkbox("Generate suggested resources (e.g. handouts, worksheets)")
+    generate_resources = st.checkbox("Generate suggested resources (e.g. handouts, worksheets)")
 
 
     resources = []
@@ -149,7 +149,7 @@ if tool == "Lesson Builder":
             prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
         if assessment != "No Assessment":
             prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
-        if generate_materials:
+        if generate_resources:
             prompt_parts.append("If you mention any resources (like handouts, worksheets, activities), include the full text or link to each.")
         if include_curriculum:
             prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
