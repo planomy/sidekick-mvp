@@ -542,6 +542,30 @@ def test_creator():
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
 
+def magic_tool():
+    st.header("✨ The Magic Tool")
+    grade = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
+    subject = st.text_input("Subject (e.g. English, Science)", placeholder="Enter subject here")
+    if st.button("Generate Magic Ideas"):
+        # Build the prompt for generating the four idea lists
+        magic_prompt = (
+            f"For a Grade {grade} {subject} class, generate four lists:\n"
+            "1. 10 Differentiation/Extension Ideas – scaffolded by ability, task, or outcome\n"
+            "2. 10 Creative Lesson Starters – including simulations, roleplays, odd scenarios, and debates\n"
+            "3. 10 Icebreakers – tailored by grade level and subject\n"
+            "4. 10 Socratic Starters – deep-question prompts to stretch thinking\n"
+            "Please format the response with clear headings and bullet points for each list."
+        )
+        with st.spinner("Boil, boil, toil and trouble..."):
+            magic_output = chat_completion_request(
+                system_msg="You are a creative, resourceful teacher assistant with a knack for brainstorming innovative ideas.",
+                user_msg=magic_prompt,
+                max_tokens=1000,
+                temperature=0.7
+            )
+        display_output_block(magic_output)
+
+
 # ----------------------- MAIN APPLICATION -----------------------
 def main():
     # Initialize OpenAI API key
@@ -558,7 +582,7 @@ def main():
         [
             "Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator",
             "Test Creator", "Email Assistant", "Video Assistant", "Feedback Assistant",
-            "Self Care Tool", "Feeling Peckish"
+            "Self Care Tool", "Feeling Peckish", "The Magic Tool"
         ]
     )
     # Generate a teacher boost (if not already done)
@@ -601,6 +625,8 @@ def main():
         video_assistant()
     elif tool == "Test Creator":
         test_creator()
+    elif tool == "The Magic Tool":
+        magic_tool()
     else:
         st.info("Select a tool from the sidebar to get started.")
 
