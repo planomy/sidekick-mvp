@@ -133,7 +133,8 @@ if tool == "Lesson Builder":
     differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
     generate_materials = st.checkbox("Generate suggested resources (e.g. handouts, worksheets)")
 
-    
+
+    resources = []
     # After your input fields are defined
     if st.button("Generate Lesson Plan"):
         prompt_parts = [
