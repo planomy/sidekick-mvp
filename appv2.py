@@ -649,11 +649,14 @@ def eald_worksheet():
                 temperature=0.7
             )
         display_output_block(worksheet_output)
+
+         # Remove any asterisks or hashes from the output (to match the other export styles)
+        cleaned_output = re.sub(r'[\*\#]', '', worksheet_output)
         
         # Create a Word export button for the generated worksheet.
         word_buffer = export_to_word(worksheet_output, "EALD_worksheet.docx")
         st.download_button(
-            label="Download Worksheet as Word",
+            label="📝 Download Worksheet as Word",
             data=word_buffer,
             file_name="EALD_worksheet.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
