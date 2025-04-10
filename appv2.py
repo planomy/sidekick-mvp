@@ -370,7 +370,7 @@ def worksheet_generator():
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
-                f"Write an information passage of about {passage_length} words. Then generate {num_questions} short answer questions (including inferential questions) for students based on the passage. "
+                f"Write an information passage of about {passage_length} words. Then generate {num_questions} short answer questions (make sure to include 2 inferential questions) for students based on the passage. "
                 "Do not remove any words or create blanks. After the questions, include an 'Answer Key:' section with the correct answers."
             )
             with st.spinner("Generating cloze worksheet..."):
@@ -419,7 +419,7 @@ def worksheet_generator():
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
-                f"Generate a worksheet containing {num_questions} short answer questions (including inferential questions) for students. The accompanying passage should be approximately {passage_length} words. "
+                f"Generate a worksheet containing {num_questions} short answer questions (make sure to include 2 inferential questions) for students. The accompanying passage should be approximately {passage_length} words. "
                 "List all the questions first, then at the bottom provide the corresponding answers."
             )
             with st.spinner("Generating worksheet..."):
