@@ -15,8 +15,8 @@ import random
 import re
 
   # New: Download as PowerPoint Slides (Multiple Slides Version)
-        from pptx import Presentation
-        from pptx.util import Inches, Pt
+from pptx import Presentation
+from pptx.util import Inches, Pt
 
 
 def create_cloze(passage: str, num_blanks: int = 5):
