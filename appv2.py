@@ -632,7 +632,7 @@ def eald_worksheet():
             "- Ask: 'What do these words mean?'\n"
             "- Ask: 'Write a sentence for each of these words.'\n"
             "4. Word Scramble:\n"
-            "- scramble the letters in each topic-related word for the students to figure what each word is.\n"
+            "- scramble the letters in each topic-related word for the students to figure what each word is. Do not repeat the topic-related words.\n"
             "5. Open-ended Questions:\n"
             "- Write 5 simple, topic-related open-ended questions.\n"
             "- Each question should be followed by 2 blank lines for answers.\n\n"
