@@ -253,7 +253,7 @@ if tool == "Lesson Builder":
         ppt_buffer.seek(0)
         
         st.download_button(
-            label="📊 Download PowerPoint",
+            label="📊 Download Lesson PowerPoint",
             data=ppt_buffer,
             file_name="lesson_plan.pptx",
             mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
