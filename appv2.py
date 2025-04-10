@@ -610,38 +610,35 @@ def eald_worksheet():
     english_level = st.text_input("English Proficiency Level", placeholder="e.g., Beginner, Intermediate, Advanced")
     
     if st.button("Generate Worksheet"):
-        # Build the prompt using teacher inputs
+        # Assemble the detailed prompt with the new modifications.
         prompt = (
             f"For a Grade {grade} student studying {subject}, create a one-page EALD worksheet on the topic \"{topic}\". "
             f"The student speaks {language} and is at a {english_level} level of English proficiency.\n\n"
-            "The worksheet should include these six activities in the order listed below. Keep layout simple and clean for easy printing.\n\n"
-            "Cloze Passage with 8 Questions:\n"
+            "The worksheet should include these six activities in the order listed below. Keep the layout simple and clean for easy printing.\n\n"
+            "1. Cloze Passage with 8 Questions:\n"
             "- Write a 120–150 word paragraph about the topic.\n"
             "- Remove 6 key words to create blanks.\n"
             "- After the passage, write 8 open-ended comprehension questions.\n"
             "- Leave 1 blank line under each question for the student to write their answer.\n\n"
-            "Sentence Starters:\n"
+            "2. Sentence Starters:\n"
             "- Provide 5 topic-related sentence starters.\n"
             "- Each starter should be followed by 1 blank line for the student to complete the sentence.\n"
             "- Tailor the difficulty based on the student's English proficiency level.\n\n"
-            "Vocabulary Activity:\n"
+            "3. Vocabulary Activity:\n"
             "- List 10 topic-related words.\n"
-            "- Next to each, add a distractor word (similar but incorrect).\n"
-            "- Instruction: Circle the correct word.\n"
-            "- Underneath, provide the correct word with a translation into {language}.\n\n"
-            "Mini Wordfind:\n"
-            "- Create a 6x6 or 8x8 word grid.\n"
+            "- For each word, ask: 'What do these words mean?'\n"
+            "- Underneath, provide the correct meaning with a translation into {language}.\n\n"
+            "4. Mini Wordfind:\n"
+            "- Create a 6x6 or 8x8 letter grid (a matrix of letters).\n"
             "- Hide 6–8 of the vocabulary words in the grid.\n"
-            "- Include a simple instruction: \"Find these words: [list].\"\n\n"
-            "General Knowledge Questions:\n"
+            "- Include an instruction: 'Find these words: [list].'\n\n"
+            "5. General Knowledge Questions:\n"
             "- Write 5 simple, topic-related general knowledge questions.\n"
-            "- Each followed by 2 blank lines for answers.\n\n"
-            "Picture-Based Task (text-only):\n"
-            "- Describe a labelled diagram or matching image activity in words. "
-            "For example, match each part of a plant with its function.\n"
-            "- Provide the list of terms and matching descriptions.\n\n"
-            "Return the full worksheet in plain text formatting, ready for copy-paste or Word export. "
-            "Keep the layout classroom-ready."
+            "- Each question should be followed by 2 blank lines for answers.\n\n"
+            "6. Picture-Based Task (text-only):\n"
+            "- Provide instructions: 'Draw a picture showing the words below.'\n"
+            "- List the vocabulary words (from the Vocabulary Activity) that the student should illustrate.\n\n"
+            "Return the full worksheet in plain text formatting, ready for copy-paste or export to Word. Keep the layout classroom-ready."
         )
         
         with st.spinner("Generating EALD worksheet..."):
@@ -652,7 +649,8 @@ def eald_worksheet():
                 temperature=0.7
             )
         display_output_block(worksheet_output)
-        # After displaying the generated worksheet
+        
+        # Create a Word export button for the generated worksheet.
         word_buffer = export_to_word(worksheet_output, "EALD_worksheet.docx")
         st.download_button(
             label="Download Worksheet as Word",
