@@ -636,7 +636,7 @@ def eald_worksheet():
             "- Write 5 simple, topic-related general knowledge questions.\n"
             "- Each question should be followed by 2 blank lines for answers.\n\n"
             "6. Picture-Based Task (text-only):\n"
-            "- Provide instructions: 'Draw a picture showing the words below.'\n"
+            "- Provide instructions: 'Draw a picture showing the 5 words below.'\n"
             "- List the vocabulary words (from the Vocabulary Activity) that the student should illustrate.\n\n"
             "Return the full worksheet in plain text formatting, ready for copy-paste or export to Word. Keep the layout classroom-ready."
         )
