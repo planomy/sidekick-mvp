@@ -51,7 +51,7 @@ if not client.api_key:
 # --- SIDEBAR: TOOL SELECTION ---
 st.sidebar.title("SIDEKICK")
 st.sidebar.markdown(
-    "<p style='font-size: 10px; margin-top: -10px;'>Nic Comino 2025✨</p>",
+    "<p style='font-size: 10px; margin-top: -10px;'>by Nic Comino 2025✨</p>",
     unsafe_allow_html=True
 )
 tool = st.sidebar.radio(
