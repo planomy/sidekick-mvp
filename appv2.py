@@ -591,7 +591,7 @@ def magic_tool():
             "\n\nPlease format the response with clear headings and bullet points for each list."
         )
         
-        with st.spinner("Generating Magic Tool ideas..."):
+        with st.spinner("Sprinkling fairy dust now..."):
             magic_output = chat_completion_request(
                 system_msg="You are a creative and resourceful teacher assistant generating innovative classroom ideas.",
                 user_msg=magic_prompt,
