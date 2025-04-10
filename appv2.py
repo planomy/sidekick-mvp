@@ -546,24 +546,53 @@ def magic_tool():
     st.header("✨ The Magic Tool")
     grade = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject (e.g. English, Science)", placeholder="Enter subject here")
+    
+    # Allow the user to choose which magic tool elements they want generated
+    selected_options = st.multiselect(
+        "Select the Magic Tool elements you want to generate:",
+        [
+            "Differentiation/Extension Ideas",
+            "Creative Lesson Starters",
+            "Icebreakers",
+            "Socratic Starters",
+            "Quick Classroom Management Tips"
+        ]
+    )
+    
     if st.button("Generate Magic Ideas"):
-        # Build the prompt for generating the four idea lists
+        if not selected_options:
+            st.error("Please select at least one magic tool element.")
+            return
+        
+        # Build the prompt sections based on the teacher's selection.
+        prompt_sections = []
+        if "Differentiation/Extension Ideas" in selected_options:
+            prompt_sections.append("10 Differentiation/Extension Ideas – scaffolded by ability, task, or outcome")
+        if "Creative Lesson Starters" in selected_options:
+            prompt_sections.append("10 Creative Lesson Starters – including simulations, roleplays, odd scenarios, and debates")
+        if "Icebreakers" in selected_options:
+            prompt_sections.append("10 Icebreakers – tailored by grade level and subject")
+        if "Socratic Starters" in selected_options:
+            prompt_sections.append("10 Socratic Starters – deep-question prompts to stretch thinking")
+        if "Quick Classroom Management Tips" in selected_options:
+            prompt_sections.append("10 Quick Classroom Management Tips – strategies for smooth transitions and effective behavior management")
+        
+        # Compose a consolidated prompt.
         magic_prompt = (
-            f"For a Grade {grade} {subject} class, generate four lists:\n"
-            "1. 10 Differentiation/Extension Ideas – scaffolded by ability, task, or outcome\n"
-            "2. 10 Creative Lesson Starters – including simulations, roleplays, odd scenarios, and debates\n"
-            "3. 10 Icebreakers – tailored by grade level and subject\n"
-            "4. 10 Socratic Starters – deep-question prompts to stretch thinking\n"
-            "Please format the response with clear headings and bullet points for each list."
+            f"For a Grade {grade} {subject} class, generate the following list(s):\n" +
+            "\n".join(f"{i+1}. {section}" for i, section in enumerate(prompt_sections)) +
+            "\n\nPlease format the response with clear headings and bullet points for each list."
         )
-        with st.spinner("Boil, boil, toil and trouble..."):
+        
+        with st.spinner("Generating Magic Tool ideas..."):
             magic_output = chat_completion_request(
-                system_msg="You are a creative, resourceful teacher assistant with a knack for brainstorming innovative ideas.",
+                system_msg="You are a creative and resourceful teacher assistant generating innovative classroom ideas.",
                 user_msg=magic_prompt,
                 max_tokens=1000,
                 temperature=0.7
             )
         display_output_block(magic_output)
+
 
 
 # ----------------------- MAIN APPLICATION -----------------------
