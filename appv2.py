@@ -601,6 +601,68 @@ def magic_tool():
         display_output_block(magic_output)
 
 
+def eald_worksheet():
+    st.header("📝 EALD Worksheet Generator")
+    grade = st.text_input("Grade Level", placeholder="Enter grade level (e.g., 7)")
+    subject = st.text_input("Subject", placeholder="Enter subject (e.g., English)")
+    topic = st.text_input("Topic", placeholder="Enter worksheet topic")
+    language = st.text_input("Student's Primary Language", placeholder="Enter language spoken by the student")
+    english_level = st.text_input("English Proficiency Level", placeholder="e.g., Beginner, Intermediate, Advanced")
+    
+    if st.button("Generate Worksheet"):
+        # Build the prompt using teacher inputs
+        prompt = (
+            f"For a Grade {grade} student studying {subject}, create a one-page EALD worksheet on the topic \"{topic}\". "
+            f"The student speaks {language} and is at a {english_level} level of English proficiency.\n\n"
+            "The worksheet should include these six activities in the order listed below. Keep layout simple and clean for easy printing.\n\n"
+            "Cloze Passage with 8 Questions:\n"
+            "- Write a 120–150 word paragraph about the topic.\n"
+            "- Remove 6 key words to create blanks.\n"
+            "- After the passage, write 8 open-ended comprehension questions.\n"
+            "- Leave 1 blank line under each question for the student to write their answer.\n\n"
+            "Sentence Starters:\n"
+            "- Provide 5 topic-related sentence starters.\n"
+            "- Each starter should be followed by 1 blank line for the student to complete the sentence.\n"
+            "- Tailor the difficulty based on the student's English proficiency level.\n\n"
+            "Vocabulary Activity:\n"
+            "- List 10 topic-related words.\n"
+            "- Next to each, add a distractor word (similar but incorrect).\n"
+            "- Instruction: Circle the correct word.\n"
+            "- Underneath, provide the correct word with a translation into {language}.\n\n"
+            "Mini Wordfind:\n"
+            "- Create a 6x6 or 8x8 word grid.\n"
+            "- Hide 6–8 of the vocabulary words in the grid.\n"
+            "- Include a simple instruction: \"Find these words: [list].\"\n\n"
+            "General Knowledge Questions:\n"
+            "- Write 5 simple, topic-related general knowledge questions.\n"
+            "- Each followed by 2 blank lines for answers.\n\n"
+            "Picture-Based Task (text-only):\n"
+            "- Describe a labelled diagram or matching image activity in words. "
+            "For example, match each part of a plant with its function.\n"
+            "- Provide the list of terms and matching descriptions.\n\n"
+            "Return the full worksheet in plain text formatting, ready for copy-paste or Word export. "
+            "Keep the layout classroom-ready."
+        )
+        
+        with st.spinner("Generating EALD worksheet..."):
+            worksheet_output = chat_completion_request(
+                system_msg="You are a creative teacher assistant generating a classroom-ready EALD worksheet.",
+                user_msg=prompt,
+                max_tokens=1500,
+                temperature=0.7
+            )
+        display_output_block(worksheet_output)
+        # After displaying the generated worksheet
+        word_buffer = export_to_word(worksheet_output, "EALD_worksheet.docx")
+        st.download_button(
+            label="Download Worksheet as Word",
+            data=word_buffer,
+            file_name="EALD_worksheet.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+
+
+
 
 
 # ----------------------- MAIN APPLICATION -----------------------
@@ -617,9 +679,9 @@ def main():
     tool = st.sidebar.radio(
         "Choose a tool:",
         [
-            "Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator",
+            "Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator", "EALD Worksheet Generator",
             "Test Creator", "Email Assistant", "Video Assistant", "Feedback Assistant",
-            "Self Care Tool", "Feeling Peckish", "The Magic Tool"
+            "Self Care Tool", "Feeling Peckish", "The Magic Tool" 
         ]
     )
     # Generate a teacher boost (if not already done)
@@ -664,6 +726,8 @@ def main():
         test_creator()
     elif tool == "The Magic Tool":
         magic_tool()
+    elif tool == "EALD Worksheet Generator":
+        eald_worksheet()
     else:
         st.info("Select a tool from the sidebar to get started.")
 
