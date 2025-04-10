@@ -195,15 +195,15 @@ if tool == "Lesson Builder":
             )
 
 
-            # Display generated resources (if any)
-    st.markdown("## 📚 Suggested Resources")
-    if resources:
-        for i, (context, resource) in enumerate(resources, 1):
-            st.markdown(f"**{i}. From lesson plan:** _{context}_")
-            display_output_block(resource)
-    else:
-        st.info("No resource suggestions found in this plan.")
-    
+                # Display generated resources (if any)
+        st.markdown("## 📚 Suggested Resources")
+        if resources:
+            for i, (context, resource) in enumerate(resources, 1):
+                st.markdown(f"**{i}. From lesson plan:** _{context}_")
+                display_output_block(resource)
+        else:
+            st.info("No resource suggestions found in this plan.")
+        
 
 
         # After displaying the lesson plan:
