@@ -50,7 +50,10 @@ if not client.api_key:
 
 # --- SIDEBAR: TOOL SELECTION ---
 st.sidebar.title("SIDEKICK")
-st.sidebar.title("Kicking goals like a champ✨")
+st.sidebar.markdown(
+    "<p style='font-size: 10px; margin-top: -10px;'>Nic Comino 2025✨</p>",
+    unsafe_allow_html=True
+)
 tool = st.sidebar.radio(
     "Choose a tool:",
     ["Lesson Builder", "Unit Planner", "Unit Glossary Generator", "Worksheet Generator", "Test Creator", "Email Assistant", "Video Assistant", "Feedback Assistant", "Self Care Tool", "Feeling Peckish"]
