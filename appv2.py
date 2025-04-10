@@ -617,7 +617,9 @@ def eald_worksheet():
             "The worksheet should include these six activities in the order listed below. Keep the layout simple and clean for easy printing.\n\n"
             "1. Cloze Passage with 8 Questions:\n"
             "- Write a 120–150 word paragraph about the topic.\n"
-            "- You must remove 6 key words to create blanks and list them under the passage in ranbdom order so the student has to figure where each goes.\n"
+            "- You must remove 6 key words to create blanks"
+            "- List the removed words (in random order) below the passage.\n"
+            "- Do not include these instructions or labels; only output the completed worksheet text."
             "- After the passage, write 8 open-ended comprehension questions.\n"
             "- Leave 1 blank line under each question for the student to write their answer.\n\n"
             "2. Sentence Starters:\n"
@@ -638,6 +640,7 @@ def eald_worksheet():
             "6. Picture-Based Task (text-only):\n"
             "- Provide instructions: 'Draw a picture showing the 5 words below.'\n"
             "- List the vocabulary words (from the Vocabulary Activity) that the student should illustrate.\n\n"
+            "Provide ONLY the final worksheet text that a teacher would print out. Do NOT include any enumerations or backstory from the prompt."
             "Return the full worksheet in plain text formatting, ready for copy-paste or export to Word. Keep the layout classroom-ready."
         )
         
