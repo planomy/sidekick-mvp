@@ -15,7 +15,25 @@ import random
 import re
 
 def create_cloze(passage: str, num_blanks: int = 5):
-    stopwords = {"the", "a", "an", "and", "or", "in", "on", "of", "to", "for", "with", "from", "at", "by", "as", "that"}
+    stopwords = {
+    'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're",
+    "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he',
+    'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's",
+    'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which',
+    'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was',
+    'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did',
+    'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while',
+    'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through',
+    'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out',
+    'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when',
+    'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some',
+    'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't',
+    'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o',
+    're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn',
+    "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma',
+    'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn',
+    "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"
+}
     
     words = re.findall(r'\b\w+\b', passage)
     candidates = [w for w in set(words) if w.lower() not in stopwords and len(w) > 3]
@@ -113,7 +131,9 @@ if tool == "Lesson Builder":
     lesson_style = st.selectbox("Lesson Style", ["Quiet/Reflective", "Discussion-Based", "Hands on", "Creative"])
     assessment = st.selectbox("Assessment Format", ["No Assessment", "Exit Slip", "Short Response", "Group Presentation", "Quiz"])
     differentiation = st.multiselect("Include Differentiation for:", ["Support", "Extension", "ESL", "Neurodiverse"])
+    generate_materials = st.checkbox("Generate suggested resources (e.g. handouts, worksheets)")
 
+    
     # After your input fields are defined
     if st.button("Generate Lesson Plan"):
         prompt_parts = [
@@ -128,6 +148,8 @@ if tool == "Lesson Builder":
             prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
         if assessment != "No Assessment":
             prompt_parts.append(f"End each lesson with a {assessment.lower()} as an assessment.")
+        if generate_materials:
+            prompt_parts.append("If you mention any resources (like handouts, worksheets, activities), include the full text or link to each.")
         if include_curriculum:
             prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
 
@@ -152,6 +174,34 @@ if tool == "Lesson Builder":
                 """,
                 unsafe_allow_html=True
             )
+
+        # --- RESOURCE GENERATION ---
+    resource_keywords = ["worksheet", "handout", "comprehension task", "activity sheet", "vocab list"]
+    matched_lines = [line for line in lesson_plan.split("\n") if any(word in line.lower() for word in resource_keywords)]
+    
+    resources = []
+    if generate_resources and matched_lines:
+        for line in matched_lines:
+            followup_prompt = f"Create the following student resource as described in the lesson: '{line.strip()}'. It should be suitable for Year {year} students and printable. Include questions or tasks and an answer key if relevant."
+    
+            resource_text = chat_completion_request(
+                system_msg="You are a practical and creative teacher who writes printable classroom resources.",
+                user_msg=followup_prompt,
+                max_tokens=700,
+                temperature=0.7
+        )
+        resources.append((line.strip(), resource_text))
+
+
+            # Display generated resources (if any)
+    st.markdown("## 📚 Suggested Resources")
+    if resources:
+        for i, (context, resource) in enumerate(resources, 1):
+            st.markdown(f"**{i}. From lesson plan:** _{context}_")
+            display_output_block(resource)
+    else:
+        st.info("No resource suggestions found in this plan.")
+    
 
 
         # After displaying the lesson plan:
