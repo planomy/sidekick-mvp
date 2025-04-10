@@ -17,18 +17,15 @@ from fpdf import FPDF
 from pptx import Presentation
 from pptx.util import Inches, Pt
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # ----------------------- CONFIGURATION -----------------------
 st.set_page_config(page_title="Super Teacher V2", layout="wide")
 
 # ----------------------- HELPER FUNCTIONS -----------------------
 def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0.7):
-    """
-    Helper to call GPT-3.5-turbo with system and user messages.
-    """
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_msg},
