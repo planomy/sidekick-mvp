@@ -357,7 +357,7 @@ def unit_planner():
 
 def worksheet_generator():
     st.header("📝 Worksheet Generator")
-    year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
+    year = st.text_input("Grade Level (e.g. 7  This produces a passage of text with questions)", placeholder="Enter grade level here")
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
     passage_length = st.slider("Desired word count for the passage (50-200)", min_value=50, max_value=200, value=100, step=10)
@@ -370,7 +370,7 @@ def worksheet_generator():
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
-                f"Write an information passage of about {passage_length} words. Then generate {num_questions} short answer questions for students based on the passage. "
+                f"Write an information passage of about {passage_length} words. Then generate {num_questions} short answer questions (including inferential questions) for students based on the passage. "
                 "Do not remove any words or create blanks. After the questions, include an 'Answer Key:' section with the correct answers."
             )
             with st.spinner("Generating cloze worksheet..."):
@@ -419,7 +419,7 @@ def worksheet_generator():
             worksheet_prompt = (
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
-                f"Generate a worksheet containing {num_questions} short answer questions for students. The accompanying passage should be approximately {passage_length} words. "
+                f"Generate a worksheet containing {num_questions} short answer questions (including inferential questions) for students. The accompanying passage should be approximately {passage_length} words. "
                 "List all the questions first, then at the bottom provide the corresponding answers."
             )
             with st.spinner("Generating worksheet..."):
