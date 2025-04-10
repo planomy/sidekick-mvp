@@ -357,7 +357,7 @@ def unit_planner():
 
 def worksheet_generator():
     st.header("📝 Worksheet Generator")
-    year = st.text_input("Grade Level (e.g. 7  This produces a passage of text with questions)", placeholder="Enter grade level here")
+    year = st.text_input("Grade Level (e.g. 7)  This produces a passage of text with questions", placeholder="Enter grade level here")
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
     passage_length = st.slider("Desired word count for the passage (50-200)", min_value=50, max_value=200, value=100, step=10)
