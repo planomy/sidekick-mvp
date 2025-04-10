@@ -134,7 +134,7 @@ if tool == "Lesson Builder":
     generate_resources = st.checkbox("Generate suggested resources (e.g. handouts, worksheets)")
 
 
-    resources = []
+    
     # After your input fields are defined
     if st.button("Generate Lesson Plan"):
         prompt_parts = [
@@ -144,6 +144,8 @@ if tool == "Lesson Builder":
             f"The lesson should use {', '.join(device_use).lower()}. Students should work in {grouping.lower()}.",
             f"Use a {lesson_style.lower()} approach."
         ]
+
+        resources = []
       
         if differentiation:
             prompt_parts.append("Include differentiation strategies for: " + ", ".join(differentiation) + ".")
