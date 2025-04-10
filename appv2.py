@@ -38,11 +38,11 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
             max_tokens=max_tokens,
             temperature=temperature
         )
-return response.choices[0].message.content.strip()
-
+        return response.choices[0].message.content.strip()  # ✅ Now correctly inside try block
     except Exception as e:
         st.error(f"Error during API call: {e}")
         return ""
+
 
 def display_output_block(text):
     """
