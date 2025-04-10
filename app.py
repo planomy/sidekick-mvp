@@ -11,9 +11,6 @@ import random
 st.set_page_config(page_title="Super Teacher", layout="wide")
 
 
-import random
-import re
-
   # New: Download as PowerPoint Slides (Multiple Slides Version)
 from pptx import Presentation
 from pptx.util import Inches, Pt
