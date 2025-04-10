@@ -17,7 +17,7 @@ from fpdf import FPDF
 from pptx import Presentation
 from pptx.util import Inches, Pt
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # ----------------------- CONFIGURATION -----------------------
