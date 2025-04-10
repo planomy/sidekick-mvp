@@ -161,6 +161,25 @@ if tool == "Lesson Builder":
                 user_msg=full_prompt,
                 max_tokens=1200
             )
+
+                    # --- RESOURCE GENERATION ---
+        resource_keywords = ["worksheet", "handout", "comprehension task", "activity sheet", "vocab list"]
+        matched_lines = [line for line in lesson_plan.split("\n") if any(word in line.lower() for word in resource_keywords)]
+        
+        resources = []
+        if generate_resources and matched_lines:
+            for line in matched_lines:
+                followup_prompt = f"Create the following student resource as described in the lesson: '{line.strip()}'. It should be suitable for Year {year} students and printable. Include questions or tasks and an answer key if relevant."
+        
+                resource_text = chat_completion_request(
+                    system_msg="You are a practical and creative teacher who writes printable classroom resources.",
+                    user_msg=followup_prompt,
+                    max_tokens=700,
+                    temperature=0.7
+            )
+            resources.append((line.strip(), resource_text))
+
+        
             formatted_plan = lesson_plan.replace("* ", "• ")
             formatted_plan = re.sub(r"^#+\s*(.+)$", r"<br><b>\1</b>", formatted_plan, flags=re.MULTILINE)
             html_plan = formatted_plan.replace("\n", "<br>")
@@ -174,23 +193,6 @@ if tool == "Lesson Builder":
                 """,
                 unsafe_allow_html=True
             )
-
-        # --- RESOURCE GENERATION ---
-    resource_keywords = ["worksheet", "handout", "comprehension task", "activity sheet", "vocab list"]
-    matched_lines = [line for line in lesson_plan.split("\n") if any(word in line.lower() for word in resource_keywords)]
-    
-    resources = []
-    if generate_resources and matched_lines:
-        for line in matched_lines:
-            followup_prompt = f"Create the following student resource as described in the lesson: '{line.strip()}'. It should be suitable for Year {year} students and printable. Include questions or tasks and an answer key if relevant."
-    
-            resource_text = chat_completion_request(
-                system_msg="You are a practical and creative teacher who writes printable classroom resources.",
-                user_msg=followup_prompt,
-                max_tokens=700,
-                temperature=0.7
-        )
-        resources.append((line.strip(), resource_text))
 
 
             # Display generated resources (if any)
