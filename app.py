@@ -260,6 +260,27 @@ if tool == "Lesson Builder":
         )
 
 
+        # Only add this if resources exist
+        if resources:
+            # Combine all resources into a single document
+            doc = Document()
+            for i, (context, resource) in enumerate(resources, 1):
+                doc.add_heading(f"Resource {i}: {context}", level=2)
+                doc.add_paragraph(resource)
+        
+            # Save to buffer
+            resource_buffer = BytesIO()
+            doc.save(resource_buffer)
+            resource_buffer.seek(0)
+        
+            st.download_button(
+                label="📥 Download Resources (Word)",
+                data=resource_buffer,
+                file_name="lesson_resources.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+
 # ========== TOOL 2: FEEDBACK ASSISTANT ==========
 elif tool == "Feedback Assistant":
     st.header("🧠 Feedback Assistant")
