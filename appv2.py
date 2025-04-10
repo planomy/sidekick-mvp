@@ -575,9 +575,10 @@ def main():
                 temperature=0.9
             )
     st.sidebar.markdown(
-    f"<p style='font-size:12px; font-style:italic;'>{st.session_state['teacher_boost']}</p>",
+    f"<p style='font-size:11px; font-style:italic; margin-top:50px;'>{st.session_state['teacher_boost']}</p>",
     unsafe_allow_html=True
     )
+
 
     # Call the selected tool
     if tool == "Lesson Builder":
