@@ -17,7 +17,7 @@ from fpdf import FPDF
 from pptx import Presentation
 from pptx.util import Inches, Pt
 
-client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # ----------------------- CONFIGURATION -----------------------
 st.set_page_config(page_title="Super Teacher V2", layout="wide")
