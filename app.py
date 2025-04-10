@@ -97,14 +97,7 @@ def display_output_block(text):
 
 # ========== TOOL 1: LESSON BUILDER ==========
 if tool == "Lesson Builder":
-    st.markdown(
-    """
-    <h1 style='font-size: 2.25rem; font-weight: 600; margin-bottom: 1rem;
-               font-family: "Segoe UI", sans-serif;'>📝 Lesson Builder</h1>
-    """,
-    unsafe_allow_html=True
-)
-
+    st.markdown("### 📝 Lesson Builder")
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject (e.g. English, Science)")
     topic = st.text_input("Lesson Topic")
