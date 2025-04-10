@@ -546,16 +546,19 @@ def magic_tool():
     st.header("✨ The Magic Tool")
     grade = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
     subject = st.text_input("Subject (e.g. English, Science)", placeholder="Enter subject here")
+    topic = st.text_input("Topic", placeholder="Enter the topic/lesson focus here")
     
-    # Allow the user to choose which magic tool elements they want generated
+    # Allow the teacher to choose which magic tool elements to generate.
     selected_options = st.multiselect(
         "Select the Magic Tool elements you want to generate:",
         [
-            "Differentiation/Extension Ideas",
+            "Differentiation Ideas",
+            "Extension Ideas",
             "Creative Lesson Starters",
             "Icebreakers",
             "Socratic Starters",
-            "Quick Classroom Management Tips"
+            "Quick Classroom Management Tips",
+            "Tech Integration Ideas"
         ]
     )
     
@@ -564,22 +567,26 @@ def magic_tool():
             st.error("Please select at least one magic tool element.")
             return
         
-        # Build the prompt sections based on the teacher's selection.
+        # Build prompt sections based on the teacher's selection.
         prompt_sections = []
-        if "Differentiation/Extension Ideas" in selected_options:
-            prompt_sections.append("10 Differentiation/Extension Ideas – scaffolded by ability, task, or outcome")
+        if "Differentiation Ideas" in selected_options:
+            prompt_sections.append("10 Differentiation Ideas – strategies tailored to student learning styles and abilities")
+        if "Extension Ideas" in selected_options:
+            prompt_sections.append("10 Extension Ideas – activities that challenge advanced learners and extend content")
         if "Creative Lesson Starters" in selected_options:
             prompt_sections.append("10 Creative Lesson Starters – including simulations, roleplays, odd scenarios, and debates")
         if "Icebreakers" in selected_options:
-            prompt_sections.append("10 Icebreakers – tailored by grade level and subject")
+            prompt_sections.append("10 Icebreakers – tailored by grade level and subject to foster a welcoming environment")
         if "Socratic Starters" in selected_options:
             prompt_sections.append("10 Socratic Starters – deep-question prompts to stretch thinking")
         if "Quick Classroom Management Tips" in selected_options:
             prompt_sections.append("10 Quick Classroom Management Tips – strategies for smooth transitions and effective behavior management")
+        if "Tech Integration Ideas" in selected_options:
+            prompt_sections.append("10 Tech Integration Ideas – suggestions for using digital tools and platforms to enhance learning")
         
-        # Compose a consolidated prompt.
+        # Compose the final prompt, including the new "topic" input.
         magic_prompt = (
-            f"For a Grade {grade} {subject} class, generate the following list(s):\n" +
+            f"For a Grade {grade} {subject} class covering the topic '{topic}', please generate the following list(s):\n" +
             "\n".join(f"{i+1}. {section}" for i, section in enumerate(prompt_sections)) +
             "\n\nPlease format the response with clear headings and bullet points for each list."
         )
@@ -592,6 +599,7 @@ def magic_tool():
                 temperature=0.7
             )
         display_output_block(magic_output)
+
 
 
 
