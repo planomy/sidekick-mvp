@@ -28,8 +28,7 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
     Helper to call GPT-3.5-turbo with system and user messages.
     """
     try:
-        client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_msg},
@@ -38,7 +37,7 @@ def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0
             max_tokens=max_tokens,
             temperature=temperature
         )
-        return response.choices[0].message.content.strip()  # ✅ Now correctly inside try block
+        return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(f"Error during API call: {e}")
         return ""
