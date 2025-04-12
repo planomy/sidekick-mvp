@@ -231,7 +231,7 @@ def lesson_builder():
             " class on '" + topic + "', please list 3 to 5 relevant websites or "
             "online resources that teachers could refer to for additional ideas, "
             "further reading, or supplementary materials. For each website, "
-            "include a brief description of what it offers. "
+            "include the url and a brief description of what it offers. "
             "Return the list formatted as bullet points, with no extra instructions."
         )
         with st.spinner("Fetching additional resources..."):
