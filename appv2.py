@@ -25,14 +25,13 @@ st.set_page_config(page_title="Super Teacher V2", layout="wide")
 
 # ----------------------- HELPER FUNCTIONS -----------------------
 def chat_completion_request(system_msg, user_msg, max_tokens=1000, temperature=0.7):
-    """
-    Helper to call GPT-3.5-turbo with system and user messages.
-    """
+    # Append the Australian spelling/terminology directive to every system message.
+    au_system_msg = system_msg + "\nPlease use Australian spelling and terminology."
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": system_msg},
+                {"role": "system", "content": au_system_msg},
                 {"role": "user", "content": user_msg}
             ],
             max_tokens=max_tokens,
