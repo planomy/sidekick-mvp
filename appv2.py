@@ -516,7 +516,7 @@ def video_assistant():
 def test_creator():
     st.header("🧪 Test Creator")
     year = st.text_input("Grade Level (e.g. 7)", placeholder="Enter grade level here")
-    subject = st.text_input("Subject", placeholder="e.g. English, Science, HASS")
+    subject = st.text_input("Subject", placeholder="e.g. English, Science, HASS or Mathematics")
     topic = st.text_input("Topic", placeholder="e.g. Fractions, Ancient Rome, Persuasive Texts")
     num_tf = st.number_input("Number of True/False Questions (Max 20)", min_value=0, max_value=20, value=3, step=1)
     num_mcq = st.number_input("Number of Multiple Choice Questions (Max 20)", min_value=0, max_value=20, value=3, step=1)
@@ -527,24 +527,48 @@ def test_creator():
     include_answers = st.checkbox("Generate an answer sheet?", value=True)
     total_qs = num_tf + num_mcq + num_sa + num_er
 
+    # Determine if this is a Mathematics test.
+    is_maths = "math" in subject.lower()
+
     if st.button("Generate Test"):
-        test_prompt = (
-            f"Create a test with {total_qs} questions for Year {year} students on the topic '{topic}' in {subject}.\n"
-        )
-        if mix_difficulty:
-            test_prompt += "Mix easy, medium, and hard questions.\n"
-        if include_instructions:
-            test_prompt += "Include clear test instructions at the top.\n"
-        if include_answers:
-            test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
-        test_prompt += (
-            f"- {num_tf} True/False questions\n"
-            f"- {num_mcq} Multiple Choice questions\n"
-            f"- {num_sa} Short Answer questions (3–5 sentence responses)\n"
-            f"- {num_er} Extended Response questions (at least 10 sentences)\n"
-            "IMPORTANT: Group the questions by type, number them sequentially, and add 'Student Name:___________________' at the top. "
-            "End the test with the phrase: 'End of Test'."
-        )
+        if is_maths:
+            test_prompt = (
+                f"Create a mathematics test with {total_qs} questions for Year {year} students on the topic '{topic}'.\n"
+                "Generate typical mathematics questions such as arithmetic, algebra, geometry, or other relevant math problems. "
+                "Ensure that the questions require calculations and include space for students to show their working or calculations. "
+            )
+            if mix_difficulty:
+                test_prompt += "Mix easy, medium, and hard math problems.\n"
+            if include_instructions:
+                test_prompt += "Include clear instructions at the top of the test.\n"
+            if include_answers:
+                test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers and brief solution outlines.\n"
+            test_prompt += (
+                f"- {num_tf} True/False questions (e.g. simple arithmetic or factual math questions)\n"
+                f"- {num_mcq} Multiple Choice questions (with calculations or problem-solving choices)\n"
+                f"- {num_sa} Short Response questions (requiring brief calculations or explanations)\n"
+                f"- {num_er} Extended Response questions (requiring detailed problem solving and step-by-step explanations, at least 10 sentences)\n"
+                "IMPORTANT: Group the questions by type, number them sequentially, and add 'Student Name:___________________' at the top. "
+                "End the test with the phrase: 'End of Test'."
+            )
+        else:
+            test_prompt = (
+                f"Create a test with {total_qs} questions for Year {year} students on the topic '{topic}' in {subject}.\n"
+            )
+            if mix_difficulty:
+                test_prompt += "Mix easy, medium, and hard questions.\n"
+            if include_instructions:
+                test_prompt += "Include clear test instructions at the top.\n"
+            if include_answers:
+                test_prompt += "After the test, include an 'Answer Sheet:' section with correct answers.\n"
+            test_prompt += (
+                f"- {num_tf} True/False questions\n"
+                f"- {num_mcq} Multiple Choice questions\n"
+                f"- {num_sa} Short Answer questions (3–5 sentence responses)\n"
+                f"- {num_er} Extended Response questions (at least 10 sentences)\n"
+                "IMPORTANT: Group the questions by type, number them sequentially, and add 'Student Name:___________________' at the top. "
+                "End the test with the phrase: 'End of Test'."
+            )
         with st.spinner("Generating test..."):
             test_output = chat_completion_request(
                 system_msg="You are an expert teacher creating clear, printable classroom tests.",
@@ -561,6 +585,7 @@ def test_creator():
             file_name="test.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
+
 
 def magic_tool():
     st.header("✨ The Magic Tool")
