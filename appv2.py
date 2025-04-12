@@ -224,6 +224,26 @@ def lesson_builder():
             """,
             unsafe_allow_html=True
         )
+
+        # --- New Block: Generate additional reference websites ---
+        reference_prompt = (
+            "Based on the lesson plan above for a Year " + year + " " + subject +
+            " class on '" + topic + "', please list 3 to 5 relevant websites or "
+            "online resources that teachers could refer to for additional ideas, "
+            "further reading, or supplementary materials. For each website, "
+            "include a brief description of what it offers. "
+            "Return the list formatted as bullet points, with no extra instructions."
+        )
+        with st.spinner("Fetching additional resources..."):
+            references = chat_completion_request(
+                system_msg="You are a helpful teacher assistant familiar with educational websites and online teaching resources.",
+                user_msg=reference_prompt,
+                max_tokens=300,
+                temperature=0.7
+            )
+        st.markdown("<h3>Additional Resources for Teachers:</h3>", unsafe_allow_html=True)
+        st.markdown(references)
+                
         # Export Options - PowerPoint
         ppt_buffer = export_to_ppt(lesson_plan)
         st.download_button(
