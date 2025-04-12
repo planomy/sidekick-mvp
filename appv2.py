@@ -534,8 +534,9 @@ def test_creator():
         if is_maths:
             test_prompt = (
                 f"Create a mathematics test with {total_qs} questions for Year {year} students on the topic '{topic}'.\n"
-                "Generate typical mathematics questions such as arithmetic, algebra, geometry, or other relevant math problems. "
-                "Ensure that the questions require calculations and include space for students to show their working or calculations. "
+                "Generate typical mathematics questions including both problem-solving and drill-type questions. "
+                "Drill questions should be short and focus on basic arithmetic operations, multiplication tables, fractions, and other foundational skills. "
+                "Ensure that space is provided for students to show their calculations and working out.\n"
             )
             if mix_difficulty:
                 test_prompt += "Mix easy, medium, and hard math problems.\n"
