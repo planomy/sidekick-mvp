@@ -390,6 +390,7 @@ def worksheet_generator():
                 f"Based on the following learning goal or lesson plan excerpt for Year {year}:\n\n"
                 f"{learning_goal}\n\n"
                 f"Write an information passage of about {passage_length} words. Then generate {num_questions} short answer questions (make sure to include 2 inferential questions) for students based on the passage. "
+                f"Check the required length of words has been generated."
                 "Do not remove any words or create blanks. After the questions, include an 'Answer Key:' section with the correct answers."
             )
             with st.spinner("Generating cloze worksheet..."):
