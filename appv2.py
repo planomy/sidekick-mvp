@@ -379,7 +379,7 @@ def worksheet_generator():
     year = st.text_input("Grade Level (e.g. 7)  This produces a passage of text with questions", placeholder="Enter grade level here")
     learning_goal = st.text_area("Enter a learning goal or paste a lesson plan excerpt", height=200)
     num_questions = st.slider("Number of questions", min_value=3, max_value=15, value=5, step=1)
-    passage_length = st.slider("Desired word count for the passage (50-200)", min_value=50, max_value=200, value=100, step=10)
+    passage_length = st.slider("Desired word count for the passage (50-300)", min_value=50, max_value=300, value=100, step=25)
     cloze_activity = st.checkbox("Make the passage a cloze activity (fill-in-the-blank worksheet)")
     if cloze_activity:
         num_blanks = st.slider("Number of words to remove", min_value=5, max_value=20, value=10, step=1)
