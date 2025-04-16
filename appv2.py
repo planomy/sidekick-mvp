@@ -168,7 +168,8 @@ def lesson_builder():
     differentiation = st.multiselect("Include Differentiation for:", 
                                      ["Support", "Extension", "ESL", "Neurodiverse"])
     generate_resources = st.checkbox("Generate suggested resources (e.g. handouts, worksheets)")
-
+    include_brain_break = st.checkbox("Include a 5-minute Brain Break activity?", value=False)
+    
     if st.button("Generate Lesson Plan"):
         prompt_parts = [
             f"Create {lesson_count} lesson(s), each {duration} minutes long, for a Year {year} {subject} class on '{topic}'.",
@@ -185,6 +186,13 @@ def lesson_builder():
             prompt_parts.append("If you mention any resources (like handouts, worksheets, activities), include the full text or link to each.")
         if include_curriculum:
             prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
+        if include_brain_break:
+            prompt_parts.append(
+            "Include a Brain Break Activity: Provide a quick, engaging 5-minute activity that allows students to reset. "
+            "This activity may involve physical movement, mental relaxation, creative play, or simple fun exercises. "
+            "Ensure the activity is classroom-friendly and requires minimal preparation."
+        )
+        
         full_prompt = " ".join(prompt_parts)
         with st.spinner("Planning your lesson(s)..."):
             lesson_plan = chat_completion_request(
