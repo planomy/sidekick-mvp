@@ -188,9 +188,9 @@ def lesson_builder():
             prompt_parts.append("Align the lesson with the Australian V9 curriculum.")
         if include_brain_break:
             prompt_parts.append(
-            "Include a Brain Break Activity: Provide a quick, engaging 5-minute activity that allows students to reset. "
+            "Include a Brain Break Activity: Provide a quick, engaging, non-contextual, 5-minute activity that allows students to reset. "
             "This activity may involve physical movement, mental relaxation, creative play, or simple fun exercises. "
-            "Ensure the activity is classroom-friendly and requires minimal preparation."
+            "Ensure the activity is classroom-friendly, non-contextual to the lesson, and requires minimal preparation. Do not make it about the lesson content."
         )
         
         full_prompt = " ".join(prompt_parts)
