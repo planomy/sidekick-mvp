@@ -9,10 +9,10 @@ from datetime import datetime
 st.set_page_config(page_title="Student Assignment Planner", layout="wide")
 
 # ----------------------- HELPER FUNCTIONS -----------------------
-subst = """
-Wrapper for OpenAI chat completion with Australian spelling directive.
-"""
 def chat_completion_request(system_msg: str, user_msg: str, max_tokens: int = 1200, temperature: float = 0.7) -> str:
+    """
+    Wrapper for OpenAI chat completion with Australian spelling directive.
+    """
     au_system = system_msg + "\nPlease use Australian spelling and terminology."
     try:
         response = openai.ChatCompletion.create(
@@ -104,7 +104,6 @@ def assignment_input():
             "Historical/Cultural context",
             "Authorial intention"
         ]
-        # default core elements
         default_elements = element_options[:5]
         paragraph_elements = st.multiselect(
             "Select paragraph elements:",
@@ -121,12 +120,9 @@ def assignment_input():
                 f" due {due_date.strftime('%d %B %Y')} with a total of {total_words} words.",
                 "1. Generate a concise, analytical thesis statement for this assignment.",
                 "2. Provide an outline: Introduction, 3 body paragraphs, and a Conclusion.",
-                "3. For each body paragraph corresponding to the selected points, include: "
+                "3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: "
                 + ", ".join(paragraph_elements) + ".",
-            ]
-            for idx, pt in enumerate(selected_points, 1):
-                prompt_parts.append(f"   {idx}. {pt}")
-            prompt_parts += [
+                *[f"   {idx}. {pt}" for idx, pt in enumerate(selected_points, 1)],
                 "4. Suggest a word budget: 10% for Introduction, 80% divided equally among the 3 body paragraphs, 10% for Conclusion.",
                 "5. At the end, provide a 100-word summary of the key content a student must know to start this assignment."
             ]
