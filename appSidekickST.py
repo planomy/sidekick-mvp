@@ -15,7 +15,7 @@ def chat_completion_request(system_msg: str, user_msg: str, max_tokens: int = 12
     """
     au_system = system_msg + "\nPlease use Australian spelling and terminology."
     try:
-        resp = openai.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": au_system},
@@ -24,7 +24,7 @@ def chat_completion_request(system_msg: str, user_msg: str, max_tokens: int = 12
             max_tokens=max_tokens,
             temperature=temperature
         )
-        return resp.choices[0].message.content.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(f"API call error: {e}")
         return ""
