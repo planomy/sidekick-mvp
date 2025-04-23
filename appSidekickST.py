@@ -78,7 +78,7 @@ def assignment_input():
             points = [p.strip().lstrip('0123456789. ') for p in response.split("\n") if p.strip()]
             st.session_state['candidate_points'] = points
 
-    # Display and select main points (no defaults)
+    # Display and select main points
     candidate_points = st.session_state.get('candidate_points', [])
     if candidate_points:
         st.markdown("**Select up to 3 main points for your plan:**")
@@ -115,23 +115,35 @@ def assignment_input():
 
         # Step 2: Generate detailed plan
         if st.button("2️⃣ Generate Detailed Plan"):
+            num_paras = len(selected_points)
+            if num_paras == 0:
+                st.error("Please select at least one main point before generating the plan.")
+                return
+            # Dynamic outline text
+            outline_text = f"Introduction, {num_paras} body paragraph{'s' if num_paras>1 else ''}, and a Conclusion"
             prompt_parts = [
                 f"Create a world-class plan for a {assignment_type.lower()} titled '{title}' in {subject},"
                 f" due {due_date.strftime('%d %B %Y')} with a total of {total_words} words.",
                 "1. Generate a concise, analytical thesis statement for this assignment.",
-                "2. Provide an outline: Introduction, 3 body paragraphs, and a Conclusion.",
-                "3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: "
-                + ", ".join(paragraph_elements) + ".",
-                *[f"   {idx}. {pt}" for idx, pt in enumerate(selected_points, 1)],
-                "4. Suggest a word budget: 10% for Introduction, 80% divided equally among the 3 body paragraphs, 10% for Conclusion.",
-                "5. At the end, provide a 100-word summary of the key content a student must know to start this assignment."
+                f"2. Provide an outline: {outline_text}.",
+                f"3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: "
+                + ", ".join(paragraph_elements) + "."
             ]
+            # Add each selected point
+            for idx, pt in enumerate(selected_points, 1):
+                prompt_parts.append(f"   {idx}. {pt}")
+            # Word budget guidance
+            prompt_parts.append(
+                f"4. Suggest a word budget: 10% for Introduction, 80% divided equally among the {num_paras} body paragraphs, 10% for Conclusion."
+            )
+            prompt_parts.append(
+                "5. At the end, provide a 100-word summary of the key content a student must know to start this assignment."
+            )
             if extra:
                 prompt_parts.append(f"Extra rubric notes: {extra}")
             full_prompt = "\n".join(prompt_parts)
             with st.spinner("Generating detailed plan..."):
                 plan = chat_completion_request("You are an expert student assistant.", full_prompt, max_tokens=1500)
-            plan = plan.replace("**", "")
             display_output_block(plan)
             buf = export_to_word(plan)
             st.download_button(
