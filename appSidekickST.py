@@ -131,6 +131,7 @@ def assignment_input():
             full_prompt = "\n".join(prompt_parts)
             with st.spinner("Generating detailed plan..."):
                 plan = chat_completion_request("You are an expert student assistant.", full_prompt, max_tokens=1500)
+            plan = plan.replace("**", "")
             display_output_block(plan)
             buf = export_to_word(plan)
             st.download_button(
