@@ -53,7 +53,7 @@ def export_to_word(text: str) -> BytesIO:
 # ----------------------- ASSIGNMENT PLANNER MODULE -----------------------
 def assignment_input():
     st.header("📌 Assignment Details")
-    year_level = st.selectbox("Year Level", ["4", "5", "6", "7", "8", "9", "10", "11", "12"], key="year_level")
+    year_level = st.selectbox("Year Level", ["7", "8", "9", "10", "11", "12"], key="year_level")
     subject = st.text_input("Subject (e.g. English, History)", key="subject")
     title = st.text_input("Assignment Title", key="title")
     due_date = st.date_input("Due Date", key="due_date")
@@ -121,6 +121,18 @@ def assignment_input():
                 st.error("Please select at least one main point before generating the plan.")
                 return
             outline_text = f"Introduction, {num_paras} body paragraph{'s' if num_paras > 1 else ''}, and a Conclusion"
+            # Calculate precise word budget
+            intro_words = int(total_words * 0.1)
+            conclusion_words = int(total_words * 0.1)
+            body_total = total_words - intro_words - conclusion_words
+            body_each = int(body_total / num_paras)
+            word_budget_text = (
+                f"Suggested Word Budget:\n"
+                f"- Introduction: {intro_words} words\n"
+                f"- Body Paragraphs (each): {body_each} words\n"
+                f"- Conclusion: {conclusion_words} words"
+            )
+
             prompt_parts = [
                 f"Create a world-class plan for a Year {year_level} student completing a {assignment_type.lower()} in {subject}, titled '{title}'.",
                 f"The due date is {due_date.strftime('%d %B %Y')} and the word count is {total_words}.",
@@ -130,12 +142,9 @@ def assignment_input():
             ]
             for idx, pt in enumerate(selected_points, 1):
                 prompt_parts.append(f"   {idx}. {pt}")
-            prompt_parts.append(
-                f"4. Suggest a word budget: 10% for Introduction, 80% divided equally among the {num_paras} body paragraphs, 10% for Conclusion."
-            )
-            prompt_parts.append(
-                "5. At the end, provide a 100-word summary of the key content a student must know to start this assignment."
-            )
+            prompt_parts.append("4. Use this word budget:")
+            prompt_parts.append(word_budget_text)
+            prompt_parts.append("5. At the end, provide a 100-word summary of the key content a student must know to start this assignment.")
             if criteria_notes:
                 prompt_parts.append(f"6. Use this marking criteria information when building the plan: {criteria_notes}")
             full_prompt = "\n".join(prompt_parts)
