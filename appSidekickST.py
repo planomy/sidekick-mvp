@@ -138,7 +138,8 @@ def assignment_input():
                 f"The due date is {due_date.strftime('%d %B %Y')} and the word count is {total_words}.",
                 f"1. Generate a clear, analytical thesis statement suitable for a Year {year_level} student.",
                 f"2. Provide an outline: {outline_text}.",
-                f"3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: " + ", ".join(paragraph_elements) + "."
+                f"3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: " + ", ".join(paragraph_elements) + ". " +
+                "Include a transition sentence ONLY after body paragraph 2 and body paragraph 3 if they exist."
             ]
             for idx, pt in enumerate(selected_points, 1):
                 prompt_parts.append(f"   {idx}. {pt}")
