@@ -53,7 +53,7 @@ def export_to_word(text: str) -> BytesIO:
 # ----------------------- ASSIGNMENT PLANNER MODULE -----------------------
 def assignment_input():
     st.header("📌 Assignment Details")
-    year_level = st.selectbox("Year Level", ["7", "8", "9", "10", "11", "12"], key="year_level")
+    year_level = st.selectbox("Year Level", ["4", "5", "6", "7", "8", "9", "10", "11", "12"], key="year_level")
     subject = st.text_input("Subject (e.g. English, History)", key="subject")
     title = st.text_input("Assignment Title", key="title")
     due_date = st.date_input("Due Date", key="due_date")
