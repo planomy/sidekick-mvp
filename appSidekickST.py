@@ -53,6 +53,7 @@ def export_to_word(text: str) -> BytesIO:
 # ----------------------- ASSIGNMENT PLANNER MODULE -----------------------
 def assignment_input():
     st.header("📌 Assignment Details")
+    year_level = st.selectbox("Year Level", ["7", "8", "9", "10", "11", "12"], key="year_level")
     subject = st.text_input("Subject (e.g. English, History)", key="subject")
     title = st.text_input("Assignment Title", key="title")
     due_date = st.date_input("Due Date", key="due_date")
@@ -62,7 +63,7 @@ def assignment_input():
         ["Essay", "Report", "Narrative", "Presentation", "Reflection"],
         key="assignment_type"
     )
-    extra = st.text_area("Additional Requirements / Rubric Notes", key="extra")
+    criteria_notes = st.text_area("Additional Requirements / Marking Criteria Notes", key="extra")
 
     # Step 1: Generate candidate main points
     if st.button("1️⃣ Generate Main Points"):
@@ -71,7 +72,7 @@ def assignment_input():
         else:
             prompt = (
                 f"Generate six concise, distinct main points for a {assignment_type.lower()} titled '{title}' in {subject}. "
-                f"The assignment is due on {due_date.strftime('%d %B %Y')} and requires {total_words} words. Return each point as a single sentence."
+                f"This is a Year {year_level} task. The assignment is due on {due_date.strftime('%d %B %Y')} and requires {total_words} words. Return each point as a single sentence."
             )
             with st.spinner("Generating main points..."):
                 response = chat_completion_request("You are a helpful student assistant.", prompt)
@@ -119,28 +120,24 @@ def assignment_input():
             if num_paras == 0:
                 st.error("Please select at least one main point before generating the plan.")
                 return
-            # Dynamic outline text
-            outline_text = f"Introduction, {num_paras} body paragraph{'s' if num_paras>1 else ''}, and a Conclusion"
+            outline_text = f"Introduction, {num_paras} body paragraph{'s' if num_paras > 1 else ''}, and a Conclusion"
             prompt_parts = [
-                f"Create a world-class plan for a {assignment_type.lower()} titled '{title}' in {subject},"
-                f" due {due_date.strftime('%d %B %Y')} with a total of {total_words} words.",
-                "1. Generate a concise, analytical thesis statement for this assignment.",
+                f"Create a world-class plan for a Year {year_level} student completing a {assignment_type.lower()} in {subject}, titled '{title}'.",
+                f"The due date is {due_date.strftime('%d %B %Y')} and the word count is {total_words}.",
+                f"1. Generate a clear, analytical thesis statement suitable for a Year {year_level} student.",
                 f"2. Provide an outline: {outline_text}.",
-                f"3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: "
-                + ", ".join(paragraph_elements) + "."
+                f"3. For each body paragraph corresponding to the selected points, include the following elements in this exact order: " + ", ".join(paragraph_elements) + "."
             ]
-            # Add each selected point
             for idx, pt in enumerate(selected_points, 1):
                 prompt_parts.append(f"   {idx}. {pt}")
-            # Word budget guidance
             prompt_parts.append(
                 f"4. Suggest a word budget: 10% for Introduction, 80% divided equally among the {num_paras} body paragraphs, 10% for Conclusion."
             )
             prompt_parts.append(
                 "5. At the end, provide a 100-word summary of the key content a student must know to start this assignment."
             )
-            if extra:
-                prompt_parts.append(f"Extra rubric notes: {extra}")
+            if criteria_notes:
+                prompt_parts.append(f"6. Use this marking criteria information when building the plan: {criteria_notes}")
             full_prompt = "\n".join(prompt_parts)
             with st.spinner("Generating detailed plan..."):
                 plan = chat_completion_request("You are an expert student assistant.", full_prompt, max_tokens=1500)
